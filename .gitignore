@@ -85,3 +85,12 @@ hs_err_pid*
 
 
 # End of https://www.gitignore.io/api/java,eclipse
+
+
+# Created by https://www.gitignore.io/api/svn
+
+### SVN ###
+.svn/
+
+
+# End of https://www.gitignore.io/api/svn
