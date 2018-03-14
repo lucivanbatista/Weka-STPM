@@ -1,0 +1,14 @@
+/BinaryParser.class
+/BinaryWriter.class
+/ByteGetter$BinaryByteGetter.class
+/ByteGetter$StringByteGetter.class
+/ByteGetter.class
+/ByteSetter$BinaryByteSetter.class
+/ByteSetter$StringByteSetter.class
+/ByteSetter.class
+/ValueGetter$NDR.class
+/ValueGetter$XDR.class
+/ValueGetter.class
+/ValueSetter$NDR.class
+/ValueSetter$XDR.class
+/ValueSetter.class

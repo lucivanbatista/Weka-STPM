@@ -45,8 +45,7 @@ public class TrajectoryMethods {
         return pointsCopy;
     }
     
-    private static void slowestNeighborhood(Vector<GPSPoint> points, SetOfPoints seeds,
-    		double speedLimit, long minTimeMilliseconds) {
+    private static void slowestNeighborhood(Vector<GPSPoint> points, SetOfPoints seeds, double speedLimit, long minTimeMilliseconds) {
         GPSPoint leftPoint;
         GPSPoint rightPoint;
         do {
@@ -90,8 +89,7 @@ public class TrajectoryMethods {
         } while (seeds.duration() < minTimeMilliseconds);
     }
     
-    private static GPSPoint addSlowerNeighborToSeeds(Vector<GPSPoint> points,
-    		SetOfPoints seeds) {
+    private static GPSPoint addSlowerNeighborToSeeds(Vector<GPSPoint> points, SetOfPoints seeds) {
         GPSPoint leftPoint;
         GPSPoint rightPoint;
         try {
@@ -116,8 +114,7 @@ public class TrajectoryMethods {
         }
     }
     
-    private static boolean limitedNeighborhood(Vector<GPSPoint> points, GPSPoint point,
-    		int clusterId, double avgSpeed, long minTimeMilliseconds, double speedLimit) {
+    private static boolean limitedNeighborhood(Vector<GPSPoint> points, GPSPoint point, int clusterId, double avgSpeed, long minTimeMilliseconds, double speedLimit) {
         if (point.speed > speedLimit) {
             return false;
         }
@@ -204,10 +201,15 @@ public class TrajectoryMethods {
         return clustrs;
     }
     
-    public static Vector<ClusterPoints> speedClustering(Trajectory t,
-    		double avgFactor, long minTimeMilli, double speedLimitFactor) {
+    public static Vector<ClusterPoints> speedClustering(Trajectory t,double avgFactor, long minTimeMilli, double speedLimitFactor) {
     	Vector<GPSPoint> points = t.points;
+    	System.out.println("t.meanSpeed:" + t.meanSpeed());
+    	// avgSpeedOfTrajectory OU meanSpeed - Distancia de todos os pontos somados e depois dividido pela diferença do primeiro e ultimo
+    	// avgFactor - MaxAvgSpeed
+    	// speedLimitFactor - MaxSpeed
     	double avgSpeedOfTrajectory = t.meanSpeed();
+    	System.out.println("avgSpeedOfTrajectory * avgFactor:" + avgSpeedOfTrajectory * avgFactor);
+    	System.out.println("avgSpeedOfTrajectory * speedLimitFactor:" + avgSpeedOfTrajectory * speedLimitFactor);
     	double avgSpeed = avgSpeedOfTrajectory * avgFactor; //0.9 and 1.1 are pretty generic
     	double speedLimit = avgSpeedOfTrajectory * speedLimitFactor;
     	
@@ -236,7 +238,6 @@ public class TrajectoryMethods {
      * @param conf			User configurations. 
      */    
     public static Vector<ClusterPoints> speedClustering(Trajectory t, double avgFactor, long minTimeMili, double SLFactor,Config conf) {
-        
     	clusterID = -1;
     	//load the trajectory and reset clusterID
         Vector<GPSPoint> array = t.points;
@@ -554,7 +555,7 @@ public class TrajectoryMethods {
 	 * @throws SQLException		If any table didn't exist in the BD, or a field.
 	 */    
     public static void smot(boolean bufferChecked, int bufferValue, Config config,Trajectory traj, String targetFeature, AssociatedParameter[] relevantFeatures, boolean featureType) throws SQLException {
-        org.postgis.PGgeometry geom;
+    	org.postgis.PGgeometry geom;
         String campos = config.tid + "," + config.time;
         
         for (AssociatedParameter rf: relevantFeatures) {
@@ -891,7 +892,6 @@ public class TrajectoryMethods {
     
     public static void stopsDiscoveryFaster(boolean bufferChecked, double bufferValue,Vector<ClusterPoints> clusters, Config config,
 		long minTimeMilis,boolean featureType,InterceptsG intercepts,int SRID,boolean DB){
-		
 		int stopid=-1;
 		boolean first=true; // the flag first-point in the stop. When the stop is opened, the flag go down.	    
 	    Vector<GPSPoint> array;
@@ -1001,6 +1001,7 @@ public class TrajectoryMethods {
 		    	s1 = conn.createStatement();	
 		        Object obj = list.elementAt(i);
 		        if (obj.getClass() == Stop.class) {
+//		        	System.out.println("TESTE 1");
 		            Stop stop = (Stop) obj;
 		            String stopName = featureType ? stop.tableName : (stop.gid + "_" + stop.tableName);
 		            sql = "INSERT INTO "+TrajectoryFrame.getCurrentNameTableStop()+" (tid,stopid,start_time,end_time,stop_gid,stop_name,the_geom,rf,avg) VALUES "+
@@ -1008,18 +1009,22 @@ public class TrajectoryMethods {
 		            stopId++;
 		            flag=false;
 		        }else if (obj.getClass() == Unknown.class) {
+//		        	System.out.println("TESTE 2");
 		            Unknown unk = (Unknown) obj;
 		            int tid = unk.pontos.firstElement().tid;
 		            if(unk.pontos.size()>=4){//to prevent the_geom null, nb: added by yipeng 080115
+//		            	System.out.println("TESTE 3");
 		            	String query = "select stop_name from "+TrajectoryFrame.getCurrentNameTableStop()+" where rf='unknown' AND ST_Intersects(the_geom,"+unk.toSQL(buffer)+");";
 		            	ResultSet rs = s1.executeQuery(query);
 		            	if(rs.next()){
+//		            		System.out.println("TESTE 4");
 		            		//joining same unknowns...
 		            		//System.out.println("aqui");
 		            		sql = "INSERT INTO "+TrajectoryFrame.getCurrentNameTableStop()+" (tid,stopid,start_time,end_time,stop_gid,stop_name,the_geom,rf,avg) VALUES "+
 		            		"("+tid+","+stopId+",'"+unk.enterTime.toString()+"','"+unk.leaveTime.toString()+"',"+stopId+",'"+rs.getString("stop_name")+"',"+unk.toSQL(buffer)+",'unknown',"+unk.avgSpeed()+")";
 		            	}
 		            	else {//or creating another
+//		            		System.out.println("TESTE 5");
 		            		sql = "INSERT INTO "+TrajectoryFrame.getCurrentNameTableStop()+" (tid,stopid,start_time,end_time,stop_gid,stop_name,the_geom,rf,avg) VALUES "+
 		            		"("+tid+","+stopId+",'"+unk.enterTime.toString()+"','"+unk.leaveTime.toString()+"',"+stopId+",'"+nextUnknown()+"_unknown',"+unk.toSQL(buffer)+",'unknown',"+unk.avgSpeed()+")";
 		            	}
@@ -1030,10 +1035,10 @@ public class TrajectoryMethods {
 		        }
 		        
 		        if(!flag){//teste pra saber se executa ou nao a query
-		        	System.out.print("Stop "+i+" saving... ");
-		        	System.out.println(sql);
+//		        	System.out.print("Stop "+i+" saving... ");
+//		        	System.out.println(sql);
 		        	s.execute(sql);
-		        	System.out.println("Saved");
+//		        	System.out.println("Saved");
 		        }
 	    	}catch(Exception e){
 	    		System.out.println(e.getMessage());
@@ -1053,7 +1058,7 @@ public class TrajectoryMethods {
 	 * But I'm not entirely sure of the author's intention and the code isn't called anyway. 
 	 * 
 	 */
-	public static void saveClusters(Trajectory traj, Config config, long minTimeMilis) throws SQLException {	
+	public static void saveClusters(Trajectory traj, Config config, long minTimeMilis) throws SQLException {
 		Statement s = config.conn.createStatement();
 		Vector<ClusterPoints> array = traj.generateClusterPoints(minTimeMilis);	
 
@@ -1091,13 +1096,10 @@ public class TrajectoryMethods {
 	 */
 	
 	
-	public static void smot2(boolean bufferChecked, Double buffer, Config config,Trajectory t,
-		boolean featureType,InterceptsG intercepts) 
-		throws SQLException {
-		
+	public static void smot2(boolean bufferChecked, Double buffer, Config config,Trajectory t,boolean featureType,InterceptsG intercepts)throws SQLException {
 		int i,j,gidaux,serial_gid=0;	
 		org.postgis.PGgeometry geom /*= new PGgeometry()*/;
-		Statement s=config.conn.createStatement();	
+		Statement s=config.conn.createStatement();
 		String sql = "select "+config.tid+",gid,"+config.time+",the_geom from "+config.table+" where "+config.tid+"="+t.tid+" order by time;";
 		System.out.println("Aplying method smot...\n"+sql);
 		ResultSet rs = s.executeQuery(sql);
