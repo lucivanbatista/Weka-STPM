@@ -109,20 +109,25 @@ public class TrajectoryFrame extends JDialog{
     /**Buffer variable*/
     private Double buffer=50.0;	// variable buffer, initialized
     
+    private SMOT smot_run = new SMOT();
+    private CBSMOT cb_run = new CBSMOT();
+    
     /*    public TrajectoryFrame(){    	
     	this.setTitle("Trajectory");    	
         init();
     	initComponents();    	
     }    */
     
-    public TrajectoryFrame(String user, String pass, String url) {        
+    // Construtor da interface TrajectoryFrame
+    public TrajectoryFrame(String user, String pass, String url) {
+    	System.out.println("AQUI 1 : Construtor da interface TrajectoryFrame");
     	this.setTitle("Trajectory");    	
-    	init();
-        initComponents();
+    	init(); // Algoritmos
+        initComponents(); // Interface gráfica
     	try {
             
-    		loadPropertiesFromFile(user, pass, url);
-            loadSchemas();
+    		loadPropertiesFromFile(user, pass, url); // Conexão Banco
+            loadSchemas(); // Schemas
             jComboBoxMethodItemStateChanged(null);
             /*            config.conn = conn;
             config.tid = "tid";
@@ -134,7 +139,9 @@ public class TrajectoryFrame extends JDialog{
         }	
     }
     
+    // Inicio da Conexão com o Banco de Dados
     private void loadPropertiesFromFile(String userFromInput, String passFromInput, String urlFromInput) throws SQLException {
+    	System.out.println("AQUI 2 : Conexão com o Banco de Dados");
     	Properties prop = new Properties();
     	InputStream input = null;
 
@@ -175,9 +182,10 @@ public class TrajectoryFrame extends JDialog{
 
     }
     
-    /**Load the tables in the DB with geometry columns
-     */
+    /**Load the tables in the DB with geometry columns*/
+    // Carregar os Schemas do Banco que possuem columas geometricas
     private void loadSchemas() {
+    	System.out.println("AQUI 3 : Schemas do Banco");
         try {
             Statement smnt = conn.createStatement();
             ResultSet rs = smnt.executeQuery("SELECT DISTINCT f_table_schema FROM geometry_columns");
@@ -190,83 +198,22 @@ public class TrajectoryFrame extends JDialog{
         }		
     }
     
-    private void init() {        
+    // Define Algoritmos do IB E CB
+    private void init() {  
+    	System.out.println("AQUI 4 : Define Algoritmos IB e CB");
     	algs = new Method[2];
-        int i=0;
+        int i = 0;
 
-        /**SMOT:
+        /** SMOT:
  		* Original method used to find stops, given a list of RFs.
  		*/
-        algs[i] = new Method() {
-        	public void run2(Trajectory t, InterceptsG in, String targetFeature) throws SQLException {
-        		//TrajectoryMethods.smot(jCheckBoxBuffer.isSelected(), buffer, config, t, targetFeature, relevantFeatures, featureType);
-        	}
-        	public void run(Trajectory t,InterceptsG in,String targetFeature,InterceptsG streets) throws SQLException, IOException {
-                java.util.Date ini = new java.util.Date();
-                System.out.println("Processing trajectory "+t.tid);
-                TrajectoryMethods.smot2(jCheckBoxBuffer.isSelected(),buffer,config,t,
-                		jRadioButtonFType.isSelected(),in);
-                
-                java.util.Date fim = new java.util.Date();
-                java.util.Date tempo = new java.util.Date(fim.getTime()-ini.getTime());
-                System.out.println("\tProcessing time: "+tempo.getTime()+" ms");
-            }
-            public String toString() {
-                    return "SMoT";
-            }                   
-        };
+        algs[i] = smot_run;                   
+//        algs[i] = new SMOT(buffer, config);
         
-        /**CB-SMOT:
+        /** CB-SMOT:
          * Used to clusterize and find slow-speed periods in a trajectory.        
          */
-        algs[++i] = new Method() {
-        	public void run2(Trajectory t, InterceptsG in, String targetFeature)
-			throws SQLException{}
-            public void run(Trajectory t,InterceptsG in,String targetFeature,InterceptsG streets) throws SQLException {
-                //load the Parameter Vector of the method class
-            	Parameter avg = (Parameter) param.elementAt(0);
-                Parameter minTime = (Parameter) param.elementAt(1);
-                Parameter speedLimit = (Parameter) param.elementAt(2);
-                
-                double SL = ((Double) speedLimit.value).doubleValue();
-                int minTimeMili = ((Integer) minTime.value).intValue() * 1000;
-                        
-                java.util.Date ini = new java.util.Date();
-                
-                System.out.println("\t\tStarting Trajectory "+t.tid+"\n\t\tavg= "+((Double) avg.value).doubleValue()+" ;\n\t\tminTime= "+minTimeMili+" ;\n\t\tSL= "+SL+" ; ");
-
-                // the clustering method, which will use the points in 't'	
-                Vector<ClusterPoints> clusters = TrajectoryMethods.speedClustering(t,
-                        ((Double) avg.value).doubleValue(),
-                        minTimeMili,
-                        SL);                    
-                
-                java.util.Date fim = new java.util.Date();
-                java.util.Date tempo = new java.util.Date(fim.getTime()-ini.getTime());
-                System.out.println("Clusterization: " +tempo.getTime()+" ms");
-                
-                //starts to apply semantics...
-                ini = new java.util.Date();
-                if(jListRF.getMaxSelectionIndex()==-1){//not RF selected
-                	// save in the stops-table the clusters founded (as unknowns);
-                	NewTrajectoryMethods.saveStopsClusters(jCheckBoxBuffer.isSelected(),
-                			clusters,config,minTimeMili,
-                			buffer,t.getSRID(),false);
-                }
-                else{
-                	//or attribute semantic given a list of RFs
-	                TrajectoryMethods.stopsDiscoveryFaster(jCheckBoxBuffer.isSelected(),
-	                		buffer,clusters,config,minTimeMili,
-	                		jRadioButtonFType.isSelected(),in,table_srid,false);
-                }
-                fim = new java.util.Date();
-                tempo = new java.util.Date(fim.getTime()-ini.getTime());
-                System.out.println("Semantics Application: " +tempo.getTime()+" ms");
-            }
-            public String toString() {
-                return "CB-SMoT";
-            }
-    };
+        algs[++i] = cb_run;
         
         algs[i].param.add(
                         new Parameter("MaxAvgSpeed",Parameter.Type.DOUBLE,new Double(0.9))
@@ -279,8 +226,10 @@ public class TrajectoryFrame extends JDialog{
                         );                
     }
     
+    // TID dos taxistas e seus pontos
     private void loadTrajectories(String tableTraj) throws SQLException, IOException { 
-        Method method = (Method) jComboBoxMethod.getSelectedItem();
+    	System.out.println("AQUI 5 : Get TID dos taxistas e seus pontos ");
+    	Method method = (Method) jComboBoxMethod.getSelectedItem();
         InterceptsG i = null;
         InterceptsG streets = null;
         
@@ -309,6 +258,7 @@ public class TrajectoryFrame extends JDialog{
         indexTimeExists = rs0.next();
         s0a.close();
         //System.out.println(sql0a);
+        //Diferenciação dos métodos será aqui        
         if (!indexTimeExists){
         	System.out.println("Creating Index on " + config.tid );
         	Statement s0b = conn.createStatement(); 
@@ -319,34 +269,39 @@ public class TrajectoryFrame extends JDialog{
         	System.out.println("Tid index on " + config.table + " exists. Performance will be good." );
         }
         
-    	//for each trajectory...        
+    	//for each trajectory... (select que pega os tid dos taxistas e ordena de forma decrescente)        
         while (rs.next()) {
         	Trajectory trajectory = new Trajectory(table_srid);
             trajectory.tid = rs.getInt("tid");     
             String meth = method.toString();
-
+            
             if (!meth.startsWith("SMoT")) {
             	//select the points of the trajectory in sequential time
             	Statement s1 = conn.createStatement();                
             	String sql2 = "SELECT "+config.time+" as time,the_geom,gid FROM "+tableTraj+" WHERE "+config.tid+"="+trajectory.tid+" ORDER BY "+config.time;
             	//System.out.println(sql2);
 
+            	//Ordenação por tempo
                 ResultSet rs2 = s1.executeQuery(sql2);
                 //for each of these points of the trajectory...
                 int timeIndex = 0;
+                
+                // Informações de cada ponto sendo colocada em gps
                 while (rs2.next()) {
+                	
                     Timestamp t = rs2.getTimestamp("time");
                     org.postgis.PGgeometry geom = (org.postgis.PGgeometry) rs2.getObject("the_geom");
                     org.postgis.Point p = (org.postgis.Point) geom.getGeometry();
                     //get the time, the_geom and tid columns to fill the Vector
                     GPSPoint gps = new GPSPoint(trajectory.tid,t,p,timeIndex);
+                    
                     gps.gid = rs2.getInt("gid");
                     trajectory.points.addElement(gps);
                     timeIndex++;
                     /*System.out.println("gid: "+gps.gid+
                     		           " tid: "+gps.tid+
                     		           " time: "+gps.time+
-                		           	   " timeIndex: "+gps.getTimeIndex());*/
+                		           	   " timeIndex: "+gps.getTimeIndex());*/                    
                 }                
                 
                 //calculates the speed of each point, and then runs the method
@@ -366,23 +321,35 @@ public class TrajectoryFrame extends JDialog{
                             //FIXME: @Hercules. impressao sa velocidade.
                             Util.imprimeVelocidades(trajectory.points, speedFile, rs.isFirst());
                         }
-               		method.run(trajectory,i,tableTraj,streets);
-               	}
-               	else{
+                        // Run do CB
+                        
+                        cb_run.setInformations(buffer, config, jCheckBoxBuffer.isSelected(), jRadioButtonFType.isSelected(), table_srid, jListRF);
+                        cb_run.run(trajectory, i, tableTraj, streets);
+//                      method.run(trajectory,i,tableTraj,streets);
+               	}else{
                		System.out.println("Trajectory "+trajectory.tid+" has less than 5 points. It will be disconsidered.");
-               	}                
+               	}
+               	//BEGIN TEST by Lucivan Batista
+                System.out.println("--- INICIANDO TESTE ---");
+                System.out.println("mediaVelocidade: " + trajectory.meanSpeed() + "; mediaDistancia: " + trajectory.meanDist() + "; duracao: " + trajectory.duration());
+                //END TEST by Lucivan Batista
             }
             //just runs the method chosen, aplyed to one trajectory
             //also see init();
-            else method.run(trajectory,i,tableTraj,streets);
-
-
+            // Run do IB
+            else{
+            	smot_run.setInformations(buffer, config, jCheckBoxBuffer.isSelected(), jRadioButtonFType.isSelected());
+            	smot_run.run(trajectory, i, tableTraj, streets);
+//            	method.run(trajectory,i,tableTraj,streets);
+            }
+            
+            
         }        
         TrajectoryMethods.resetunknown();        
     }
 
     public static List<Trajectory> getTrajectoriesWithSpeeds(String tableTraj, Config config, Integer table_srid) throws SQLException, IOException {
-
+    	System.out.println("AQUI 6");
         List<Trajectory> trajectorys = new ArrayList<Trajectory>();
         Statement s = config.conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_UPDATABLE);
         // selects the trajectory-tid to be processed
@@ -430,9 +397,9 @@ public class TrajectoryFrame extends JDialog{
         return trajectorys;
     }
 
-
-    
+    // Criar tables
     private void createTables() throws SQLException {
+    	System.out.println("AQUI 7 : Criação das Tabelas");
         Statement s = conn.createStatement();
         Statement s1= conn.createStatement();        
         Double bufferValue = Double.valueOf(jTextFieldBuffer.getText());
@@ -551,7 +518,9 @@ public class TrajectoryFrame extends JDialog{
 
     }
 
-private InterceptsG createIntercepts() throws SQLException{
+    // Criação dos Intercepts com os Pontos de Interesse
+    private InterceptsG createIntercepts() throws SQLException{
+	System.out.println("AQUI 8 : Create Intercepts");
 	 	//get the RFs from panel...
     	Object[] objs = jListRF.getSelectedValues();                    
     	AssociatedParameter[] relevantFeatures = new AssociatedParameter[objs.length];                    
@@ -625,12 +594,14 @@ private InterceptsG createIntercepts() throws SQLException{
 // INTERFACE BEGINS
 //----------------------------------------------------------------------------------------------------------------    
     
-    private void initComponents(){
-    	//Mounts the layout
+	// Criação da Interface Gráfica
+	private void initComponents(){
+		System.out.println("AQUI 9 : Criação da Interface Gráfica");
+		//Mounts the layout
 		Container container = getContentPane();
-    	//JPanel container = new JPanel();
+		//JPanel container = new JPanel();
 		container.setLayout(new BorderLayout());
-		
+	
 		//PANEL LOAD SCHEMA
 		JPanel panelSchema = new JPanel();
 		panelSchema.setBorder(BorderFactory.createEtchedBorder());
@@ -639,310 +610,312 @@ private InterceptsG createIntercepts() throws SQLException{
 		jComboBoxSchema = new JComboBox();
 		jComboBoxSchema.setPreferredSize(new Dimension(150,22));
 		panelSchema.add(jComboBoxSchema,BorderLayout.CENTER);		
-		
+	
 		JButton Load = new javax.swing.JButton("Load");
 		Load.addActionListener(new java.awt.event.ActionListener(){
-		    public void actionPerformed(java.awt.event.ActionEvent evt) {
-                LoadActionPerformed(evt);
-            }});
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				LoadActionPerformed(evt);
+			}});
 		panelSchema.add(Load);
-				
+	
 		JButton configure = new javax.swing.JButton("Configure Trajectory Table");
 		configure.addActionListener(new java.awt.event.ActionListener(){
-		    public void actionPerformed(java.awt.event.ActionEvent evt) {
-                configureActionPerformed(evt);
-            }});
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				configureActionPerformed(evt);
+			}});
 		panelSchema.add(configure);
-
-		
+	
+	
 		//bruno
 		JButton show = new javax.swing.JButton("Visualization");
 		show.addActionListener(new java.awt.event.ActionListener(){
-
+	
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-			   showDadosGeograficos();
+				showDadosGeograficos();
 			}});
 		panelSchema.add(show);
 		//bruno
-		
-		
-//@Hercules
-JButton filter = new javax.swing.JButton("Trajectory cleaning");
-filter.addActionListener(new java.awt.event.ActionListener() {
-
-    public void actionPerformed(java.awt.event.ActionEvent evt) {
-        filterActionPerformed(evt);
-    }
-});
-panelSchema.add(filter);
-//HMA
+	
+	
+		//@Hercules
+		JButton filter = new javax.swing.JButton("Trajectory cleaning");
+		filter.addActionListener(new java.awt.event.ActionListener() {
+	
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				filterActionPerformed(evt);
+			}
+		});
+		panelSchema.add(filter);
+		//HMA
 		container.add(panelSchema,BorderLayout.NORTH);
-		
+	
 		//PANEL CONTENT
 		JPanel panelContent = new JPanel();
 		panelContent.setBorder(BorderFactory.createEtchedBorder());		
-		
+	
 		GridBagLayout gridbag = new GridBagLayout();
 		panelContent.setLayout(gridbag);
 		GridBagConstraints c = new GridBagConstraints();
-		
+	
 		c.fill = GridBagConstraints.BOTH; 			
 		c.insets = new Insets(5,10,5,10);
-		
-			//Config of trajectory Table
-			c.gridx=0;
-			c.gridy=0;			
-			JLabel jLabel1 = new javax.swing.JLabel("Trajectory Table: ");
-			panelContent.add(jLabel1,c);
-			
-			c.gridx=2;			
-			c.gridwidth=2;
-			c.weightx = 1.0;						
-			JScrollPane sc1 = new javax.swing.JScrollPane();
-			DefaultListModel modelsc = new DefaultListModel();
-			jListTrajectoryTables= new JList(modelsc);
-			jListTrajectoryTables.setVisibleRowCount(2);
-			jListTrajectoryTables.setFixedCellWidth(2);			
-			sc1.setViewportView(jListTrajectoryTables);
-			panelContent.add(sc1,c);
-			
-			c.gridx=0;
-			c.gridy=1;
-			c.gridwidth=5;
-			c.gridheight=1;
-			javax.swing.JButton jButtonConfig = new javax.swing.JButton("Trajectory Table Config...");
-			
-			
-			//Granularity Level-Panel Granularity
-			JPanel panelGranularity = new JPanel();
-			panelGranularity.setBorder(BorderFactory.createTitledBorder("Granularity Level"));
-			
-				jRadioButtonFType = new JRadioButton("Feature Type",false);
-				jRadioButtonFInstance = new JRadioButton("Feature Instance",true);
-				ButtonGroup group = new ButtonGroup();
-				group.add(jRadioButtonFType);
-				group.add(jRadioButtonFInstance);
-			
-    		panelGranularity.add(jRadioButtonFType);
-    		panelGranularity.add(jRadioButtonFInstance);
-			
-    		c.gridx=5;
-    		c.gridy=0;
-    		c.gridwidth=5;
-    		c.gridheight=3;
-			panelContent.add(panelGranularity,c);
-			
-			//Relevant Features
-			c.gridx=0;
-			c.gridy=1;
-			c.gridheight=2;
-			JLabel jLabel2 = new javax.swing.JLabel();
-			jLabel2.setText("Relevant Features");
-			panelContent.add(jLabel2,c);
-			
-			c.gridy=3;
-			c.gridwidth=3;
-			c.weightx = 1.0;			
-			JScrollPane jScrollPane1 = new javax.swing.JScrollPane();
-			DefaultListModel modelRF = new DefaultListModel();
-			jListRF= new JList(modelRF);
-			jListRF.setVisibleRowCount(4);
-			jListRF.setFixedCellWidth(4);
-			jListRF.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-	            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-	                jListRFValueChanged(evt);
-	            }
-	        });
-			jScrollPane1.setViewportView(jListRF);
-			panelContent.add(jScrollPane1,c);
-			validate();
-			
-			//Buffer
-	        JPanel bufPanel = new JPanel();
-	        bufPanel.setBorder(BorderFactory.createEtchedBorder());
-	        GridBagLayout gbag = new GridBagLayout();
-			bufPanel.setLayout(gbag);
-			GridBagConstraints c2 = new GridBagConstraints();
-			c2.insets = new Insets(5,5,5,5);
-			
-				c2.gridx=0;
-				c2.gridy=0;
-				jCheckBoxBuffer= new JCheckBox();
-				jCheckBoxBuffer.setSelected(true);
-		        jCheckBoxBuffer.setText("User Buffer (m):");		        
-		        bufPanel.add(jCheckBoxBuffer,c2); 
-				
-				c2.gridy=2;
-				c2.gridheight=2;				       
-				jTextFieldBuffer=new JTextField();
-				jTextFieldBuffer.setPreferredSize(new Dimension(60,20));
-				jTextFieldBuffer.setText("50.0");		        	        
-		        bufPanel.add(jTextFieldBuffer,c2);
-
-		    c.gridx=3;
-		    c.gridy=2;
-		    c.gridheight=2;
-		    c.gridwidth=2;
-		    panelContent.add(bufPanel,c);   
-			
-		    //MinTimeBox	     
-	        JPanel mtPanel = new JPanel();
-	        mtPanel.setBorder(BorderFactory.createEtchedBorder());
-	        gbag = new GridBagLayout();
-			mtPanel.setLayout(gbag);
-			c2 = new GridBagConstraints();
-	        
-		        c2.gridx=0;
-		        c2.gridy=0;
-		        JLabel jLabel3 = new javax.swing.JLabel("RF Min Time (sec): ");
-				mtPanel.add(jLabel3,c2);
-				
-				c2.gridx=0;
-				c2.gridy=1;
-				RFMinTime= new JTextField();
-				RFMinTime.setPreferredSize(new Dimension(40,20));
-				RFMinTime.setColumns(6);
-		        RFMinTime.addFocusListener(new java.awt.event.FocusAdapter() {
-		            public void focusLost(java.awt.event.FocusEvent evt) {//if 'tab' after entering RF mintime
-		                RFMinTimeFocusLost(evt);
-		            }
-		        });
-		        RFMinTime.addActionListener(// if 'enter' after entering RF mintime
-						new ActionListener() {
-							public void actionPerformed(ActionEvent e) {
-								RFMinTimeActionPerformed(e);
-							}
-						}
+	
+		//Config of trajectory Table
+		c.gridx=0;
+		c.gridy=0;			
+		JLabel jLabel1 = new javax.swing.JLabel("Trajectory Table: ");
+		panelContent.add(jLabel1,c);
+	
+		c.gridx=2;			
+		c.gridwidth=2;
+		c.weightx = 1.0;						
+		JScrollPane sc1 = new javax.swing.JScrollPane();
+		DefaultListModel modelsc = new DefaultListModel();
+		jListTrajectoryTables= new JList(modelsc);
+		jListTrajectoryTables.setVisibleRowCount(2);
+		jListTrajectoryTables.setFixedCellWidth(2);			
+		sc1.setViewportView(jListTrajectoryTables);
+		panelContent.add(sc1,c);
+	
+		c.gridx=0;
+		c.gridy=1;
+		c.gridwidth=5;
+		c.gridheight=1;
+		javax.swing.JButton jButtonConfig = new javax.swing.JButton("Trajectory Table Config...");
+	
+	
+		//Granularity Level-Panel Granularity
+		JPanel panelGranularity = new JPanel();
+		panelGranularity.setBorder(BorderFactory.createTitledBorder("Granularity Level"));
+	
+		jRadioButtonFType = new JRadioButton("Feature Type",false);
+		jRadioButtonFInstance = new JRadioButton("Feature Instance",true);
+		ButtonGroup group = new ButtonGroup();
+		group.add(jRadioButtonFType);
+		group.add(jRadioButtonFInstance);
+	
+		panelGranularity.add(jRadioButtonFType);
+		panelGranularity.add(jRadioButtonFInstance);
+	
+		c.gridx=5;
+		c.gridy=0;
+		c.gridwidth=5;
+		c.gridheight=3;
+		panelContent.add(panelGranularity,c);
+	
+		//Relevant Features
+		c.gridx=0;
+		c.gridy=1;
+		c.gridheight=2;
+		JLabel jLabel2 = new javax.swing.JLabel();
+		jLabel2.setText("Relevant Features");
+		panelContent.add(jLabel2,c);
+	
+		c.gridy=3;
+		c.gridwidth=3;
+		c.weightx = 1.0;			
+		JScrollPane jScrollPane1 = new javax.swing.JScrollPane();
+		DefaultListModel modelRF = new DefaultListModel();
+		jListRF= new JList(modelRF);
+		jListRF.setVisibleRowCount(4);
+		jListRF.setFixedCellWidth(4);
+		jListRF.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+			public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+				jListRFValueChanged(evt);
+			}
+		});
+		jScrollPane1.setViewportView(jListRF);
+		panelContent.add(jScrollPane1,c);
+		validate();
+	
+		//Buffer
+		JPanel bufPanel = new JPanel();
+		bufPanel.setBorder(BorderFactory.createEtchedBorder());
+		GridBagLayout gbag = new GridBagLayout();
+		bufPanel.setLayout(gbag);
+		GridBagConstraints c2 = new GridBagConstraints();
+		c2.insets = new Insets(5,5,5,5);
+	
+		c2.gridx=0;
+		c2.gridy=0;
+		jCheckBoxBuffer= new JCheckBox();
+		jCheckBoxBuffer.setSelected(true);
+		jCheckBoxBuffer.setText("User Buffer (m):");		        
+		bufPanel.add(jCheckBoxBuffer,c2); 
+	
+		c2.gridy=2;
+		c2.gridheight=2;				       
+		jTextFieldBuffer=new JTextField();
+		jTextFieldBuffer.setPreferredSize(new Dimension(60,20));
+		jTextFieldBuffer.setText("50.0");		        	        
+		bufPanel.add(jTextFieldBuffer,c2);
+	
+		c.gridx=3;
+		c.gridy=2;
+		c.gridheight=2;
+		c.gridwidth=2;
+		panelContent.add(bufPanel,c);   
+	
+		//MinTimeBox	     
+		JPanel mtPanel = new JPanel();
+		mtPanel.setBorder(BorderFactory.createEtchedBorder());
+		gbag = new GridBagLayout();
+		mtPanel.setLayout(gbag);
+		c2 = new GridBagConstraints();
+	
+		c2.gridx=0;
+		c2.gridy=0;
+		JLabel jLabel3 = new javax.swing.JLabel("RF Min Time (sec): ");
+		mtPanel.add(jLabel3,c2);
+	
+		c2.gridx=0;
+		c2.gridy=1;
+		RFMinTime= new JTextField();
+		RFMinTime.setPreferredSize(new Dimension(40,20));
+		RFMinTime.setColumns(6);
+		RFMinTime.addFocusListener(new java.awt.event.FocusAdapter() {
+			public void focusLost(java.awt.event.FocusEvent evt) {//if 'tab' after entering RF mintime
+				RFMinTimeFocusLost(evt);
+			}
+		});
+		RFMinTime.addActionListener(// if 'enter' after entering RF mintime
+				new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						RFMinTimeActionPerformed(e);
+					}
+				}
 				);
-				mtPanel.add(RFMinTime,c2);
-			
-			c.gridx=3;
-			c.gridy=4;
-			panelContent.add(mtPanel,c);
-			
-			//Method Panel
-			JPanel panelMethod = new JPanel();
-			panelMethod.setBorder(BorderFactory.createTitledBorder("Method"));
-			gbag = new GridBagLayout();
-			panelMethod.setLayout(gbag);
-			c2 = new GridBagConstraints();
-			c2.insets=new Insets(3,3,3,3);
-			
-				c2.gridx=0;
-				c2.gridy=0;				
-				c2.gridwidth=6;
-				jComboBoxMethod=new JComboBox(algs);
-				jComboBoxMethod.setPreferredSize(new Dimension(210,20));	
-				jComboBoxMethod.addItemListener(new java.awt.event.ItemListener() {
-		            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-		                jComboBoxMethodItemStateChanged(evt);
-		            }
-		        });
-				panelMethod.add(jComboBoxMethod,c2);
-				
-				c2.gridx=0;
-				c2.gridy=2;
-				c2.gridwidth=3;
-				JLabel jLabel4 = new javax.swing.JLabel("Parameter: ");
-				panelMethod.add(jLabel4,c2);
-				
-				c2.gridx=3;
-				JLabel jLabel5 = new javax.swing.JLabel("Value: ");
-				panelMethod.add(jLabel5,c2);
-				
-				c2.gridx=3;
-				c2.gridy=3;
-				jTextFieldParam= new JTextField();
-				jTextFieldParam.setPreferredSize(new Dimension(40,20));
-				jTextFieldParam.addFocusListener(new java.awt.event.FocusAdapter() {
-		            public void focusLost(java.awt.event.FocusEvent evt) {
-		                jTextFieldParamFocusLost(evt);
-		            }
-		        });
-				panelMethod.add(jTextFieldParam,c2);
-				
-				c2.gridx=0;
-				c2.gridy=3;
-				jComboBoxParam=new JComboBox();
-				jComboBoxParam.setPreferredSize(new Dimension(160,20));
-				jComboBoxParam.addItemListener(new java.awt.event.ItemListener() {
-		            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-		                jComboBoxParamItemStateChanged(evt);
-		            }
-		        });
-				panelMethod.add(jComboBoxParam,c2);
-				
-		    c.gridx=5;
-			c.gridy=3;
-			panelContent.add(panelMethod,c);
+		mtPanel.add(RFMinTime,c2);
+	
+		c.gridx=3;
+		c.gridy=4;
+		panelContent.add(mtPanel,c);
+	
+		//Method Panel
+		JPanel panelMethod = new JPanel();
+		panelMethod.setBorder(BorderFactory.createTitledBorder("Method"));
+		gbag = new GridBagLayout();
+		panelMethod.setLayout(gbag);
+		c2 = new GridBagConstraints();
+		c2.insets=new Insets(3,3,3,3);
+	
+		c2.gridx=0;
+		c2.gridy=0;				
+		c2.gridwidth=6;
+		jComboBoxMethod=new JComboBox(algs);
+		jComboBoxMethod.setPreferredSize(new Dimension(210,20));	
+		jComboBoxMethod.addItemListener(new java.awt.event.ItemListener() {
+			public void itemStateChanged(java.awt.event.ItemEvent evt) {
+				jComboBoxMethodItemStateChanged(evt);
+			}
+		});
+		panelMethod.add(jComboBoxMethod,c2);
+	
+		c2.gridx=0;
+		c2.gridy=2;
+		c2.gridwidth=3;
+		JLabel jLabel4 = new javax.swing.JLabel("Parameter: ");
+		panelMethod.add(jLabel4,c2);
+	
+		c2.gridx=3;
+		JLabel jLabel5 = new javax.swing.JLabel("Value: ");
+		panelMethod.add(jLabel5,c2);
+	
+		c2.gridx=3;
+		c2.gridy=3;
+		jTextFieldParam= new JTextField();
+		jTextFieldParam.setPreferredSize(new Dimension(40,20));
+		jTextFieldParam.addFocusListener(new java.awt.event.FocusAdapter() {
+			public void focusLost(java.awt.event.FocusEvent evt) {
+				jTextFieldParamFocusLost(evt);
+			}
+		});
+		panelMethod.add(jTextFieldParam,c2);
+	
+		c2.gridx=0;
+		c2.gridy=3;
+		jComboBoxParam=new JComboBox();
+		jComboBoxParam.setPreferredSize(new Dimension(160,20));
+		jComboBoxParam.addItemListener(new java.awt.event.ItemListener() {
+			public void itemStateChanged(java.awt.event.ItemEvent evt) {
+				jComboBoxParamItemStateChanged(evt);
+			}
+		});
+		panelMethod.add(jComboBoxParam,c2);
+	
+		c.gridx=5;
+		c.gridy=3;
+		panelContent.add(panelMethod,c);
 		container.add(panelContent,BorderLayout.CENTER);	
-		
+	
 		JPanel panelDown = new JPanel();
 		panelDown.setBorder(BorderFactory.createEtchedBorder());		
-		
+	
 		gridbag = new GridBagLayout();
 		panelDown.setLayout(gridbag);
 		c = new GridBagConstraints();
-		
+	
 		c.fill = GridBagConstraints.BOTH; 			
 		c.insets = new Insets(10,10,10,10);
-		
-			jButtonGenArffFile = new JButton("Generate Arff File..."); 
-			jButtonGenArffFile.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	                jButtonGenArffFileActionPerformed(evt);
-	            }
-	        });
-			c.gridx=0;
-			c.gridy=0;
-			panelDown.add(jButtonGenArffFile,c);
-			
-			JButton jButtonOK = new javax.swing.JButton("OK");
-			jButtonOK.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	                try {
-						OKActionPerformed(evt);
-					} catch (IOException e) {
-						e.printStackTrace();
-						System.out.println(e.getMessage());
-					} catch (SQLException e) {
-						e.printStackTrace();
-						System.out.println(e.getMessage());
-					}
-	            }
-	        });
-			
-			c.gridx=3;
-			c.gridy=0;
-			c.gridwidth=2;
-			panelDown.add(jButtonOK,c);			
-			
-			JButton jButtonCancel = new javax.swing.JButton("Close");
-			jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
-	            public void actionPerformed(java.awt.event.ActionEvent evt) {
-	                jButtonCancelActionPerformed(evt);
-	            }
-	        });
-			c.gridx=5;
-			c.gridy=0;
-			c.gridwidth=2;
-			panelDown.add(jButtonCancel,c);		
-			
-			c.gridx=9;
-			c.gridy=0;			
-			panelDown.add(tm,c);
-			
+	
+		jButtonGenArffFile = new JButton("Generate Arff File..."); 
+		jButtonGenArffFile.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				jButtonGenArffFileActionPerformed(evt);
+			}
+		});
+		c.gridx=0;
+		c.gridy=0;
+		panelDown.add(jButtonGenArffFile,c);
+	
+		JButton jButtonOK = new javax.swing.JButton("OK");
+		jButtonOK.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				try {
+					OKActionPerformed(evt);
+				} catch (IOException e) {
+					e.printStackTrace();
+					System.out.println(e.getMessage());
+				} catch (SQLException e) {
+					e.printStackTrace();
+					System.out.println(e.getMessage());
+				}
+			}
+		});
+	
+		c.gridx=3;
+		c.gridy=0;
+		c.gridwidth=2;
+		panelDown.add(jButtonOK,c);			
+	
+		JButton jButtonCancel = new javax.swing.JButton("Close");
+		jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				jButtonCancelActionPerformed(evt);
+			}
+		});
+		c.gridx=5;
+		c.gridy=0;
+		c.gridwidth=2;
+		panelDown.add(jButtonCancel,c);		
+	
+		c.gridx=9;
+		c.gridy=0;			
+		panelDown.add(tm,c);
+	
 		container.add(panelDown,BorderLayout.SOUTH);
-		
+	
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		this.pack();
 		jComboBoxSchema.requestFocusInWindow();				
 		this.setMaximumSize(new Dimension(600,360));		
 		this.setSize(680,360);
 		this.setVisible(true);
-    }
+	}
 	
+	// Interface Gráfica Configure Trajectory Table
     private void configureActionPerformed(ActionEvent e) {
+    	System.out.println("AQUI 10 : Interface Gráfica Configure Trajectory Table");
     	int[] i = jListTrajectoryTables.getSelectedIndices();
     	if( i.length == 1){
     		Object[] temp = jListTrajectoryTables.getSelectedValues();    		
@@ -958,7 +931,9 @@ panelSchema.add(filter);
     	}
     }
     
+    // Muda a interface com base na seleção do IB ou CB
     private void jComboBoxMethodItemStateChanged(java.awt.event.ItemEvent evt) {
+    	System.out.println("AQUI 11 : Interface = Seleção IB ou CB");
         Method alg = (Method) jComboBoxMethod.getSelectedItem();
         jComboBoxParam.removeAllItems();
         for (int i=0;i<alg.param.size();i++) {
@@ -976,7 +951,9 @@ panelSchema.add(filter);
         }
     }
     
+    // Checa o Buffer
     private boolean checkBufferState() {
+    	System.out.println("AQUI 12 : Checar Buffer");
         try{
         	buffer = Double.valueOf(jTextFieldBuffer.getText());
         	return true;
@@ -987,17 +964,23 @@ panelSchema.add(filter);
         }   
     }
 
+    // Interface Gráfica Generate Arff File
     private void jButtonGenArffFileActionPerformed(java.awt.event.ActionEvent evt) {
+    	System.out.println("AQUI 13 : Interface Generate Arff File");
         GenArffFile gaf = new GenArffFile(conn,jRadioButtonFType.isSelected());
         gaf.setVisible(true);
     }
     
+    // Sair da Interface
     private void jButtonCancelActionPerformed(java.awt.event.ActionEvent evt) {
+    	System.out.println("AQUI 14 : Sair");
         this.dispose();
     }
     
+    // Valores dos Campos CB ao serem alterados
     @SuppressWarnings("static-access")
 	private void jTextFieldParamFocusLost(java.awt.event.FocusEvent evt) {
+    	System.out.println("AQUI 15 : Valores Campos CB alterados");
         Parameter p = (Parameter) jComboBoxParam.getSelectedItem();
         try {
             if (p.type.DOUBLE == p.type) {
@@ -1010,8 +993,10 @@ panelSchema.add(filter);
         }
     }
 
+    // Campos CB ao ser ativado
     @SuppressWarnings("static-access")
 	private void jComboBoxParamItemStateChanged(java.awt.event.ItemEvent evt) {
+    	System.out.println("AQUI 16 : Campos CB ativando");
         Parameter p = (Parameter) evt.getItem();
         if (p.type == p.type.DOUBLE) {
             jTextFieldParam.setText(((Double)p.value).toString());
@@ -1021,6 +1006,7 @@ panelSchema.add(filter);
     }
 
     private void jComboBoxMethodItemStateChanged1(java.awt.event.ItemEvent evt) {
+    	System.out.println("AQUI 17");
         Method alg = (Method) jComboBoxMethod.getSelectedItem();
         jComboBoxParam.removeAllItems();
         for (int i=0;i<alg.param.size();i++) {
@@ -1028,13 +1014,17 @@ panelSchema.add(filter);
         }
     }
 
+    // Atribui valor para o RFMinTime ao selecionar Relevant Features
     private void jListRFValueChanged(javax.swing.event.ListSelectionEvent evt) {
+    	System.out.println("AQUI 18 : Set Value RFMinTime");
         AssociatedParameter par = (AssociatedParameter) jListRF.getSelectedValue();
         if (par != null)
             RFMinTime.setText(""+par.value.intValue());
     }
 
+    // Box do RFMinTime
     private void RFMinTimeFocusLost(java.awt.event.FocusEvent evt) {
+    	System.out.println("AQUI 19 : Box RFMinTime");
         Object[] objs = jListRF.getSelectedValues();
         try {
             for (Object obj : objs) {
@@ -1049,6 +1039,7 @@ panelSchema.add(filter);
     }
     
     private void RFMinTimeActionPerformed(java.awt.event.ActionEvent evt) {
+    	System.out.println("AQUI 20");
         Object[] objs = jListRF.getSelectedValues();
         try {
             for (Object obj : objs) {
@@ -1062,8 +1053,9 @@ panelSchema.add(filter);
         }
     }
     
-    
+    // Carregar Tables do Schema selecionado
     private void LoadActionPerformed(ActionEvent evt) {
+    	System.out.println("AQUI 21 : Carregar Tables");
     	try{ //load the tables in a list of auxiliary strings
             Statement s = conn.createStatement();
             ResultSet vTableName = s.executeQuery("SELECT f_table_name as tableName,type "+
@@ -1084,7 +1076,9 @@ panelSchema.add(filter);
     
     }
     
-    private void OKActionPerformed(ActionEvent evt) throws IOException, SQLException {       
+    // Valor do Buffer
+    private void OKActionPerformed(ActionEvent evt) throws IOException, SQLException {
+    	System.out.println("AQUI 22 : Buffer Valor");
     	if(jCheckBoxBuffer.isSelected()){
     		if(checkBufferState()){    		
     			System.out.println("Buffer of "+buffer+" saved.");
@@ -1178,12 +1172,14 @@ panelSchema.add(filter);
         Runtime.getRuntime().gc();
     }
     
+    // SRID
     private String checkSRIDs() {
-    	
+    	System.out.println("AQUI 23 : SRID");
         Statement sn;
 		try {
 			//getting trajectory SRID
 			sn = conn.createStatement();
+			
 			ResultSet rsn = sn.executeQuery("select srid from geometry_columns where f_table_name='"+config.table+"'");
 	        rsn.next();
 	        table_srid=rsn.getInt("srid");
@@ -1210,8 +1206,10 @@ panelSchema.add(filter);
     	return "";
 	}
 
-        //@autor: Bruno
+    // Interface Gráfica Visualization
+    //@autor: Bruno
 	protected String showDadosGeograficos() {
+		System.out.println("AQUI 24 : Interface Visualization");
 		try {
 			//getting trajectory SRID
 			
@@ -1275,25 +1273,16 @@ panelSchema.add(filter);
 		}
 		return "";
 	}
-        //@autor: Bruno
-
+	
+	// Formatar Nome dos Parâmetros
 //----------------------------------------------------------------------------------------------------------------
 // INTERFACE ENDS
 //----------------------------------------------------------------------------------------------------------------    
 
-/*
-    public static void main (String args[]){    	
-		String url = "jdbc:postgresql://localhost:5432/";
-		String db = "";
-		String user = "";
-		String pass = "" ;
-    	new TrajectoryFrame(user,pass,url+db);
-    }
-*/
-
 
 
 private void filterActionPerformed(ActionEvent e) {
+	System.out.println("AQUI 25");
     String esquema = (String)jComboBoxSchema.getSelectedItem();
     int[] i = jListTrajectoryTables.getSelectedIndices();
     if (i.length >= 1) {
@@ -1311,7 +1300,8 @@ private void filterActionPerformed(ActionEvent e) {
         return;
     }
 }
-public String formatNameParameter(String nm){
+	public String formatNameParameter(String nm){
+	System.out.println("AQUI 26 : Formatar Nome dos Parâmetros");
         System.out.println("Parm = "+nm);
         if(nm.trim().equalsIgnoreCase("MaxAvgSpeed")){
             return "as";
@@ -1332,7 +1322,10 @@ public String formatNameParameter(String nm){
         }
         return nm;
     }
-    public String parametersClusterStr(){
+    
+	// ??? Cluster parâmetros Str
+	public String parametersClusterStr(){
+    	System.out.println("AQUI 27 : ??? Parâmetros Cluster Str ???");
         StringBuilder str = new StringBuilder();
         for(Parameter param :parametersCluster()){
             if(param.name!=null && !param.name.equals("") && param.value!=null){
@@ -1347,7 +1340,10 @@ public String formatNameParameter(String nm){
         return str1;
     }
 
+
+    // ??? Cluster parâmetros
     public List<Parameter> parametersCluster(){
+    	System.out.println("AQUI 28 : ??? Parâmetros Cluster ???");
         List<Parameter> list = new ArrayList<Parameter>();
         int tamParans = 0;
         while(tamParans < this.jComboBoxParam.getModel().getSize()){
@@ -1357,25 +1353,33 @@ public String formatNameParameter(String nm){
         }
         return list;
     }
+    
+    // Nome da tabela de stop
 
     public String nameTableStop(String sp){
+    	System.out.println("AQUI 29 : Nome da tabela de stop");
         return "stops_".concat(sp.concat(parametersClusterStr()));
     }
 
     private static String currentNameTableStop;
 
+    // Get Nome atual da table stop
     public static String getCurrentNameTableStop() {
+    	System.out.println("AQUI 30 : Get nome da atual table stop");
         if(currentNameTableStop==null || currentNameTableStop.equals("")){
             return "stops";
         }
         return currentNameTableStop;
     }
 
+    // Set Nome atual da table stop
     private static void setCurrentNameTableStop(String currentNameTableStop) {
+    	System.out.println("AQUI 31 : Set nome da atual table stop");
         TrajectoryFrame.currentNameTableStop = currentNameTableStop;
     }
 
     public void insertCleanTrajProcess(long timeProcess){
+    	System.out.println("AQUI 32");
         Object[] objs = jListRF.getSelectedValues();
         AssociatedParameter[] relevantFeatures = new AssociatedParameter[objs.length];
         Integer rfMinTime = null;
@@ -1454,9 +1458,9 @@ public String formatNameParameter(String nm){
         }
     }
 
-public static void main(String args[]) {
-    new TrajectoryFrame(null, null, null);
-}
-
+    // Main, responsável por iniciar a aplicação
+    public static void main(String args[]) {
+    	new TrajectoryFrame(null, null, null);
+    }
 
 }

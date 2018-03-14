@@ -322,7 +322,6 @@ public class Trajectory {
             totalDist += p1.distance(p2);
             p1 = p2;
         }        
-        
         return (totalDist / (duration()/1000));
     }
     

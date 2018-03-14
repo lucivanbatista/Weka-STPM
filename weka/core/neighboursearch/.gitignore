@@ -1,0 +1,16 @@
+/BallTree.class
+/CoverTree$CoverTreeNode.class
+/CoverTree$DistanceNode.class
+/CoverTree$MyHeap.class
+/CoverTree$MyHeapElement.class
+/CoverTree$d_node.class
+/CoverTree.class
+/KDTree.class
+/LinearNNSearch.class
+/NearestNeighbourSearch$MyHeap.class
+/NearestNeighbourSearch$MyHeapElement.class
+/NearestNeighbourSearch$NeighborList.class
+/NearestNeighbourSearch$NeighborNode.class
+/NearestNeighbourSearch.class
+/PerformanceStats.class
+/TreePerformanceStats.class

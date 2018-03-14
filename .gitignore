@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Created by https://www.gitignore.io/api/java,eclipse
 
 ### Eclipse ###
@@ -165,3 +166,6 @@ fabric.properties
 
 
 # End of https://www.gitignore.io/api/intellij
+=======
+/bin/
+>>>>>>> 8897b4f9eb355ad0b4c18d37f3f69c3e8b6164ec
