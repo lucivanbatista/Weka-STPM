@@ -10,11 +10,6 @@ package weka.gui.stpm;
 
 import java.util.*;
 
-import org.postgis.PGgeometry;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.*;
 /**
  *
@@ -204,7 +199,7 @@ public class TrajectoryMethods {
     public static Vector<ClusterPoints> speedClustering(Trajectory t,double avgFactor, long minTimeMilli, double speedLimitFactor) {
     	Vector<GPSPoint> points = t.points;
     	System.out.println("t.meanSpeed:" + t.meanSpeed());
-    	// avgSpeedOfTrajectory OU meanSpeed - Distancia de todos os pontos somados e depois dividido pela diferença do primeiro e ultimo
+    	// avgSpeedOfTrajectory OU meanSpeed - Distancia de todos os pontos somados e depois dividido pela diferenï¿½a do primeiro e ultimo
     	// avgFactor - MaxAvgSpeed
     	// speedLimitFactor - MaxSpeed
     	double avgSpeedOfTrajectory = t.meanSpeed();
@@ -1197,7 +1192,7 @@ public class TrajectoryMethods {
     		else
     			conn = DriverManager.getConnection(url,user,pass);
 
-    		((org.postgresql.PGConnection) conn).addDataType("geometry",org.postgis.PGgeometry.class);
+    		((org.postgresql.PGConnection) conn).addDataType("geometry",PGgeometry.class);
 
     		config.conn = conn;
     		config.table = prop.getProperty("trajectoryTable");

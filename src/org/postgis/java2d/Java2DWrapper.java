@@ -118,7 +118,7 @@ public class Java2DWrapper extends Driver {
      * @exception SQLException if a database-access error occurs (Dont know why
      *                it would *shrug*)
      */
-    public boolean acceptsURL(String url) throws SQLException {
+    public boolean acceptsURL(String url)  {
         try {
             url = mangleURL(url);
         } catch (SQLException e) {
@@ -150,6 +150,6 @@ public class Java2DWrapper extends Driver {
      * Returns our own CVS version plus postgres Version
      */
     public static String getVersion() {
-        return "Java2DWrapper " + REVISION + ", wrapping " + Driver.getVersion();
+        return "Java2DWrapper " + REVISION;
     }
 }

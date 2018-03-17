@@ -41,7 +41,7 @@ import java.util.logging.Level;
  * representation, and thus only works against PostGIS 1.x servers and newer.
  * 
  * For usage notes, see DriverWrapper class, but use "jdbc:postgresql_lwgis:" as
- * JDBC url prefix and org.postgis.DriverWrapperLW as driver class.
+ * JDBC url prefix and DriverWrapperLW as driver class.
  * 
  * @author Markus Schaber <markus.schaber@logix-tt.com>
  * @see DriverWrapper
@@ -79,6 +79,6 @@ public class DriverWrapperLW extends DriverWrapper {
      * Returns our own CVS version plus postgres Version
      */
     public static String getVersion() {
-        return "PostGisWrapperLW " + REVISIONLW + ", wrapping " + Driver.getVersion();
+        return "PostGisWrapperLW " + REVISIONLW;
     }
 }

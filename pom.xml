@@ -8,6 +8,19 @@
     <artifactId>weka-stpm</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
+
+    <properties>
+        <project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.1.4</version>
+        </dependency>
+    </dependencies>
+
     <build>
         <sourceDirectory>src</sourceDirectory>
         <plugins>
@@ -25,7 +38,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.javacreed.maven.examples.Main</mainClass>
+                            <mainClass>weka.gui.stpm.TrajectoryFrame</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

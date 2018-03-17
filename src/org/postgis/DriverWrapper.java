@@ -52,7 +52,7 @@ import org.postgresql.PGConnection;
  * following works for jboss:
  * 
  * <code>
- * &lt;driver-class&gt;org.postgis.DriverWrapper&lt;/driver-class&gt;
+ * &lt;driver-class&gt;DriverWrapper&lt;/driver-class&gt;
  * </code>
  * If you don't like or want to use the DriverWrapper, you have two
  * alternatives, see the README file.
@@ -71,7 +71,7 @@ import org.postgresql.PGConnection;
  */
 public class DriverWrapper extends Driver {
 
-    protected static final Logger logger = Logger.getLogger("org.postgis.DriverWrapper");
+    protected static final Logger logger = Logger.getLogger("DriverWrapper");
     
     public static final String POSTGRES_PROTOCOL = "jdbc:postgresql:";
     public static final String POSTGIS_PROTOCOL = "jdbc:postgresql_postGIS:";
@@ -122,7 +122,7 @@ public class DriverWrapper extends Driver {
 
     private static TypesAdder loadTypesAdder(String version) throws SQLException {
         try {
-            Class klass = Class.forName("org.postgis.DriverWrapper$TypesAdder" + version);
+            Class klass = Class.forName("DriverWrapper$TypesAdder" + version);
             return (TypesAdder) klass.newInstance();
         } catch (Exception e) {
             throw new SQLException("Cannot create TypesAdder instance! " + e.getMessage());
@@ -177,7 +177,7 @@ public class DriverWrapper extends Driver {
      * @exception SQLException Passed through from the underlying PostgreSQL
      *                driver, should not happen.
      */
-    public boolean acceptsURL(String url) throws SQLException {
+    public boolean acceptsURL(String url) {
         try {
             url = mangleURL(url);
         } catch (SQLException e) {
@@ -187,10 +187,11 @@ public class DriverWrapper extends Driver {
     }
 
     /**
-     * Returns our own CVS version plus postgres Version
+     * Old: Returns our own CVS version plus postgres Version
+     * New: Returns our own CVS version
      */
     public static String getVersion() {
-        return "PostGisWrapper " + REVISION + ", wrapping " + Driver.getVersion();
+        return "PostGisWrapper " + REVISION;
     }
 
     /*
@@ -266,18 +267,18 @@ public class DriverWrapper extends Driver {
     protected static final class TypesAdder74 extends TypesAdder {
         public void addGeometries(Connection conn) {
             PGConnection pgconn = (PGConnection) conn;
-            pgconn.addDataType("geometry", "org.postgis.PGgeometry");
+            pgconn.addDataType("geometry", "PGgeometry");
         }
 
         public void addBoxen(Connection conn) {
             PGConnection pgconn = (PGConnection) conn;
-            pgconn.addDataType("box3d", "org.postgis.PGbox3d");
-            pgconn.addDataType("box2d", "org.postgis.PGbox2d");
+            pgconn.addDataType("box3d", "PGbox3d");
+            pgconn.addDataType("box2d", "PGbox2d");
         }
 
         public void addBinaryGeometries(Connection conn) {
             PGConnection pgconn = (PGConnection) conn;
-            pgconn.addDataType("geometry", "org.postgis.PGgeometryLW");
+            pgconn.addDataType("geometry", "PGgeometryLW");
         }
     }
 
@@ -285,18 +286,18 @@ public class DriverWrapper extends Driver {
     protected static class TypesAdder72 extends TypesAdder {
         public void addGeometries(Connection conn) {
             PGConnection pgconn = (PGConnection) conn;
-            pgconn.addDataType("geometry", "org.postgis.PGgeometry");
+            pgconn.addDataType("geometry", "PGgeometry");
         }
 
         public void addBoxen(Connection conn) {
             PGConnection pgconn = (PGConnection) conn;
-            pgconn.addDataType("box3d", "org.postgis.PGbox3d");
-            pgconn.addDataType("box2d", "org.postgis.PGbox2d");
+            pgconn.addDataType("box3d", "PGbox3d");
+            pgconn.addDataType("box2d", "PGbox2d");
         }
 
         public void addBinaryGeometries(Connection conn) {
             PGConnection pgconn = (PGConnection) conn;
-            pgconn.addDataType("geometry", "org.postgis.PGgeometryLW");
+            pgconn.addDataType("geometry", "PGgeometryLW");
         }
     }
 

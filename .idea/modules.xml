@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/cabeca-WEKA.iml" filepath="$PROJECT_DIR$/cabeca-WEKA.iml" />
+      <module fileurl="file://$PROJECT_DIR$/weka-stpm.iml" filepath="$PROJECT_DIR$/weka-stpm.iml" />
     </modules>
   </component>
 </project>

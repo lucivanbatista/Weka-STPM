@@ -26,7 +26,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import weka.gui.geodata.visualizer.ShowGeoData;
@@ -45,7 +44,7 @@ public class TrajectoryFrame extends JDialog{
 	
 	/**User configurations*/
 	private Config config = new Config();
-	
+
 	// Method panel
 	/**Selects the appropriate method to be applied */
     private javax.swing.JComboBox jComboBoxMethod;

@@ -46,7 +46,7 @@ import java.util.logging.Level;
  * access incompatible PostGIS versions that reside in other schemas.
  * 
  * For usage notes, see DriverWrapper class, but use "jdbc:postgresql_autogis:"
- * as JDBC url prefix and org.postgis.DriverWrapperAutoprobe as driver class.
+ * as JDBC url prefix and DriverWrapperAutoprobe as driver class.
  * 
  * @author Markus Schaber <markus.schaber@logix-tt.com>
  * @see DriverWrapper
@@ -89,7 +89,7 @@ public class DriverWrapperAutoprobe extends DriverWrapper {
      * Returns our own CVS version plus postgres Version
      */
     public static String getVersion() {
-        return "PostGisWrapperAutoprobe " + REVISIONAUTO + ", wrapping " + Driver.getVersion();
+        return "PostGisWrapperAutoprobe " + REVISIONAUTO;
     }
 
     public static boolean supportsEWKB(Connection conn) throws SQLException {
