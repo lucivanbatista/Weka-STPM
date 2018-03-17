@@ -2,13 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="da0042df-c628-452f-b735-79f9795f2ac2" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/main/resources/weka3.gif" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/main/resources/weka_animated.gif" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/main/resources/weka_icon.gif" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/main/resources/weka_icon.jpg" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/main/resources/weka_stationary.gif" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/src/weka/gui/stpm/Constants.java" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/src/weka/gui/WekaTaskMonitor.java" afterPath="$PROJECT_DIR$/src/weka/gui/WekaTaskMonitor.java" />
+      <change beforePath="$PROJECT_DIR$/config.properties" afterPath="$PROJECT_DIR$/src/main/resources/config.properties" />
+      <change beforePath="$PROJECT_DIR$/src/weka/gui/stpm/TrajectoryFrame.java" afterPath="$PROJECT_DIR$/src/weka/gui/stpm/TrajectoryFrame.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -24,7 +22,7 @@
       <file leaf-file-name="pom.xml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pom.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
+            <state relative-caret-position="360">
               <caret line="20" column="21" lean-forward="false" selection-start-line="20" selection-start-column="21" selection-end-line="20" selection-end-column="21" />
               <folding />
             </state>
@@ -84,86 +82,100 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="WekaTaskMonitor.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="WekaTaskMonitor.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/weka/gui/WekaTaskMonitor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="29">
+            <state relative-caret-position="245">
               <caret line="69" column="38" lean-forward="false" selection-start-line="69" selection-start-column="38" selection-end-line="69" selection-end-column="38" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="config.properties" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/resources/config.properties">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="144">
+              <caret line="8" column="0" lean-forward="true" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TrajectoryFrame.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/weka/gui/stpm/TrajectoryFrame.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-349">
+              <caret line="11" column="27" lean-forward="true" selection-start-line="11" selection-start-column="27" selection-end-line="11" selection-end-column="27" />
               <folding>
-                <element signature="e#3983#4125#0" expanded="true" />
-                <element signature="e#4124#4125#0" expanded="true" />
+                <element signature="e#30388#30555#0" expanded="true" />
+                <element signature="e#30554#30555#0" expanded="true" />
+                <element signature="e#54773#54774#0" expanded="true" />
+                <element signature="e#54823#54824#0" expanded="true" />
+                <marker date="1521280223792" expanded="true" signature="6045:6097" ph="SELECT DISTI... geometry_columns" />
+                <marker date="1521280223792" expanded="true" signature="7880:7982" ph="SELECT missi... missingValue" />
+                <marker date="1521280223792" expanded="true" signature="8589:8822" ph="select 1 fro... attnum" />
+                <marker date="1521280223792" expanded="true" signature="8604:8702" ph="select attnu... pg_attribute" />
+                <marker date="1521280223792" expanded="true" signature="8655:8670" ph="select * fro... x" />
+                <marker date="1521280223792" expanded="true" signature="8732:8795" ph="select indke... pg_index" />
+                <marker date="1521280223792" expanded="true" signature="8779:8794" ph="select * fro... x" />
+                <marker date="1521280223792" expanded="true" signature="10026:10138" ph="SELECT missi... " />
+                <marker date="1521280223792" expanded="true" signature="14122:14221" ph="SELECT missi... missingValue" />
+                <marker date="1521280223792" expanded="true" signature="14744:14856" ph="SELECT missi... " />
+                <marker date="1521280223792" expanded="true" signature="16648:16659" ph="DROP TABLE m... " />
+                <marker date="1521280223792" expanded="true" signature="16728:16825" ph="DELETE FROM geometry_columns... " />
+                <marker date="1521280223792" expanded="true" signature="16987:17633" ph="CREATE TABLE... missingValue" />
+                <marker date="1521280223792" expanded="true" signature="17692:17811" ph="SELECT AddGe... " />
+                <marker date="1521280223792" expanded="true" signature="18400:18416" ph="DROP TABLE m... " />
+                <marker date="1521280223792" expanded="true" signature="18443:18500" ph="DELETE FROM geometry_columns... " />
+                <marker date="1521280223792" expanded="true" signature="18599:19225" ph="CREATE TABLE... moves" />
+                <marker date="1521280223792" expanded="true" signature="19265:19342" ph="SELECT AddGe... " />
+                <marker date="1521280223792" expanded="true" signature="22741:22766" ph="DROP TABLE m... " />
+                <marker date="1521280223792" expanded="true" signature="22902:23014" ph="create table... missingValue_buf" />
+                <marker date="1521280223792" expanded="true" signature="23057:23134" ph="alter table missingValue_buf... " />
+                <marker date="1521280223792" expanded="true" signature="23173:23345" ph="select A.gid... missingValue" />
+                <marker date="1521280223792" expanded="true" signature="23730:23755" ph="DROP TABLE m... " />
+                <marker date="1521280223792" expanded="true" signature="23882:23994" ph="CREATE TABLE... missingValue_buf" />
+                <marker date="1521280223792" expanded="true" signature="24035:24112" ph="ALTER TABLE missingValue_buf... " />
+                <marker date="1521280223792" expanded="true" signature="24154:24339" ph="select A.gid... missingValue" />
+                <marker date="1521280223792" expanded="true" signature="24380:24557" ph="select A.gid... missingValue" />
+                <marker date="1521280223792" expanded="true" signature="39136:39453" ph="SELECT f_tab... geometry_columns" />
+                <marker date="1521280223792" expanded="true" signature="42332:42403" ph="select srid geometry_columns" />
+                <marker date="1521280223792" expanded="true" signature="44534:44605" ph="select srid geometry_columns" />
+                <marker date="1521280223792" expanded="true" signature="45186:45257" ph="select srid geometry_columns" />
+                <marker date="1521280223792" expanded="true" signature="45926:46104" ph="SELECT f_tab... geometry_columns" />
+                <marker date="1521280223792" expanded="true" signature="52800:52821" ph="select count... missingValue" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TrajectoryFrame.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/weka/gui/stpm/TrajectoryFrame.java">
+      <file leaf-file-name="Constants.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/weka/gui/stpm/Constants.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="25326">
-              <caret line="1461" column="0" lean-forward="false" selection-start-line="1461" selection-start-column="0" selection-end-line="1461" selection-end-column="0" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#26796#26797#0" expanded="true" />
-                <element signature="e#26831#26832#0" expanded="true" />
-                <element signature="e#27070#27071#0" expanded="true" />
-                <element signature="e#27110#27111#0" expanded="true" />
-                <element signature="e#27345#27346#0" expanded="true" />
-                <element signature="e#27378#27379#0" expanded="true" />
-                <element signature="e#27633#27634#0" expanded="true" />
-                <element signature="e#27670#27671#0" expanded="true" />
-                <element signature="e#29997#29998#0" expanded="true" />
-                <element signature="e#30032#30033#0" expanded="true" />
-                <element signature="e#31734#31735#0" expanded="true" />
-                <element signature="e#31776#31777#0" expanded="true" />
-                <element signature="e#32414#32415#0" expanded="true" />
-                <element signature="e#32461#32462#0" expanded="true" />
-                <element signature="e#33338#33339#0" expanded="true" />
-                <element signature="e#33384#33385#0" expanded="true" />
-                <element signature="e#34026#34027#0" expanded="true" />
-                <element signature="e#34075#34076#0" expanded="true" />
-                <element signature="e#34862#34863#0" expanded="true" />
-                <element signature="e#34906#34907#0" expanded="true" />
-                <element signature="e#56739#56740#0" expanded="true" />
-                <marker date="1521256092247" expanded="true" signature="6517:6569" ph="SELECT DISTI... geometry_columns" />
-                <marker date="1521256092247" expanded="true" signature="8352:8454" ph="SELECT missi... missingValue" />
-                <marker date="1521256092247" expanded="true" signature="9061:9294" ph="select 1 fro... attnum" />
-                <marker date="1521256092247" expanded="true" signature="9076:9174" ph="select attnu... pg_attribute" />
-                <marker date="1521256092247" expanded="true" signature="9127:9142" ph="select * fro... x" />
-                <marker date="1521256092247" expanded="true" signature="9204:9267" ph="select indke... pg_index" />
-                <marker date="1521256092247" expanded="true" signature="9251:9266" ph="select * fro... x" />
-                <marker date="1521256092247" expanded="true" signature="10498:10610" ph="SELECT missi... " />
-                <marker date="1521256092247" expanded="true" signature="14594:14693" ph="SELECT missi... missingValue" />
-                <marker date="1521256092247" expanded="true" signature="15216:15328" ph="SELECT missi... " />
-                <marker date="1521256092247" expanded="true" signature="17120:17131" ph="DROP TABLE m... " />
-                <marker date="1521256092247" expanded="true" signature="17200:17297" ph="DELETE FROM geometry_columns... " />
-                <marker date="1521256092247" expanded="true" signature="17459:18105" ph="CREATE TABLE... missingValue" />
-                <marker date="1521256092247" expanded="true" signature="18164:18283" ph="SELECT AddGe... " />
-                <marker date="1521256092247" expanded="true" signature="18872:18888" ph="DROP TABLE m... " />
-                <marker date="1521256092247" expanded="true" signature="18915:18972" ph="DELETE FROM geometry_columns... " />
-                <marker date="1521256092247" expanded="true" signature="19071:19697" ph="CREATE TABLE... moves" />
-                <marker date="1521256092247" expanded="true" signature="19737:19814" ph="SELECT AddGe... " />
-                <marker date="1521256092247" expanded="true" signature="23213:23238" ph="DROP TABLE m... " />
-                <marker date="1521256092247" expanded="true" signature="23374:23486" ph="create table... missingValue_buf" />
-                <marker date="1521256092247" expanded="true" signature="23529:23606" ph="alter table missingValue_buf... " />
-                <marker date="1521256092247" expanded="true" signature="23645:23817" ph="select A.gid... missingValue" />
-                <marker date="1521256092247" expanded="true" signature="24202:24227" ph="DROP TABLE m... " />
-                <marker date="1521256092247" expanded="true" signature="24354:24466" ph="CREATE TABLE... missingValue_buf" />
-                <marker date="1521256092247" expanded="true" signature="24507:24584" ph="ALTER TABLE missingValue_buf... " />
-                <marker date="1521256092247" expanded="true" signature="24626:24811" ph="select A.gid... missingValue" />
-                <marker date="1521256092247" expanded="true" signature="24852:25029" ph="select A.gid... missingValue" />
-                <marker date="1521256092247" expanded="true" signature="41006:41323" ph="SELECT f_tab... geometry_columns" />
-                <marker date="1521256092247" expanded="true" signature="44234:44305" ph="select srid geometry_columns" />
-                <marker date="1521256092247" expanded="true" signature="46436:46507" ph="select srid geometry_columns" />
-                <marker date="1521256092247" expanded="true" signature="47088:47159" ph="select srid geometry_columns" />
-                <marker date="1521256092247" expanded="true" signature="47828:48014" ph="SELECT f_tab... geometry_columns" />
-                <marker date="1521256092247" expanded="true" signature="54716:54737" ph="select count... missingValue" />
-              </folding>
+            <state relative-caret-position="216">
+              <caret line="12" column="11" lean-forward="false" selection-start-line="12" selection-start-column="11" selection-end-line="12" selection-end-column="11" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
     </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>private</find>
+    </findStrings>
+    <replaceStrings>
+      <replace>public</replace>
+    </replaceStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -178,13 +190,15 @@
       <list>
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/src/main/java/weka/gui/stpm/TrajectoryFrame.java" />
-        <option value="$PROJECT_DIR$/src/weka/gui/stpm/TrajectoryFrame.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/org/postgis/DriverWrapper.java" />
         <option value="$PROJECT_DIR$/src/org/postgis/DriverWrapperAutoprobe.java" />
         <option value="$PROJECT_DIR$/src/org/postgis/DriverWrapperLW.java" />
         <option value="$PROJECT_DIR$/src/org/postgis/java2d/Java2DWrapper.java" />
         <option value="$PROJECT_DIR$/src/weka/gui/WekaTaskMonitor.java" />
+        <option value="$PROJECT_DIR$/config.properties" />
+        <option value="$PROJECT_DIR$/src/weka/gui/stpm/Constants.java" />
+        <option value="$PROJECT_DIR$/src/weka/gui/stpm/TrajectoryFrame.java" />
       </list>
     </option>
   </component>
@@ -234,7 +248,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="Scratches" />
       <pane id="AndroidView" />
       <pane id="ProjectPane">
@@ -259,13 +273,35 @@
               <item name="cabeca-WEKA" type="b2602c69:ProjectViewProjectNode" />
               <item name="cabeca-WEKA" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="postgis" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="resources" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="cabeca-WEKA" type="b2602c69:ProjectViewProjectNode" />
+              <item name="cabeca-WEKA" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="weka" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="cabeca-WEKA" type="b2602c69:ProjectViewProjectNode" />
+              <item name="cabeca-WEKA" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="weka" type="462c0819:PsiDirectoryNode" />
+              <item name="gui" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="cabeca-WEKA" type="b2602c69:ProjectViewProjectNode" />
+              <item name="cabeca-WEKA" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="weka" type="462c0819:PsiDirectoryNode" />
+              <item name="gui" type="462c0819:PsiDirectoryNode" />
+              <item name="stpm" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -280,6 +316,9 @@
     <property name="aspect.path.notification.shown" value="true" />
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/resources" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/main/resources" />
     </key>
@@ -419,11 +458,12 @@
       <workItem from="1521253890982" duration="378000" />
       <workItem from="1521255280832" duration="1708000" />
       <workItem from="1521277716624" duration="562000" />
+      <workItem from="1521278454120" duration="1795000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="2648000" />
+    <option name="totallyTimeSpent" value="4443000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="27" width="1366" height="741" extended-state="6" />
@@ -438,7 +478,7 @@
       <window_info id="TCPMON" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3294702" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3294702" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -446,6 +486,7 @@
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -457,7 +498,6 @@
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -529,61 +569,150 @@
         <state relative-caret-position="26298">
           <caret line="1461" column="0" lean-forward="false" selection-start-line="1461" selection-start-column="0" selection-end-line="1461" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#26796#26797#0" expanded="true" />
-            <element signature="e#26831#26832#0" expanded="true" />
-            <element signature="e#27070#27071#0" expanded="true" />
-            <element signature="e#27110#27111#0" expanded="true" />
-            <element signature="e#27345#27346#0" expanded="true" />
-            <element signature="e#27378#27379#0" expanded="true" />
-            <element signature="e#27633#27634#0" expanded="true" />
-            <element signature="e#27670#27671#0" expanded="true" />
-            <element signature="e#29997#29998#0" expanded="true" />
-            <element signature="e#30032#30033#0" expanded="true" />
-            <element signature="e#31734#31735#0" expanded="true" />
-            <element signature="e#31776#31777#0" expanded="true" />
-            <element signature="e#32414#32415#0" expanded="true" />
-            <element signature="e#32461#32462#0" expanded="true" />
-            <element signature="e#33338#33339#0" expanded="true" />
-            <element signature="e#33384#33385#0" expanded="true" />
-            <element signature="e#34026#34027#0" expanded="true" />
-            <element signature="e#34075#34076#0" expanded="true" />
-            <element signature="e#34862#34863#0" expanded="true" />
-            <element signature="e#34906#34907#0" expanded="true" />
-            <element signature="e#56739#56740#0" expanded="true" />
-            <marker date="1521256092247" expanded="true" signature="6517:6569" ph="SELECT DISTI... geometry_columns" />
-            <marker date="1521256092247" expanded="true" signature="8352:8454" ph="SELECT missi... missingValue" />
-            <marker date="1521256092247" expanded="true" signature="9061:9294" ph="select 1 fro... attnum" />
-            <marker date="1521256092247" expanded="true" signature="9076:9174" ph="select attnu... pg_attribute" />
-            <marker date="1521256092247" expanded="true" signature="9127:9142" ph="select * fro... x" />
-            <marker date="1521256092247" expanded="true" signature="9204:9267" ph="select indke... pg_index" />
-            <marker date="1521256092247" expanded="true" signature="9251:9266" ph="select * fro... x" />
-            <marker date="1521256092247" expanded="true" signature="10498:10610" ph="SELECT missi... " />
-            <marker date="1521256092247" expanded="true" signature="14594:14693" ph="SELECT missi... missingValue" />
-            <marker date="1521256092247" expanded="true" signature="15216:15328" ph="SELECT missi... " />
-            <marker date="1521256092247" expanded="true" signature="17120:17131" ph="DROP TABLE m... " />
-            <marker date="1521256092247" expanded="true" signature="17200:17297" ph="DELETE FROM geometry_columns... " />
-            <marker date="1521256092247" expanded="true" signature="17459:18105" ph="CREATE TABLE... missingValue" />
-            <marker date="1521256092247" expanded="true" signature="18164:18283" ph="SELECT AddGe... " />
-            <marker date="1521256092247" expanded="true" signature="18872:18888" ph="DROP TABLE m... " />
-            <marker date="1521256092247" expanded="true" signature="18915:18972" ph="DELETE FROM geometry_columns... " />
-            <marker date="1521256092247" expanded="true" signature="19071:19697" ph="CREATE TABLE... moves" />
-            <marker date="1521256092247" expanded="true" signature="19737:19814" ph="SELECT AddGe... " />
-            <marker date="1521256092247" expanded="true" signature="23213:23238" ph="DROP TABLE m... " />
-            <marker date="1521256092247" expanded="true" signature="23374:23486" ph="create table... missingValue_buf" />
-            <marker date="1521256092247" expanded="true" signature="23529:23606" ph="alter table missingValue_buf... " />
-            <marker date="1521256092247" expanded="true" signature="23645:23817" ph="select A.gid... missingValue" />
-            <marker date="1521256092247" expanded="true" signature="24202:24227" ph="DROP TABLE m... " />
-            <marker date="1521256092247" expanded="true" signature="24354:24466" ph="CREATE TABLE... missingValue_buf" />
-            <marker date="1521256092247" expanded="true" signature="24507:24584" ph="ALTER TABLE missingValue_buf... " />
-            <marker date="1521256092247" expanded="true" signature="24626:24811" ph="select A.gid... missingValue" />
-            <marker date="1521256092247" expanded="true" signature="24852:25029" ph="select A.gid... missingValue" />
-            <marker date="1521256092247" expanded="true" signature="41006:41323" ph="SELECT f_tab... geometry_columns" />
-            <marker date="1521256092247" expanded="true" signature="44234:44305" ph="select srid geometry_columns" />
-            <marker date="1521256092247" expanded="true" signature="46436:46507" ph="select srid geometry_columns" />
-            <marker date="1521256092247" expanded="true" signature="47088:47159" ph="select srid geometry_columns" />
-            <marker date="1521256092247" expanded="true" signature="47828:48014" ph="SELECT f_tab... geometry_columns" />
-            <marker date="1521256092247" expanded="true" signature="54716:54737" ph="select count... missingValue" />
+            <element signature="e#30388#30555#0" expanded="true" />
+            <element signature="e#30554#30555#0" expanded="true" />
+            <element signature="e#54773#54774#0" expanded="true" />
+            <element signature="e#54823#54824#0" expanded="true" />
+            <marker date="1521280223792" expanded="true" signature="6045:6097" ph="SELECT DISTI... geometry_columns" />
+            <marker date="1521280223792" expanded="true" signature="7880:7982" ph="SELECT missi... missingValue" />
+            <marker date="1521280223792" expanded="true" signature="8589:8822" ph="select 1 fro... attnum" />
+            <marker date="1521280223792" expanded="true" signature="8604:8702" ph="select attnu... pg_attribute" />
+            <marker date="1521280223792" expanded="true" signature="8655:8670" ph="select * fro... x" />
+            <marker date="1521280223792" expanded="true" signature="8732:8795" ph="select indke... pg_index" />
+            <marker date="1521280223792" expanded="true" signature="8779:8794" ph="select * fro... x" />
+            <marker date="1521280223792" expanded="true" signature="10026:10138" ph="SELECT missi... " />
+            <marker date="1521280223792" expanded="true" signature="14122:14221" ph="SELECT missi... missingValue" />
+            <marker date="1521280223792" expanded="true" signature="14744:14856" ph="SELECT missi... " />
+            <marker date="1521280223792" expanded="true" signature="16648:16659" ph="DROP TABLE m... " />
+            <marker date="1521280223792" expanded="true" signature="16728:16825" ph="DELETE FROM geometry_columns... " />
+            <marker date="1521280223792" expanded="true" signature="16987:17633" ph="CREATE TABLE... missingValue" />
+            <marker date="1521280223792" expanded="true" signature="17692:17811" ph="SELECT AddGe... " />
+            <marker date="1521280223792" expanded="true" signature="18400:18416" ph="DROP TABLE m... " />
+            <marker date="1521280223792" expanded="true" signature="18443:18500" ph="DELETE FROM geometry_columns... " />
+            <marker date="1521280223792" expanded="true" signature="18599:19225" ph="CREATE TABLE... moves" />
+            <marker date="1521280223792" expanded="true" signature="19265:19342" ph="SELECT AddGe... " />
+            <marker date="1521280223792" expanded="true" signature="22741:22766" ph="DROP TABLE m... " />
+            <marker date="1521280223792" expanded="true" signature="22902:23014" ph="create table... missingValue_buf" />
+            <marker date="1521280223792" expanded="true" signature="23057:23134" ph="alter table missingValue_buf... " />
+            <marker date="1521280223792" expanded="true" signature="23173:23345" ph="select A.gid... missingValue" />
+            <marker date="1521280223792" expanded="true" signature="23730:23755" ph="DROP TABLE m... " />
+            <marker date="1521280223792" expanded="true" signature="23882:23994" ph="CREATE TABLE... missingValue_buf" />
+            <marker date="1521280223792" expanded="true" signature="24035:24112" ph="ALTER TABLE missingValue_buf... " />
+            <marker date="1521280223792" expanded="true" signature="24154:24339" ph="select A.gid... missingValue" />
+            <marker date="1521280223792" expanded="true" signature="24380:24557" ph="select A.gid... missingValue" />
+            <marker date="1521280223792" expanded="true" signature="39136:39453" ph="SELECT f_tab... geometry_columns" />
+            <marker date="1521280223792" expanded="true" signature="42332:42403" ph="select srid geometry_columns" />
+            <marker date="1521280223792" expanded="true" signature="44534:44605" ph="select srid geometry_columns" />
+            <marker date="1521280223792" expanded="true" signature="45186:45257" ph="select srid geometry_columns" />
+            <marker date="1521280223792" expanded="true" signature="45926:46104" ph="SELECT f_tab... geometry_columns" />
+            <marker date="1521280223792" expanded="true" signature="52800:52821" ph="select count... missingValue" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/weka/gui/WekaTaskMonitor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="864">
+          <caret line="69" column="38" lean-forward="false" selection-start-line="69" selection-start-column="38" selection-end-line="69" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="20" column="21" lean-forward="false" selection-start-line="20" selection-start-column="21" selection-end-line="20" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/postgis/DriverWrapper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3420">
+          <caret line="190" column="39" lean-forward="false" selection-start-line="190" selection-start-column="39" selection-end-line="190" selection-end-column="39" />
+          <folding>
+            <element signature="e#6629#6630#0" expanded="true" />
+            <element signature="e#6680#6681#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/postgis/DriverWrapperAutoprobe.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1638">
+          <caret line="91" column="56" lean-forward="false" selection-start-line="91" selection-start-column="56" selection-end-line="91" selection-end-column="56" />
+          <folding>
+            <element signature="e#3074#3075#0" expanded="true" />
+            <element signature="e#3138#3139#0" expanded="true" />
+            <marker date="1521256687128" expanded="true" signature="3310:3334" ph="SELECT postg... " />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/postgis/DriverWrapperLW.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="900">
+          <caret line="81" column="47" lean-forward="false" selection-start-line="81" selection-start-column="47" selection-end-line="81" selection-end-column="47" />
+          <folding>
+            <element signature="e#2592#2593#0" expanded="true" />
+            <element signature="e#2647#2648#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/postgis/java2d/Java2DWrapper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2106">
+          <caret line="152" column="42" lean-forward="false" selection-start-line="152" selection-start-column="42" selection-end-line="152" selection-end-column="42" />
+          <folding>
+            <element signature="e#4941#4942#0" expanded="true" />
+            <element signature="e#4991#4992#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/weka/gui/stpm/TrajectoryFrame.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="26298">
+          <caret line="1461" column="0" lean-forward="false" selection-start-line="1461" selection-start-column="0" selection-end-line="1461" selection-end-column="0" />
+          <folding>
+            <element signature="e#30388#30555#0" expanded="true" />
+            <element signature="e#30554#30555#0" expanded="true" />
+            <element signature="e#54773#54774#0" expanded="true" />
+            <element signature="e#54823#54824#0" expanded="true" />
+            <marker date="1521280223792" expanded="true" signature="6045:6097" ph="SELECT DISTI... geometry_columns" />
+            <marker date="1521280223792" expanded="true" signature="7880:7982" ph="SELECT missi... missingValue" />
+            <marker date="1521280223792" expanded="true" signature="8589:8822" ph="select 1 fro... attnum" />
+            <marker date="1521280223792" expanded="true" signature="8604:8702" ph="select attnu... pg_attribute" />
+            <marker date="1521280223792" expanded="true" signature="8655:8670" ph="select * fro... x" />
+            <marker date="1521280223792" expanded="true" signature="8732:8795" ph="select indke... pg_index" />
+            <marker date="1521280223792" expanded="true" signature="8779:8794" ph="select * fro... x" />
+            <marker date="1521280223792" expanded="true" signature="10026:10138" ph="SELECT missi... " />
+            <marker date="1521280223792" expanded="true" signature="14122:14221" ph="SELECT missi... missingValue" />
+            <marker date="1521280223792" expanded="true" signature="14744:14856" ph="SELECT missi... " />
+            <marker date="1521280223792" expanded="true" signature="16648:16659" ph="DROP TABLE m... " />
+            <marker date="1521280223792" expanded="true" signature="16728:16825" ph="DELETE FROM geometry_columns... " />
+            <marker date="1521280223792" expanded="true" signature="16987:17633" ph="CREATE TABLE... missingValue" />
+            <marker date="1521280223792" expanded="true" signature="17692:17811" ph="SELECT AddGe... " />
+            <marker date="1521280223792" expanded="true" signature="18400:18416" ph="DROP TABLE m... " />
+            <marker date="1521280223792" expanded="true" signature="18443:18500" ph="DELETE FROM geometry_columns... " />
+            <marker date="1521280223792" expanded="true" signature="18599:19225" ph="CREATE TABLE... moves" />
+            <marker date="1521280223792" expanded="true" signature="19265:19342" ph="SELECT AddGe... " />
+            <marker date="1521280223792" expanded="true" signature="22741:22766" ph="DROP TABLE m... " />
+            <marker date="1521280223792" expanded="true" signature="22902:23014" ph="create table... missingValue_buf" />
+            <marker date="1521280223792" expanded="true" signature="23057:23134" ph="alter table missingValue_buf... " />
+            <marker date="1521280223792" expanded="true" signature="23173:23345" ph="select A.gid... missingValue" />
+            <marker date="1521280223792" expanded="true" signature="23730:23755" ph="DROP TABLE m... " />
+            <marker date="1521280223792" expanded="true" signature="23882:23994" ph="CREATE TABLE... missingValue_buf" />
+            <marker date="1521280223792" expanded="true" signature="24035:24112" ph="ALTER TABLE missingValue_buf... " />
+            <marker date="1521280223792" expanded="true" signature="24154:24339" ph="select A.gid... missingValue" />
+            <marker date="1521280223792" expanded="true" signature="24380:24557" ph="select A.gid... missingValue" />
+            <marker date="1521280223792" expanded="true" signature="39136:39453" ph="SELECT f_tab... geometry_columns" />
+            <marker date="1521280223792" expanded="true" signature="42332:42403" ph="select srid geometry_columns" />
+            <marker date="1521280223792" expanded="true" signature="44534:44605" ph="select srid geometry_columns" />
+            <marker date="1521280223792" expanded="true" signature="45186:45257" ph="select srid geometry_columns" />
+            <marker date="1521280223792" expanded="true" signature="45926:46104" ph="SELECT f_tab... geometry_columns" />
+            <marker date="1521280223792" expanded="true" signature="52800:52821" ph="select count... missingValue" />
           </folding>
         </state>
       </provider>
@@ -592,10 +721,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="720">
           <caret line="69" column="0" lean-forward="false" selection-start-line="69" selection-start-column="0" selection-end-line="69" selection-end-column="0" />
-          <folding>
-            <element signature="e#3983#4125#0" expanded="true" />
-            <element signature="e#4124#4125#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -623,7 +749,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
+        <state relative-caret-position="360">
           <caret line="20" column="21" lean-forward="false" selection-start-line="20" selection-start-column="21" selection-end-line="20" selection-end-column="21" />
           <folding />
         </state>
@@ -674,88 +800,87 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/weka/gui/stpm/TrajectoryFrame.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="25326">
-          <caret line="1461" column="0" lean-forward="false" selection-start-line="1461" selection-start-column="0" selection-end-line="1461" selection-end-column="0" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#26796#26797#0" expanded="true" />
-            <element signature="e#26831#26832#0" expanded="true" />
-            <element signature="e#27070#27071#0" expanded="true" />
-            <element signature="e#27110#27111#0" expanded="true" />
-            <element signature="e#27345#27346#0" expanded="true" />
-            <element signature="e#27378#27379#0" expanded="true" />
-            <element signature="e#27633#27634#0" expanded="true" />
-            <element signature="e#27670#27671#0" expanded="true" />
-            <element signature="e#29997#29998#0" expanded="true" />
-            <element signature="e#30032#30033#0" expanded="true" />
-            <element signature="e#31734#31735#0" expanded="true" />
-            <element signature="e#31776#31777#0" expanded="true" />
-            <element signature="e#32414#32415#0" expanded="true" />
-            <element signature="e#32461#32462#0" expanded="true" />
-            <element signature="e#33338#33339#0" expanded="true" />
-            <element signature="e#33384#33385#0" expanded="true" />
-            <element signature="e#34026#34027#0" expanded="true" />
-            <element signature="e#34075#34076#0" expanded="true" />
-            <element signature="e#34862#34863#0" expanded="true" />
-            <element signature="e#34906#34907#0" expanded="true" />
-            <element signature="e#56739#56740#0" expanded="true" />
-            <marker date="1521256092247" expanded="true" signature="6517:6569" ph="SELECT DISTI... geometry_columns" />
-            <marker date="1521256092247" expanded="true" signature="8352:8454" ph="SELECT missi... missingValue" />
-            <marker date="1521256092247" expanded="true" signature="9061:9294" ph="select 1 fro... attnum" />
-            <marker date="1521256092247" expanded="true" signature="9076:9174" ph="select attnu... pg_attribute" />
-            <marker date="1521256092247" expanded="true" signature="9127:9142" ph="select * fro... x" />
-            <marker date="1521256092247" expanded="true" signature="9204:9267" ph="select indke... pg_index" />
-            <marker date="1521256092247" expanded="true" signature="9251:9266" ph="select * fro... x" />
-            <marker date="1521256092247" expanded="true" signature="10498:10610" ph="SELECT missi... " />
-            <marker date="1521256092247" expanded="true" signature="14594:14693" ph="SELECT missi... missingValue" />
-            <marker date="1521256092247" expanded="true" signature="15216:15328" ph="SELECT missi... " />
-            <marker date="1521256092247" expanded="true" signature="17120:17131" ph="DROP TABLE m... " />
-            <marker date="1521256092247" expanded="true" signature="17200:17297" ph="DELETE FROM geometry_columns... " />
-            <marker date="1521256092247" expanded="true" signature="17459:18105" ph="CREATE TABLE... missingValue" />
-            <marker date="1521256092247" expanded="true" signature="18164:18283" ph="SELECT AddGe... " />
-            <marker date="1521256092247" expanded="true" signature="18872:18888" ph="DROP TABLE m... " />
-            <marker date="1521256092247" expanded="true" signature="18915:18972" ph="DELETE FROM geometry_columns... " />
-            <marker date="1521256092247" expanded="true" signature="19071:19697" ph="CREATE TABLE... moves" />
-            <marker date="1521256092247" expanded="true" signature="19737:19814" ph="SELECT AddGe... " />
-            <marker date="1521256092247" expanded="true" signature="23213:23238" ph="DROP TABLE m... " />
-            <marker date="1521256092247" expanded="true" signature="23374:23486" ph="create table... missingValue_buf" />
-            <marker date="1521256092247" expanded="true" signature="23529:23606" ph="alter table missingValue_buf... " />
-            <marker date="1521256092247" expanded="true" signature="23645:23817" ph="select A.gid... missingValue" />
-            <marker date="1521256092247" expanded="true" signature="24202:24227" ph="DROP TABLE m... " />
-            <marker date="1521256092247" expanded="true" signature="24354:24466" ph="CREATE TABLE... missingValue_buf" />
-            <marker date="1521256092247" expanded="true" signature="24507:24584" ph="ALTER TABLE missingValue_buf... " />
-            <marker date="1521256092247" expanded="true" signature="24626:24811" ph="select A.gid... missingValue" />
-            <marker date="1521256092247" expanded="true" signature="24852:25029" ph="select A.gid... missingValue" />
-            <marker date="1521256092247" expanded="true" signature="41006:41323" ph="SELECT f_tab... geometry_columns" />
-            <marker date="1521256092247" expanded="true" signature="44234:44305" ph="select srid geometry_columns" />
-            <marker date="1521256092247" expanded="true" signature="46436:46507" ph="select srid geometry_columns" />
-            <marker date="1521256092247" expanded="true" signature="47088:47159" ph="select srid geometry_columns" />
-            <marker date="1521256092247" expanded="true" signature="47828:48014" ph="SELECT f_tab... geometry_columns" />
-            <marker date="1521256092247" expanded="true" signature="54716:54737" ph="select count... missingValue" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar:///usr/lib/jvm/java-9-oracle/lib/src.zip!/java.desktop/java/awt/Container.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-423">
           <caret line="991" column="16" lean-forward="false" selection-start-line="991" selection-start-column="16" selection-end-line="991" selection-end-column="16" />
-          <folding>
-            <element signature="e#38090#38091#0" expanded="true" />
-            <element signature="e#38136#38137#0" expanded="true" />
-          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/config.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/resources/config.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="144">
+          <caret line="8" column="0" lean-forward="true" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/weka/gui/WekaTaskMonitor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="29">
+        <state relative-caret-position="245">
           <caret line="69" column="38" lean-forward="false" selection-start-line="69" selection-start-column="38" selection-end-line="69" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/weka/gui/stpm/Constants.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="216">
+          <caret line="12" column="11" lean-forward="false" selection-start-line="12" selection-start-column="11" selection-end-line="12" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/weka/gui/stpm/TrajectoryFrame.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-349">
+          <caret line="11" column="27" lean-forward="true" selection-start-line="11" selection-start-column="27" selection-end-line="11" selection-end-column="27" />
           <folding>
-            <element signature="e#3983#4125#0" expanded="true" />
-            <element signature="e#4124#4125#0" expanded="true" />
+            <element signature="e#30388#30555#0" expanded="true" />
+            <element signature="e#30554#30555#0" expanded="true" />
+            <element signature="e#54773#54774#0" expanded="true" />
+            <element signature="e#54823#54824#0" expanded="true" />
+            <marker date="1521280223792" expanded="true" signature="6045:6097" ph="SELECT DISTI... geometry_columns" />
+            <marker date="1521280223792" expanded="true" signature="7880:7982" ph="SELECT missi... missingValue" />
+            <marker date="1521280223792" expanded="true" signature="8589:8822" ph="select 1 fro... attnum" />
+            <marker date="1521280223792" expanded="true" signature="8604:8702" ph="select attnu... pg_attribute" />
+            <marker date="1521280223792" expanded="true" signature="8655:8670" ph="select * fro... x" />
+            <marker date="1521280223792" expanded="true" signature="8732:8795" ph="select indke... pg_index" />
+            <marker date="1521280223792" expanded="true" signature="8779:8794" ph="select * fro... x" />
+            <marker date="1521280223792" expanded="true" signature="10026:10138" ph="SELECT missi... " />
+            <marker date="1521280223792" expanded="true" signature="14122:14221" ph="SELECT missi... missingValue" />
+            <marker date="1521280223792" expanded="true" signature="14744:14856" ph="SELECT missi... " />
+            <marker date="1521280223792" expanded="true" signature="16648:16659" ph="DROP TABLE m... " />
+            <marker date="1521280223792" expanded="true" signature="16728:16825" ph="DELETE FROM geometry_columns... " />
+            <marker date="1521280223792" expanded="true" signature="16987:17633" ph="CREATE TABLE... missingValue" />
+            <marker date="1521280223792" expanded="true" signature="17692:17811" ph="SELECT AddGe... " />
+            <marker date="1521280223792" expanded="true" signature="18400:18416" ph="DROP TABLE m... " />
+            <marker date="1521280223792" expanded="true" signature="18443:18500" ph="DELETE FROM geometry_columns... " />
+            <marker date="1521280223792" expanded="true" signature="18599:19225" ph="CREATE TABLE... moves" />
+            <marker date="1521280223792" expanded="true" signature="19265:19342" ph="SELECT AddGe... " />
+            <marker date="1521280223792" expanded="true" signature="22741:22766" ph="DROP TABLE m... " />
+            <marker date="1521280223792" expanded="true" signature="22902:23014" ph="create table... missingValue_buf" />
+            <marker date="1521280223792" expanded="true" signature="23057:23134" ph="alter table missingValue_buf... " />
+            <marker date="1521280223792" expanded="true" signature="23173:23345" ph="select A.gid... missingValue" />
+            <marker date="1521280223792" expanded="true" signature="23730:23755" ph="DROP TABLE m... " />
+            <marker date="1521280223792" expanded="true" signature="23882:23994" ph="CREATE TABLE... missingValue_buf" />
+            <marker date="1521280223792" expanded="true" signature="24035:24112" ph="ALTER TABLE missingValue_buf... " />
+            <marker date="1521280223792" expanded="true" signature="24154:24339" ph="select A.gid... missingValue" />
+            <marker date="1521280223792" expanded="true" signature="24380:24557" ph="select A.gid... missingValue" />
+            <marker date="1521280223792" expanded="true" signature="39136:39453" ph="SELECT f_tab... geometry_columns" />
+            <marker date="1521280223792" expanded="true" signature="42332:42403" ph="select srid geometry_columns" />
+            <marker date="1521280223792" expanded="true" signature="44534:44605" ph="select srid geometry_columns" />
+            <marker date="1521280223792" expanded="true" signature="45186:45257" ph="select srid geometry_columns" />
+            <marker date="1521280223792" expanded="true" signature="45926:46104" ph="SELECT f_tab... geometry_columns" />
+            <marker date="1521280223792" expanded="true" signature="52800:52821" ph="select count... missingValue" />
           </folding>
         </state>
       </provider>
