@@ -1,36 +1,23 @@
 package weka.gui.stpm;
 
-import javax.swing.*;
-
 import weka.gui.WekaTaskMonitor;
+import weka.gui.geodata.visualizer.ShowGeoData;
+import weka.gui.stpm.clean.TrajectoryClean;
+import weka.gui.stpm.clean.Util;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import weka.gui.geodata.visualizer.ShowGeoData;
-import weka.gui.stpm.clean.TrajectoryClean;
-import weka.gui.stpm.clean.Util;
+
+import static weka.gui.stpm.Constants.*;
 
 
 //public class TrajectoryFrame extends JFrame{
@@ -137,48 +124,40 @@ public class TrajectoryFrame extends JDialog{
             dispose();
         }	
     }
-    
+
+
     // Inicio da Conexão com o Banco de Dados
     private void loadPropertiesFromFile(String userFromInput, String passFromInput, String urlFromInput) throws SQLException {
     	System.out.println("AQUI 2 : Conexão com o Banco de Dados");
-    	Properties prop = new Properties();
-    	InputStream input = null;
+    	Properties properties = new Properties();
+
 
     	try {
+            properties.load(ClassLoader.getSystemResourceAsStream(CONFIG_PROPERTIES));
 
-    		input = new FileInputStream("config.properties");
 
-    		// load a properties file
-    		prop.load(input);
+    		String user = (userFromInput != null) ? userFromInput :
+                    properties.getProperty(DB_USER);
+    		String pass = (userFromInput != null) ? passFromInput :
+                    properties.getProperty(DB_PASS);
+    		String url = (userFromInput  != null) ? urlFromInput  :
+                    properties.getProperty(DB_URL) + properties.getProperty(DB_NAME);
 
-    		String user = (userFromInput!=null) ? userFromInput : prop.getProperty("dbUser"); 
-    		String pass = (userFromInput!=null) ? passFromInput : prop.getProperty("dbPass");
-    		String url = (userFromInput!=null) ? urlFromInput : prop.getProperty("dbURL") + prop.getProperty("dbName");
-
-    		if (user == "")
+    		if (user.equals(VOID))
     			conn = DriverManager.getConnection(url);
     		else
     			conn = DriverManager.getConnection(url,user,pass);
 
-    		((org.postgresql.PGConnection) conn).addDataType("geometry",org.postgis.PGgeometry.class);
+    		((org.postgresql.PGConnection) conn).addDataType(DB_TYPE_GEOMETRY, org.postgis.PGgeometry.class);
 
     		config.conn = conn;
-    		config.table = prop.getProperty("trajectoryTable");
-    		config.tid = prop.getProperty("trajectoryId");
-    		config.time = prop.getProperty("detectionTime"); 
+    		config.table = properties.getProperty(TRAJECTORY_TABLE);
+    		config.tid = properties.getProperty(TRAJECTORY_ID);
+    		config.time = properties.getProperty(DETECTION_TIME);
 
     	} catch (IOException ex) {
     		ex.printStackTrace();
-    	} finally {
-    		if (input != null) {
-    			try {
-    				input.close();
-    			} catch (IOException e) {
-    				e.printStackTrace();
-    			}
-    		}
     	}
-
     }
     
     /**Load the tables in the DB with geometry columns*/
@@ -611,39 +590,24 @@ public class TrajectoryFrame extends JDialog{
 		panelSchema.add(jComboBoxSchema,BorderLayout.CENTER);		
 	
 		JButton Load = new javax.swing.JButton("Load");
-		Load.addActionListener(new java.awt.event.ActionListener(){
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				LoadActionPerformed(evt);
-			}});
+		Load.addActionListener(evt -> LoadActionPerformed(evt));
 		panelSchema.add(Load);
 	
 		JButton configure = new javax.swing.JButton("Configure Trajectory Table");
-		configure.addActionListener(new java.awt.event.ActionListener(){
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				configureActionPerformed(evt);
-			}});
+		configure.addActionListener(evt -> configureActionPerformed(evt));
 		panelSchema.add(configure);
 	
 	
 		//bruno
 		JButton show = new javax.swing.JButton("Visualization");
-		show.addActionListener(new java.awt.event.ActionListener(){
-	
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				showDadosGeograficos();
-			}});
+		show.addActionListener(evt -> showDadosGeograficos());
 		panelSchema.add(show);
 		//bruno
 	
 	
 		//@Hercules
 		JButton filter = new javax.swing.JButton("Trajectory cleaning");
-		filter.addActionListener(new java.awt.event.ActionListener() {
-	
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				filterActionPerformed(evt);
-			}
-		});
+		filter.addActionListener(evt -> filterActionPerformed(evt));
 		panelSchema.add(filter);
 		//HMA
 		container.add(panelSchema,BorderLayout.NORTH);
@@ -718,11 +682,7 @@ public class TrajectoryFrame extends JDialog{
 		jListRF= new JList(modelRF);
 		jListRF.setVisibleRowCount(4);
 		jListRF.setFixedCellWidth(4);
-		jListRF.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-			public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-				jListRFValueChanged(evt);
-			}
-		});
+		jListRF.addListSelectionListener(evt -> jListRFValueChanged(evt));
 		jScrollPane1.setViewportView(jListRF);
 		panelContent.add(jScrollPane1,c);
 		validate();
@@ -778,12 +738,8 @@ public class TrajectoryFrame extends JDialog{
 			}
 		});
 		RFMinTime.addActionListener(// if 'enter' after entering RF mintime
-				new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						RFMinTimeActionPerformed(e);
-					}
-				}
-				);
+                e -> RFMinTimeActionPerformed(e)
+        );
 		mtPanel.add(RFMinTime,c2);
 	
 		c.gridx=3;
@@ -803,11 +759,7 @@ public class TrajectoryFrame extends JDialog{
 		c2.gridwidth=6;
 		jComboBoxMethod=new JComboBox(algs);
 		jComboBoxMethod.setPreferredSize(new Dimension(210,20));	
-		jComboBoxMethod.addItemListener(new java.awt.event.ItemListener() {
-			public void itemStateChanged(java.awt.event.ItemEvent evt) {
-				jComboBoxMethodItemStateChanged(evt);
-			}
-		});
+		jComboBoxMethod.addItemListener(evt -> jComboBoxMethodItemStateChanged(evt));
 		panelMethod.add(jComboBoxMethod,c2);
 	
 		c2.gridx=0;
@@ -835,11 +787,7 @@ public class TrajectoryFrame extends JDialog{
 		c2.gridy=3;
 		jComboBoxParam=new JComboBox();
 		jComboBoxParam.setPreferredSize(new Dimension(160,20));
-		jComboBoxParam.addItemListener(new java.awt.event.ItemListener() {
-			public void itemStateChanged(java.awt.event.ItemEvent evt) {
-				jComboBoxParamItemStateChanged(evt);
-			}
-		});
+		jComboBoxParam.addItemListener(evt -> jComboBoxParamItemStateChanged(evt));
 		panelMethod.add(jComboBoxParam,c2);
 	
 		c.gridx=5;
@@ -858,29 +806,13 @@ public class TrajectoryFrame extends JDialog{
 		c.insets = new Insets(10,10,10,10);
 	
 		jButtonGenArffFile = new JButton("Generate Arff File..."); 
-		jButtonGenArffFile.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				jButtonGenArffFileActionPerformed(evt);
-			}
-		});
+		jButtonGenArffFile.addActionListener(evt -> jButtonGenArffFileActionPerformed(evt));
 		c.gridx=0;
 		c.gridy=0;
 		panelDown.add(jButtonGenArffFile,c);
 	
 		JButton jButtonOK = new javax.swing.JButton("OK");
-		jButtonOK.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				try {
-					OKActionPerformed(evt);
-				} catch (IOException e) {
-					e.printStackTrace();
-					System.out.println(e.getMessage());
-				} catch (SQLException e) {
-					e.printStackTrace();
-					System.out.println(e.getMessage());
-				}
-			}
-		});
+		jButtonOK.addActionListener(evt -> OKActionPerformed(evt));
 	
 		c.gridx=3;
 		c.gridy=0;
@@ -888,11 +820,7 @@ public class TrajectoryFrame extends JDialog{
 		panelDown.add(jButtonOK,c);			
 	
 		JButton jButtonCancel = new javax.swing.JButton("Close");
-		jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				jButtonCancelActionPerformed(evt);
-			}
-		});
+		jButtonCancel.addActionListener(evt -> jButtonCancelActionPerformed(evt));
 		c.gridx=5;
 		c.gridy=0;
 		c.gridwidth=2;
@@ -983,9 +911,9 @@ public class TrajectoryFrame extends JDialog{
         Parameter p = (Parameter) jComboBoxParam.getSelectedItem();
         try {
             if (p.type.DOUBLE == p.type) {
-                p.value = new Double(jTextFieldParam.getText());
+                p.value = Double.valueOf(jTextFieldParam.getText());
             }else {
-                p.value = new Integer(jTextFieldParam.getText());
+                p.value = Integer.valueOf(jTextFieldParam.getText());
             }
         }catch(NumberFormatException e) {
             JOptionPane.showMessageDialog(this,"Parameter value invalid!");
@@ -998,7 +926,7 @@ public class TrajectoryFrame extends JDialog{
     	System.out.println("AQUI 16 : Campos CB ativando");
         Parameter p = (Parameter) evt.getItem();
         if (p.type == p.type.DOUBLE) {
-            jTextFieldParam.setText(((Double)p.value).toString());
+            jTextFieldParam.setText(p.value.toString());
         }else {
             jTextFieldParam.setText(((Integer)p.value).toString());
         }
@@ -1028,7 +956,7 @@ public class TrajectoryFrame extends JDialog{
         try {
             for (Object obj : objs) {
                 AssociatedParameter p = (AssociatedParameter) obj;
-                p.value = new Integer(Integer.parseInt(RFMinTime.getText()));
+                p.value = Integer.valueOf(Integer.parseInt(RFMinTime.getText()));
             }
             jTextFieldBuffer.grabFocus();
         }catch(java.lang.NumberFormatException e) {
@@ -1043,7 +971,7 @@ public class TrajectoryFrame extends JDialog{
         try {
             for (Object obj : objs) {
                 AssociatedParameter p = (AssociatedParameter) obj;
-                p.value = new Integer(Integer.parseInt(RFMinTime.getText()));
+                p.value = Integer.parseInt(RFMinTime.getText());
             }
             jTextFieldBuffer.grabFocus();
         }catch(java.lang.NumberFormatException e) {
@@ -1076,7 +1004,7 @@ public class TrajectoryFrame extends JDialog{
     }
     
     // Valor do Buffer
-    private void OKActionPerformed(ActionEvent evt) throws IOException, SQLException {
+    private void OKActionPerformed(ActionEvent evt)  {
     	System.out.println("AQUI 22 : Buffer Valor");
     	if(jCheckBoxBuffer.isSelected()){
     		if(checkBufferState()){    		
@@ -1218,7 +1146,7 @@ public class TrajectoryFrame extends JDialog{
 			if (jListTrajectoryTables.getSelectedIndex() != -1){
 				 ResultSet vTableName = s.executeQuery("SELECT f_table_name as tableName,type "+
 						"FROM geometry_columns " +
-						"WHERE f_table_schema=trim('"+(String) jComboBoxSchema.getSelectedItem()+"') "+
+						"WHERE f_table_schema=trim('"+ jComboBoxSchema.getSelectedItem()+"') "+
 				 		"ORDER BY tableName");
 				 int indexAtualVT=0;
 				 while ( vTableName.next() ) {
@@ -1285,7 +1213,7 @@ private void filterActionPerformed(ActionEvent e) {
     String esquema = (String)jComboBoxSchema.getSelectedItem();
     int[] i = jListTrajectoryTables.getSelectedIndices();
     if (i.length >= 1) {
-        List<String> listaTab = new ArrayList<String>();
+        List<String> listaTab = new ArrayList<>();
         Object[] temp = jListTrajectoryTables.getSelectedValues();
         for(Object ob: temp){
             listaTab.add((String) ob);
