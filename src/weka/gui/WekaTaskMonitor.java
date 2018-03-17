@@ -22,16 +22,8 @@
 
 package weka.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.Toolkit;
-
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
+import javax.swing.*;
+import java.awt.*;
 
 /** 
  * This panel records the number of weka tasks running and displays a
@@ -66,10 +58,11 @@ public class WekaTaskMonitor
    * Constructor
    */
   public WekaTaskMonitor() {
+
     Image pic = Toolkit.getDefaultToolkit().
-      getImage(ClassLoader.getSystemResource("weka/gui/weka_stationary.gif"));
+      getImage(ClassLoader.getSystemResource("weka_stationary.gif"));
     Image pic2 = Toolkit.getDefaultToolkit().
-      getImage(ClassLoader.getSystemResource("weka/gui/weka_animated.gif"));
+      getImage(ClassLoader.getSystemResource("weka_animated.gif"));
 
     m_iconStationary = new ImageIcon(pic); 
     m_iconAnimated = new ImageIcon(pic2);
@@ -83,10 +76,9 @@ public class WekaTaskMonitor
     */
     setLayout(new BorderLayout());
     Dimension d = m_MonitorLabel.getPreferredSize();
-    m_MonitorLabel.setPreferredSize(new Dimension(d.width+15,d.height));
-    m_MonitorLabel.setMinimumSize(new Dimension(d.width+15,d.height));
+    m_MonitorLabel.setPreferredSize(new Dimension(d.width + 15, d.height));
+    m_MonitorLabel.setMinimumSize(new Dimension(d.width + 15, d.height));
     add(m_MonitorLabel, BorderLayout.CENTER);
-    
 
   }
 
