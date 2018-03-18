@@ -182,26 +182,22 @@ public class TrajectoryFrame extends JDialog{
     	algs = new Method[2];
         int i = 0;
 
-        /** SMOT:
- 		* Original method used to find stops, given a list of RFs.
- 		*/
+        /**
+         * SMOT:
+         * Original method used to find stops, given a list of RFs.
+ 		 */
         algs[i] = smot_run;                   
 //        algs[i] = new SMOT(buffer, config);
         
-        /** CB-SMOT:
-         * Used to clusterize and find slow-speed periods in a trajectory.        
+        /**
+		 * CB-SMOT:
+         * Used to clusterize and find slow-speed periods in a trajectory.
          */
         algs[++i] = cb_run;
         
-        algs[i].param.add(
-                        new Parameter("MaxAvgSpeed",Parameter.Type.DOUBLE,new Double(0.9))
-                        );
-        algs[i].param.add(
-                        new Parameter("MinTime (seconds)",Parameter.Type.INT,new Integer(60))
-                        );                
-        algs[i].param.add(
-                        new Parameter("MaxSpeed",Parameter.Type.DOUBLE,new Double(1.1))
-                        );                
+        algs[i].param.add(new Parameter("MaxAvgSpeed",Parameter.Type.DOUBLE, 0.9));
+        algs[i].param.add(new Parameter("MinTime (seconds)",Parameter.Type.INT, 60));
+        algs[i].param.add(new Parameter("MaxSpeed",Parameter.Type.DOUBLE, 1.1));
     }
     
     // TID dos taxistas e seus pontos
@@ -427,6 +423,7 @@ public class TrajectoryFrame extends JDialog{
             s.execute("DROP TABLE moves");
             s.execute("DELETE FROM geometry_columns WHERE f_table_name = 'moves'");
         } catch (SQLException ex) {
+            ex.printStackTrace();
         }finally {
             s.execute(
                 "CREATE TABLE moves ("+

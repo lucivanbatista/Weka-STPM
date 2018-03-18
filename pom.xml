@@ -45,7 +45,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>weka.gui.stpm.TrajectoryFrame</mainClass>
+                            <mainClass>main.java.App</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
