@@ -410,15 +410,15 @@ public class TrajectoryFrame extends JDialog{
                 ") WITHOUT OIDS;"    
             );            
               s.execute("SELECT AddGeometryColumn('"+TrajectoryFrame.getCurrentNameTableStop()+"', 'the_geom',"+table_srid+", 'MULTIPOLYGON', 2)");
-            try {
-                //s.execute("ALTER TABLE "+TrajectoryFrame.getCurrentNameTableStop()+" DROP CONSTRAINT enforce_geotype_the_geom");
-            } catch (Exception ex) {
-                try {
-                    //s.execute("ALTER TABLE "+TrajectoryFrame.getCurrentNameTableStop()+" DROP CONSTRAINT \"$2\"");
-                }catch (Exception e) {
-                    ex.printStackTrace();
-                }
-            }            
+//            try {
+//                //s.execute("ALTER TABLE "+TrajectoryFrame.getCurrentNameTableStop()+" DROP CONSTRAINT enforce_geotype_the_geom");
+//            } catch (Exception ex) {
+//                try {
+//                    //s.execute("ALTER TABLE "+TrajectoryFrame.getCurrentNameTableStop()+" DROP CONSTRAINT \"$2\"");
+//                }catch (Exception e) {
+//                    ex.printStackTrace();
+//                }
+//            }
         }
 
         //MOVES table (NOT USED YET)
@@ -443,15 +443,15 @@ public class TrajectoryFrame extends JDialog{
                 ")WITHOUT OIDS"
             );
             s.execute("SELECT AddGeometryColumn('moves', 'the_geom',"+table_srid+", 'LINESTRING', 2)");
-            try {
-                //s.execute("ALTER TABLE moves DROP CONSTRAINT enforce_geotype_the_geom");
-            } catch (Exception ex) {
-                try {
-                    //s.execute("ALTER TABLE moves DROP CONSTRAINT \"$2\"");
-                }catch (Exception e) {
-                    ex.printStackTrace();
-                }
-            }            
+//            try {
+//                //s.execute("ALTER TABLE moves DROP CONSTRAINT enforce_geotype_the_geom");
+//            } catch (Exception ex) {
+//                try {
+//                    //s.execute("ALTER TABLE moves DROP CONSTRAINT \"$2\"");
+//                }catch (Exception e) {
+//                    ex.printStackTrace();
+//                }
+//            }
         }
         
         /*Apply buffer geometry to RFs.  */
@@ -500,7 +500,7 @@ public class TrajectoryFrame extends JDialog{
     private InterceptsG createIntercepts() throws SQLException{
 	System.out.println("AQUI 8 : Create Intercepts");
 	 	//get the RFs from panel...
-    	Object[] objs = jListRF.getSelectedValues();                    
+    	Object[] objs = jListRF.getSelectedValuesList().toArray();
     	AssociatedParameter[] relevantFeatures = new AssociatedParameter[objs.length];                    
         for (int i=0;i<objs.length;i++) {
             relevantFeatures[i] = (AssociatedParameter) objs[i];
@@ -845,7 +845,7 @@ public class TrajectoryFrame extends JDialog{
     	System.out.println("AQUI 10 : Interface Gráfica Configure Trajectory Table");
     	int[] i = jListTrajectoryTables.getSelectedIndices();
     	if( i.length == 1){
-    		Object[] temp = jListTrajectoryTables.getSelectedValues();    		
+    		Object[] temp = jListTrajectoryTables.getSelectedValuesList().toArray();
     		config.table = (String)temp[0];
             config.conn = conn;
             TrajectoryConfig tc = new TrajectoryConfig();
@@ -854,7 +854,6 @@ public class TrajectoryFrame extends JDialog{
     	}
     	else{
     		JOptionPane.showMessageDialog(this,"Select only one Trajectory Table.");
-            return;
     	}
     }
     
@@ -863,10 +862,12 @@ public class TrajectoryFrame extends JDialog{
     	System.out.println("AQUI 11 : Interface = Seleção IB ou CB");
         Method alg = (Method) jComboBoxMethod.getSelectedItem();
         jComboBoxParam.removeAllItems();
-        for (int i=0;i<alg.param.size();i++) {
-            jComboBoxParam.addItem(alg.param.elementAt(i));
+        if (alg != null) {
+            for (int i=0;i<alg.param.size();i++) {
+                jComboBoxParam.addItem(alg.param.elementAt(i));
+            }
         }
-        
+
         //prevents the SMoT methods to call upon parameters
         if(alg.toString().compareTo("SMoT")==0){
         	jComboBoxParam.setEnabled(false);
@@ -910,10 +911,12 @@ public class TrajectoryFrame extends JDialog{
     	System.out.println("AQUI 15 : Valores Campos CB alterados");
         Parameter p = (Parameter) jComboBoxParam.getSelectedItem();
         try {
-            if (p.type.DOUBLE == p.type) {
-                p.value = Double.valueOf(jTextFieldParam.getText());
-            }else {
-                p.value = Integer.valueOf(jTextFieldParam.getText());
+            if (p != null) {
+                if (p.type.DOUBLE == p.type) {
+                    p.value = Double.valueOf(jTextFieldParam.getText());
+                }else {
+                    p.value = Integer.valueOf(jTextFieldParam.getText());
+                }
             }
         }catch(NumberFormatException e) {
             JOptionPane.showMessageDialog(this,"Parameter value invalid!");
@@ -936,7 +939,7 @@ public class TrajectoryFrame extends JDialog{
     	System.out.println("AQUI 17");
         Method alg = (Method) jComboBoxMethod.getSelectedItem();
         jComboBoxParam.removeAllItems();
-        for (int i=0;i<alg.param.size();i++) {
+        for (int i = 0; i< (alg != null ? alg.param.size() : 0); i++) {
             jComboBoxParam.addItem(alg.param.elementAt(i));
         }
     }
@@ -952,11 +955,11 @@ public class TrajectoryFrame extends JDialog{
     // Box do RFMinTime
     private void RFMinTimeFocusLost(java.awt.event.FocusEvent evt) {
     	System.out.println("AQUI 19 : Box RFMinTime");
-        Object[] objs = jListRF.getSelectedValues();
+        Object[] objs = jListRF.getSelectedValuesList().toArray();
         try {
             for (Object obj : objs) {
                 AssociatedParameter p = (AssociatedParameter) obj;
-                p.value = Integer.valueOf(Integer.parseInt(RFMinTime.getText()));
+                p.value = Integer.parseInt(RFMinTime.getText());
             }
             jTextFieldBuffer.grabFocus();
         }catch(java.lang.NumberFormatException e) {
@@ -967,7 +970,7 @@ public class TrajectoryFrame extends JDialog{
     
     private void RFMinTimeActionPerformed(java.awt.event.ActionEvent evt) {
     	System.out.println("AQUI 20");
-        Object[] objs = jListRF.getSelectedValues();
+        Object[] objs = jListRF.getSelectedValuesList().toArray();
         try {
             for (Object obj : objs) {
                 AssociatedParameter p = (AssociatedParameter) obj;
@@ -995,7 +998,7 @@ public class TrajectoryFrame extends JDialog{
             model2.removeAllElements();                        
             while ( vTableName.next() )  {/* creates a new table for each table that has objects with topological relation to vRegion */
                 model2.addElement(new AssociatedParameter(vTableName.getString("tableName"),vTableName.getString("type")));// RFs
-            	model.addElement(new String(vTableName.getString(1)));//Traject tables            	
+            	model.addElement(vTableName.getString(1));//Traject tables
             }	
         }catch (Exception vErro){
             vErro.printStackTrace();
@@ -1031,7 +1034,7 @@ public class TrajectoryFrame extends JDialog{
         }        
         
         //get the thing in 'things', those trajectories tables to be executed 
-        Object[] objs = jListTrajectoryTables.getSelectedValues();
+        Object[] objs = jListTrajectoryTables.getSelectedValuesList().toArray();
         String[] str = new String [objs.length];
         for(int i=0;i<objs.length;i++){
                 str[i]=(String)objs[i];
@@ -1224,7 +1227,6 @@ private void filterActionPerformed(ActionEvent e) {
         tc.setVisibleFrame(true);
     } else {
         JOptionPane.showMessageDialog(this, "Select one or more Trajectory Table.");
-        return;
     }
 }
 	public String formatNameParameter(String nm){
@@ -1259,19 +1261,18 @@ private void filterActionPerformed(ActionEvent e) {
                 str.append("_").append(formatNameParameter(param.name)).append("_").append(param.value.toString());
             }
         }
-        String str1 = str.toString().toLowerCase().replace(".", "_")
+        return str.toString().toLowerCase().replace(".", "_")
                 .replace(",", "_").replace(" ", "")
                 .replace("(degrees)", "")
                 .replace("(seconds)", "")
                 .replace("(points)", "");
-        return str1;
     }
 
 
     // ??? Cluster parâmetros
     public List<Parameter> parametersCluster(){
     	System.out.println("AQUI 28 : ??? Parâmetros Cluster ???");
-        List<Parameter> list = new ArrayList<Parameter>();
+        List<Parameter> list = new ArrayList<>();
         int tamParans = 0;
         while(tamParans < this.jComboBoxParam.getModel().getSize()){
             Parameter param = (Parameter)this.jComboBoxParam.getModel().getElementAt(tamParans);
@@ -1307,11 +1308,11 @@ private void filterActionPerformed(ActionEvent e) {
 
     public void insertCleanTrajProcess(long timeProcess){
     	System.out.println("AQUI 32");
-        Object[] objs = jListRF.getSelectedValues();
+        Object[] objs = jListRF.getSelectedValuesList().toArray();
         AssociatedParameter[] relevantFeatures = new AssociatedParameter[objs.length];
         Integer rfMinTime = null;
         if(relevantFeatures.length > 0){
-            rfMinTime = relevantFeatures[0].value.intValue();
+            rfMinTime = relevantFeatures[0].value;
         }
         Double avgSpeed = null;
         Integer minTime = null;
@@ -1335,7 +1336,7 @@ private void filterActionPerformed(ActionEvent e) {
         }
         
         String sqlCount = "select count(*) from "+TrajectoryFrame.getCurrentNameTableStop();
-        System.out.println(sqlCount.toString());
+        System.out.println(sqlCount);
         try{
             PreparedStatement psCount = conn.prepareStatement(sqlCount);
             ResultSet resultSet = psCount.executeQuery();
@@ -1383,11 +1384,6 @@ private void filterActionPerformed(ActionEvent e) {
         } catch (SQLException ex) {
             Logger.getLogger(TrajectoryFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-
-    // Main, responsável por iniciar a aplicação
-    public static void main(String args[]) {
-    	new TrajectoryFrame(null, null, null);
     }
 
 }
