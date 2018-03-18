@@ -3,8 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="da0042df-c628-452f-b735-79f9795f2ac2" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
-      <change beforePath="$PROJECT_DIR$/src/weka/gui/stpm/TrajectoryFrame.java" afterPath="$PROJECT_DIR$/src/weka/gui/stpm/TrajectoryFrame.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -447,7 +445,7 @@
       <workItem from="1521255280832" duration="1708000" />
       <workItem from="1521277716624" duration="562000" />
       <workItem from="1521278454120" duration="1888000" />
-      <workItem from="1521334770833" duration="2204000" />
+      <workItem from="1521334770833" duration="2236000" />
     </task>
     <task id="LOCAL-00001" summary="remove local lib postgis to maven library">
       <created>1521336335108</created>
@@ -456,11 +454,18 @@
       <option name="project" value="LOCAL" />
       <updated>1521336335108</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="remove local lib postgis to maven library">
+      <created>1521337042055</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1521337042055</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="6740000" />
+    <option name="totallyTimeSpent" value="6772000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
