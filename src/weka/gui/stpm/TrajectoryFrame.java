@@ -106,7 +106,7 @@ public class TrajectoryFrame extends JDialog{
     
     // Construtor da interface TrajectoryFrame
     public TrajectoryFrame(String user, String pass, String url) {
-    	System.out.println("AQUI 1 : Construtor da interface TrajectoryFrame");
+//    	System.out.println("AQUI 1 : Construtor da interface TrajectoryFrame");
     	this.setTitle("Trajectory");    	
     	init(); // Algoritmos
         initComponents(); // Interface gráfica
@@ -125,10 +125,9 @@ public class TrajectoryFrame extends JDialog{
         }	
     }
 
-
     // Inicio da Conexão com o Banco de Dados
     private void loadPropertiesFromFile(String userFromInput, String passFromInput, String urlFromInput) throws SQLException {
-    	System.out.println("AQUI 2 : Conexão com o Banco de Dados");
+//    	System.out.println("AQUI 2 : Conexão com o Banco de Dados");
     	Properties properties = new Properties();
 
 
@@ -163,7 +162,7 @@ public class TrajectoryFrame extends JDialog{
     /**Load the tables in the DB with geometry columns*/
     // Carregar os Schemas do Banco que possuem columas geometricas
     private void loadSchemas() {
-    	System.out.println("AQUI 3 : Schemas do Banco");
+//    	System.out.println("AQUI 3 : Schemas do Banco");
         try {
             Statement smnt = conn.createStatement();
             ResultSet rs = smnt.executeQuery("SELECT DISTINCT f_table_schema FROM geometry_columns");
@@ -178,7 +177,7 @@ public class TrajectoryFrame extends JDialog{
     
     // Define Algoritmos do IB E CB
     private void init() {  
-    	System.out.println("AQUI 4 : Define Algoritmos IB e CB");
+//    	System.out.println("AQUI 4 : Define Algoritmos IB e CB");
     	algs = new Method[2];
         int i = 0;
 
@@ -202,7 +201,7 @@ public class TrajectoryFrame extends JDialog{
     
     // TID dos taxistas e seus pontos
     private void loadTrajectories(String tableTraj) throws SQLException, IOException { 
-    	System.out.println("AQUI 5 : Get TID dos taxistas e seus pontos ");
+//    	System.out.println("AQUI 5 : Get TID dos taxistas e seus pontos ");
     	Method method = (Method) jComboBoxMethod.getSelectedItem();
         InterceptsG i = null;
         InterceptsG streets = null;
@@ -248,7 +247,6 @@ public class TrajectoryFrame extends JDialog{
         	Trajectory trajectory = new Trajectory(table_srid);
             trajectory.tid = rs.getInt("tid");     
             String meth = method.toString();
-            
             if (!meth.startsWith("SMoT")) {
             	//select the points of the trajectory in sequential time
             	Statement s1 = conn.createStatement();                
@@ -297,6 +295,10 @@ public class TrajectoryFrame extends JDialog{
                         }
                         // Run do CB
                         
+                        System.out.println("ANTES DE EXECUTAR O MÉTODO");
+                        for(GPSPoint p : trajectory.points){
+                        	System.out.println("GID: " + p.gid + "; SPEED: " + p.speed);
+                        }
                         cb_run.setInformations(buffer, config, jCheckBoxBuffer.isSelected(), jRadioButtonFType.isSelected(), table_srid, jListRF);
                         cb_run.run(trajectory, i, tableTraj, streets);
 //                      method.run(trajectory,i,tableTraj,streets);
@@ -323,7 +325,7 @@ public class TrajectoryFrame extends JDialog{
     }
 
     public static List<Trajectory> getTrajectoriesWithSpeeds(String tableTraj, Config config, Integer table_srid) throws SQLException, IOException {
-    	System.out.println("AQUI 6");
+//    	System.out.println("AQUI 6");
         List<Trajectory> trajectorys = new ArrayList<Trajectory>();
         Statement s = config.conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_UPDATABLE);
         // selects the trajectory-tid to be processed
@@ -373,7 +375,7 @@ public class TrajectoryFrame extends JDialog{
 
     // Criar tables
     private void createTables() throws SQLException {
-    	System.out.println("AQUI 7 : Criação das Tabelas");
+//    	System.out.println("AQUI 7 : Criação das Tabelas");
         Statement s = conn.createStatement();
         Statement s1= conn.createStatement();        
         Double bufferValue = Double.valueOf(jTextFieldBuffer.getText());
@@ -495,7 +497,7 @@ public class TrajectoryFrame extends JDialog{
 
     // Criação dos Intercepts com os Pontos de Interesse
     private InterceptsG createIntercepts() throws SQLException{
-	System.out.println("AQUI 8 : Create Intercepts");
+//	System.out.println("AQUI 8 : Create Intercepts");
 	 	//get the RFs from panel...
     	Object[] objs = jListRF.getSelectedValuesList().toArray();
     	AssociatedParameter[] relevantFeatures = new AssociatedParameter[objs.length];                    
@@ -520,10 +522,10 @@ public class TrajectoryFrame extends JDialog{
                 } catch (SQLException ex) {
                 	// do nothing
                 } finally {
-                	s.execute("create table "+a.name+"_buf as select gid, ST_Buffer(the_geom::geography,"+buffer+")::geometry as the_geom from "+a.name+";");
+                	s.execute("create table "+a.name+"_buf as select gid, amenity, ST_Buffer(the_geom::geography,"+buffer+")::geometry as the_geom from "+a.name+";");
                 	s.execute("alter table "+a.name+"_buf add constraint "+a.name+"_buf_pk primary key (gid);");
                 }
-        		sql=("select A.gid as pt, B.gid as gid, '"+a.name+"' as rf "+
+        		sql=("select A.gid as pt, B.gid as gid, '"+a.name+"' as rf, B.amenity as amenity "+
         			 "from "+config.table+" A,"+a.name+"_buf B " +
 	            	 "where st_intersects(A.the_geom,B.the_geom);");
         	}
@@ -537,14 +539,14 @@ public class TrajectoryFrame extends JDialog{
             		} catch (SQLException ex) {
             			// do nothing
             		} finally {
-            			s.execute("CREATE TABLE "+a.name+"_buf AS SELECT gid, ST_Buffer(the_geom::geography,"+buffer+")::geometry AS the_geom FROM "+a.name+";");
+            			s.execute("CREATE TABLE "+a.name+"_buf AS SELECT gid, amenity, ST_Buffer(the_geom::geography,"+buffer+")::geometry AS the_geom FROM "+a.name+";");
             			s.execute("ALTER TABLE "+a.name+"_buf ADD CONSTRAINT "+a.name+"_buf_pk PRIMARY KEY (gid);");
             		}
-            		sql = "select A.gid as pt, B.gid as gid, '"+a.name+"' as rf "+
+            		sql = "select A.gid as pt, B.gid as gid, '"+a.name+"' as rf, B.amenity as amenity "+
             		      "from "+config.table+" A, "+a.name+"_buf B "+
             		      "where st_intersects(A.the_geom,B.the_geom);";
         		} else {
-        			sql = "select A.gid as pt, B.gid as gid, '"+a.name+"' as rf "+
+        			sql = "select A.gid as pt, B.gid as gid, '"+a.name+"' as rf, B.amenity as amenity "+
       		      		  "from "+config.table+" A, "+a.name+" B "+
       		      		  "where st_intersects(A.the_geom,B.the_geom);";
         		}
@@ -557,7 +559,7 @@ public class TrajectoryFrame extends JDialog{
             // then, save the registers from the query in an adequate struct 
                              
             while(Intercep.next()){            	
-            	Interc i = new Interc (Intercep.getInt("pt"), Intercep.getInt("gid"), Intercep.getString("rf"),a.value.intValue());
+            	Interc i = new Interc (Intercep.getInt("pt"), Intercep.getInt("gid"), Intercep.getString("rf"), a.value.intValue(), Intercep.getString("amenity"));
             	intercs.addpt(i);
             }                
         }
@@ -571,7 +573,7 @@ public class TrajectoryFrame extends JDialog{
     
 	// Criação da Interface Gráfica
 	private void initComponents(){
-		System.out.println("AQUI 9 : Criação da Interface Gráfica");
+//		System.out.println("AQUI 9 : Criação da Interface Gráfica");
 		//Mounts the layout
 		Container container = getContentPane();
 		//JPanel container = new JPanel();
@@ -839,7 +841,7 @@ public class TrajectoryFrame extends JDialog{
 	
 	// Interface Gráfica Configure Trajectory Table
     private void configureActionPerformed(ActionEvent e) {
-    	System.out.println("AQUI 10 : Interface Gráfica Configure Trajectory Table");
+//    	System.out.println("AQUI 10 : Interface Gráfica Configure Trajectory Table");
     	int[] i = jListTrajectoryTables.getSelectedIndices();
     	if( i.length == 1){
     		Object[] temp = jListTrajectoryTables.getSelectedValuesList().toArray();
@@ -856,7 +858,7 @@ public class TrajectoryFrame extends JDialog{
     
     // Muda a interface com base na seleção do IB ou CB
     private void jComboBoxMethodItemStateChanged(java.awt.event.ItemEvent evt) {
-    	System.out.println("AQUI 11 : Interface = Seleção IB ou CB");
+//    	System.out.println("AQUI 11 : Interface = Seleção IB ou CB");
         Method alg = (Method) jComboBoxMethod.getSelectedItem();
         jComboBoxParam.removeAllItems();
         if (alg != null) {
@@ -878,7 +880,7 @@ public class TrajectoryFrame extends JDialog{
     
     // Checa o Buffer
     private boolean checkBufferState() {
-    	System.out.println("AQUI 12 : Checar Buffer");
+//    	System.out.println("AQUI 12 : Checar Buffer");
         try{
         	buffer = Double.valueOf(jTextFieldBuffer.getText());
         	return true;
@@ -891,21 +893,21 @@ public class TrajectoryFrame extends JDialog{
 
     // Interface Gráfica Generate Arff File
     private void jButtonGenArffFileActionPerformed(java.awt.event.ActionEvent evt) {
-    	System.out.println("AQUI 13 : Interface Generate Arff File");
+//    	System.out.println("AQUI 13 : Interface Generate Arff File");
         GenArffFile gaf = new GenArffFile(conn,jRadioButtonFType.isSelected());
         gaf.setVisible(true);
     }
     
     // Sair da Interface
     private void jButtonCancelActionPerformed(java.awt.event.ActionEvent evt) {
-    	System.out.println("AQUI 14 : Sair");
+//    	System.out.println("AQUI 14 : Sair");
         this.dispose();
     }
     
     // Valores dos Campos CB ao serem alterados
     @SuppressWarnings("static-access")
 	private void jTextFieldParamFocusLost(java.awt.event.FocusEvent evt) {
-    	System.out.println("AQUI 15 : Valores Campos CB alterados");
+//    	System.out.println("AQUI 15 : Valores Campos CB alterados");
         Parameter p = (Parameter) jComboBoxParam.getSelectedItem();
         try {
             if (p != null) {
@@ -923,7 +925,7 @@ public class TrajectoryFrame extends JDialog{
     // Campos CB ao ser ativado
     @SuppressWarnings("static-access")
 	private void jComboBoxParamItemStateChanged(java.awt.event.ItemEvent evt) {
-    	System.out.println("AQUI 16 : Campos CB ativando");
+//    	System.out.println("AQUI 16 : Campos CB ativando");
         Parameter p = (Parameter) evt.getItem();
         if (p.type == p.type.DOUBLE) {
             jTextFieldParam.setText(p.value.toString());
@@ -933,7 +935,7 @@ public class TrajectoryFrame extends JDialog{
     }
 
     private void jComboBoxMethodItemStateChanged1(java.awt.event.ItemEvent evt) {
-    	System.out.println("AQUI 17");
+//    	System.out.println("AQUI 17");
         Method alg = (Method) jComboBoxMethod.getSelectedItem();
         jComboBoxParam.removeAllItems();
         for (int i = 0; i< (alg != null ? alg.param.size() : 0); i++) {
@@ -943,7 +945,7 @@ public class TrajectoryFrame extends JDialog{
 
     // Atribui valor para o RFMinTime ao selecionar Relevant Features
     private void jListRFValueChanged(javax.swing.event.ListSelectionEvent evt) {
-    	System.out.println("AQUI 18 : Set Value RFMinTime");
+//    	System.out.println("AQUI 18 : Set Value RFMinTime");
         AssociatedParameter par = (AssociatedParameter) jListRF.getSelectedValue();
         if (par != null)
             RFMinTime.setText(""+par.value.intValue());
@@ -951,7 +953,7 @@ public class TrajectoryFrame extends JDialog{
 
     // Box do RFMinTime
     private void RFMinTimeFocusLost(java.awt.event.FocusEvent evt) {
-    	System.out.println("AQUI 19 : Box RFMinTime");
+//    	System.out.println("AQUI 19 : Box RFMinTime");
         Object[] objs = jListRF.getSelectedValuesList().toArray();
         try {
             for (Object obj : objs) {
@@ -966,7 +968,7 @@ public class TrajectoryFrame extends JDialog{
     }
     
     private void RFMinTimeActionPerformed(java.awt.event.ActionEvent evt) {
-    	System.out.println("AQUI 20");
+//    	System.out.println("AQUI 20");
         Object[] objs = jListRF.getSelectedValuesList().toArray();
         try {
             for (Object obj : objs) {
@@ -982,7 +984,7 @@ public class TrajectoryFrame extends JDialog{
     
     // Carregar Tables do Schema selecionado
     private void LoadActionPerformed(ActionEvent evt) {
-    	System.out.println("AQUI 21 : Carregar Tables");
+//    	System.out.println("AQUI 21 : Carregar Tables");
     	try{ //load the tables in a list of auxiliary strings
             Statement s = conn.createStatement();
             ResultSet vTableName = s.executeQuery("SELECT f_table_name as tableName,type "+
@@ -1005,7 +1007,7 @@ public class TrajectoryFrame extends JDialog{
     
     // Valor do Buffer
     private void OKActionPerformed(ActionEvent evt)  {
-    	System.out.println("AQUI 22 : Buffer Valor");
+//    	System.out.println("AQUI 22 : Buffer Valor");
     	if(jCheckBoxBuffer.isSelected()){
     		if(checkBufferState()){    		
     			System.out.println("Buffer of "+buffer+" saved.");
@@ -1101,7 +1103,7 @@ public class TrajectoryFrame extends JDialog{
     
     // SRID
     private String checkSRIDs() {
-    	System.out.println("AQUI 23 : SRID");
+//    	System.out.println("AQUI 23 : SRID");
         Statement sn;
 		try {
 			//getting trajectory SRID
@@ -1136,7 +1138,7 @@ public class TrajectoryFrame extends JDialog{
     // Interface Gráfica Visualization
     //@autor: Bruno
 	protected String showDadosGeograficos() {
-		System.out.println("AQUI 24 : Interface Visualization");
+//		System.out.println("AQUI 24 : Interface Visualization");
 		try {
 			//getting trajectory SRID
 			
@@ -1208,26 +1210,27 @@ public class TrajectoryFrame extends JDialog{
 
 
 
-private void filterActionPerformed(ActionEvent e) {
-	System.out.println("AQUI 25");
-    String esquema = (String)jComboBoxSchema.getSelectedItem();
-    int[] i = jListTrajectoryTables.getSelectedIndices();
-    if (i.length >= 1) {
-        List<String> listaTab = new ArrayList<>();
-        Object[] temp = jListTrajectoryTables.getSelectedValues();
-        for(Object ob: temp){
-            listaTab.add((String) ob);
-        }
-        TrajectoryClean tc = new TrajectoryClean(conn, listaTab);
-        tc.setConfig(this.config);
-        tc.setEsquema(esquema);
-        tc.setVisibleFrame(true);
-    } else {
-        JOptionPane.showMessageDialog(this, "Select one or more Trajectory Table.");
-    }
-}
+	private void filterActionPerformed(ActionEvent e) {
+	//	System.out.println("AQUI 25");
+	    String esquema = (String)jComboBoxSchema.getSelectedItem();
+	    int[] i = jListTrajectoryTables.getSelectedIndices();
+	    if (i.length >= 1) {
+	        List<String> listaTab = new ArrayList<>();
+	        Object[] temp = jListTrajectoryTables.getSelectedValues();
+	        for(Object ob: temp){
+	            listaTab.add((String) ob);
+	        }
+	        TrajectoryClean tc = new TrajectoryClean(conn, listaTab);
+	        tc.setConfig(this.config);
+	        tc.setEsquema(esquema);
+	        tc.setVisibleFrame(true);
+	    } else {
+	        JOptionPane.showMessageDialog(this, "Select one or more Trajectory Table.");
+	    }
+	}
+	
 	public String formatNameParameter(String nm){
-	System.out.println("AQUI 26 : Formatar Nome dos Parâmetros");
+//	System.out.println("AQUI 26 : Formatar Nome dos Parâmetros");
         System.out.println("Parm = "+nm);
         if(nm.trim().equalsIgnoreCase("MaxAvgSpeed")){
             return "as";
@@ -1251,7 +1254,7 @@ private void filterActionPerformed(ActionEvent e) {
     
 	// ??? Cluster parâmetros Str
 	public String parametersClusterStr(){
-    	System.out.println("AQUI 27 : ??? Parâmetros Cluster Str ???");
+//    	System.out.println("AQUI 27 : ??? Parâmetros Cluster Str ???");
         StringBuilder str = new StringBuilder();
         for(Parameter param :parametersCluster()){
             if(param.name!=null && !param.name.equals("") && param.value!=null){
@@ -1265,10 +1268,9 @@ private void filterActionPerformed(ActionEvent e) {
                 .replace("(points)", "");
     }
 
-
     // ??? Cluster parâmetros
     public List<Parameter> parametersCluster(){
-    	System.out.println("AQUI 28 : ??? Parâmetros Cluster ???");
+//    	System.out.println("AQUI 28 : ??? Parâmetros Cluster ???");
         List<Parameter> list = new ArrayList<>();
         int tamParans = 0;
         while(tamParans < this.jComboBoxParam.getModel().getSize()){
@@ -1280,9 +1282,8 @@ private void filterActionPerformed(ActionEvent e) {
     }
     
     // Nome da tabela de stop
-
     public String nameTableStop(String sp){
-    	System.out.println("AQUI 29 : Nome da tabela de stop");
+//    	System.out.println("AQUI 29 : Nome da tabela de stop");
         return "stops_".concat(sp.concat(parametersClusterStr()));
     }
 
@@ -1290,7 +1291,7 @@ private void filterActionPerformed(ActionEvent e) {
 
     // Get Nome atual da table stop
     public static String getCurrentNameTableStop() {
-    	System.out.println("AQUI 30 : Get nome da atual table stop");
+//    	System.out.println("AQUI 30 : Get nome da atual table stop");
         if(currentNameTableStop==null || currentNameTableStop.equals("")){
             return "stops";
         }
@@ -1299,12 +1300,12 @@ private void filterActionPerformed(ActionEvent e) {
 
     // Set Nome atual da table stop
     private static void setCurrentNameTableStop(String currentNameTableStop) {
-    	System.out.println("AQUI 31 : Set nome da atual table stop");
+//    	System.out.println("AQUI 31 : Set nome da atual table stop");
         TrajectoryFrame.currentNameTableStop = currentNameTableStop;
     }
 
     public void insertCleanTrajProcess(long timeProcess){
-    	System.out.println("AQUI 32");
+//    	System.out.println("AQUI 32");
         Object[] objs = jListRF.getSelectedValuesList().toArray();
         AssociatedParameter[] relevantFeatures = new AssociatedParameter[objs.length];
         Integer rfMinTime = null;

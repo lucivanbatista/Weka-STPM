@@ -26,6 +26,7 @@ public class GPSPoint implements Comparable<GPSPoint> {
     public Cluster cluster;
     public int clusterId;
     public double speed;
+    public String amenity; // Usado para a geração do nome do Stop
 
     private int timeIndex;
     

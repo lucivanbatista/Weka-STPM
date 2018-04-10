@@ -21,13 +21,14 @@ public class Stop {
     public int gid;
     public int minTime = 0; //em milisegundos
     public String tableName;
+    public String amenity;
     public Vector<org.postgis.Point> points = new Vector<org.postgis.Point>(); //stop last point
     public Vector<GPSPoint> pts = new Vector<GPSPoint>();
     private int SRID;
     private boolean isbuffer;
     
     /** Creates a new instance of Stop */
-    public Stop(int tid,Timestamp enter,Timestamp leave,int gid,String table) {
+    public Stop(int tid,Timestamp enter,Timestamp leave,int gid,String table, String amenity) {
         this.tid = tid;
         enterTime = enter;
         leaveTime = leave;
@@ -35,6 +36,7 @@ public class Stop {
         tableName = table;
         this.isbuffer=true;
         this.SRID = -1;
+        this.amenity = amenity;
         
     }
     public Stop(){//initializes those variables

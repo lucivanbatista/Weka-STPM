@@ -5,6 +5,7 @@ public class Interc implements Comparable<Interc>{
 	public int gid; // gid from rf 
 	public String rf;// rf_name
 	public int value;//rf min_time value
+	public String amenity;
 	
 	public Interc(){}
 	
@@ -13,6 +14,14 @@ public class Interc implements Comparable<Interc>{
 		gid=gidn;
 		rf=rfn;
 		value=val;
+	}
+	
+	public Interc(int ponto,int gidn,String rfn,int val, String amenity){
+		pt=ponto;
+		gid=gidn;
+		rf=rfn;
+		value=val;
+		this.amenity = amenity;
 	}
 	
 	public int compareTo(Interc o) {

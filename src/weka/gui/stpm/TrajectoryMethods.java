@@ -151,8 +151,7 @@ public class TrajectoryMethods {
         while (i < points.size()) {
             GPSPoint p = points.get(i); // gets the second point ordered by time
             int lastClusterId = points.get(p.getTimeIndex()-1).clusterId;
-            if (p.clusterId != GPSPoint.NULL_CLUSTER_ID
-                    && lastClusterId != GPSPoint.NULL_CLUSTER_ID) {
+            if (p.clusterId != GPSPoint.NULL_CLUSTER_ID && lastClusterId != GPSPoint.NULL_CLUSTER_ID) {
                 if (p.clusterId != lastClusterId) {
                     int newClusterId = Math.min(lastClusterId, p.clusterId);
                     p.clusterId = newClusterId;
@@ -198,13 +197,13 @@ public class TrajectoryMethods {
     
     public static Vector<ClusterPoints> speedClustering(Trajectory t,double avgFactor, long minTimeMilli, double speedLimitFactor) {
     	Vector<GPSPoint> points = t.points;
-    	System.out.println("t.meanSpeed:" + t.meanSpeed());
+//    	System.out.println("t.meanSpeed:" + t.meanSpeed());
     	// avgSpeedOfTrajectory OU meanSpeed - Distancia de todos os pontos somados e depois dividido pela diferen�a do primeiro e ultimo
     	// avgFactor - MaxAvgSpeed
     	// speedLimitFactor - MaxSpeed
     	double avgSpeedOfTrajectory = t.meanSpeed();
-    	System.out.println("avgSpeedOfTrajectory * avgFactor:" + avgSpeedOfTrajectory * avgFactor);
-    	System.out.println("avgSpeedOfTrajectory * speedLimitFactor:" + avgSpeedOfTrajectory * speedLimitFactor);
+//    	System.out.println("avgSpeedOfTrajectory * avgFactor:" + avgSpeedOfTrajectory * avgFactor);
+//    	System.out.println("avgSpeedOfTrajectory * speedLimitFactor:" + avgSpeedOfTrajectory * speedLimitFactor);
     	double avgSpeed = avgSpeedOfTrajectory * avgFactor; //0.9 and 1.1 are pretty generic
     	double speedLimit = avgSpeedOfTrajectory * speedLimitFactor;
     	
@@ -212,8 +211,7 @@ public class TrajectoryMethods {
         Vector<GPSPoint> pointsSorted = getPointsSortedBySpeed(points);
         for (GPSPoint point: pointsSorted) { // for each point, consider a limited neighborhood of points
             if (point.clusterId == GPSPoint.NULL_CLUSTER_ID) { // point is unprocessed
-                if (limitedNeighborhood(points, point, clusterId, avgSpeed,
-                		minTimeMilli, speedLimit)) {
+                if (limitedNeighborhood(points, point, clusterId, avgSpeed,	minTimeMilli, speedLimit)) {
                     clusterId++;
                 }
             }
@@ -984,8 +982,7 @@ public class TrajectoryMethods {
         stopid=saveStopsAndMoves2(stops,config.conn,featureType,bufferValue,++stopid);        
     }
 
-	protected static int saveStopsAndMoves2(Vector list, Connection conn, 
-						boolean featureType, double buffer,int stopextern){
+	protected static int saveStopsAndMoves2(Vector list, Connection conn, boolean featureType, double buffer,int stopextern){
 	    Statement s,s1;
 	    boolean flag=false;
 	    int stopId=stopextern;
@@ -998,7 +995,7 @@ public class TrajectoryMethods {
 		        if (obj.getClass() == Stop.class) {
 //		        	System.out.println("TESTE 1");
 		            Stop stop = (Stop) obj;
-		            String stopName = featureType ? stop.tableName : (stop.gid + "_" + stop.tableName);
+		            String stopName = featureType ? stop.tableName : (stop.gid + "_" + stop.amenity);
 		            sql = "INSERT INTO "+TrajectoryFrame.getCurrentNameTableStop()+" (tid,stopid,start_time,end_time,stop_gid,stop_name,the_geom,rf,avg) VALUES "+
 		                "("+stop.tid+","+stopId+",'"+stop.enterTime.toString()+"','"+stop.leaveTime.toString()+"','"+stop.gid+"','"+stopName+"',"+stop.toSQL(buffer)+",'"+stop.tableName+"',"+stop.avgSpeed()+")";                
 		            stopId++;
@@ -1127,6 +1124,7 @@ public class TrajectoryMethods {
 	    			//... we have to test that sequential control, then...
 				//	if(timeaux!=serial_time){// the times of the points (this and the anterior), can't be the same !!
 						if(gidaux - serial_gid <= 1){ // the diference between gid's can't exceed 1
+							st.amenity = rf.amenity;
 							st.addPoint(pt);
 						}
 						//else...
@@ -1139,6 +1137,7 @@ public class TrajectoryMethods {
 	        		}        			
 	    			st = new Stop();//creates a new stop
 	        		if (rf != null) { //it is the first of another relevant feature in the same trajectory
+	        			st.amenity = rf.amenity;
 	        			st.addPoint(pt,rf.rf,rf.value,rf.gid); // saves the enterTime
 		        		first=false;
 		        		gidRelevantFeature = rf.gid;
@@ -1152,6 +1151,7 @@ public class TrajectoryMethods {
 	    	else{//being the first, there's no need to tests, so...            		
 	        	Interc rf=intercepts.is_in(pt.gid);
 	        	if(rf!=null){//...tests only if there's an intercs associated and add to the stop
+	        		st.amenity = rf.amenity;
 	        		st.addPoint(pt,rf.rf,rf.value,rf.gid); // saves the enterTime
 	        		first=false;
 	        		gidRelevantFeature = rf.gid;
