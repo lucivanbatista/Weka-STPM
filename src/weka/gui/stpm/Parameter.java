@@ -14,7 +14,8 @@ package weka.gui.stpm;
  * @author Administrador
  */
 public class Parameter {
-    enum Type {DOUBLE, INT};
+    enum Type {DOUBLE, INT}
+
     String name;
     Type type;
     Object value;
