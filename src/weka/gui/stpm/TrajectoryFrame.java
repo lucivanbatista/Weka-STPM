@@ -277,7 +277,7 @@ public class TrajectoryFrame extends JDialog{
                 }                
                 
                 //calculates the speed of each point, and then runs the method
-               	if (trajectory.points.size()>5){                	
+               	if (trajectory.points.size()>5){   
                		//trajectory.calculatePointsSpeed(2);
                		trajectory.calculatePointsSpeed();
                         double mediaVelocidade  = trajectory.meanSpeed();
@@ -295,10 +295,10 @@ public class TrajectoryFrame extends JDialog{
                         }
                         // Run do CB
                         
-                        System.out.println("ANTES DE EXECUTAR O MÉTODO");
-                        for(GPSPoint p : trajectory.points){
-                        	System.out.println("GID: " + p.gid + "; SPEED: " + p.speed);
-                        }
+//                        System.out.println("ANTES DE EXECUTAR O MÉTODO");
+//                        for(GPSPoint p : trajectory.points){
+//                        	System.out.println("GID: " + p.gid + "; SPEED: " + p.speed);
+//                        }
                         cb_run.setInformations(buffer, config, jCheckBoxBuffer.isSelected(), jRadioButtonFType.isSelected(), table_srid, jListRF);
                         cb_run.run(trajectory, i, tableTraj, streets);
 //                      method.run(trajectory,i,tableTraj,streets);
@@ -306,8 +306,8 @@ public class TrajectoryFrame extends JDialog{
                		System.out.println("Trajectory "+trajectory.tid+" has less than 5 points. It will be disconsidered.");
                	}
                	//BEGIN TEST by Lucivan Batista
-                System.out.println("--- INICIANDO TESTE ---");
-                System.out.println("mediaVelocidade: " + trajectory.meanSpeed() + "; mediaDistancia: " + trajectory.meanDist() + "; duracao: " + trajectory.duration());
+//                System.out.println("--- INICIANDO TESTE ---");
+//                System.out.println("mediaVelocidade: " + trajectory.meanSpeed() + "; mediaDistancia: " + trajectory.meanDist() + "; duracao: " + trajectory.duration());
                 //END TEST by Lucivan Batista
             }
             //just runs the method chosen, aplyed to one trajectory
@@ -361,7 +361,7 @@ public class TrajectoryFrame extends JDialog{
                 timeIndex++;
 
             }
-            System.out.println("calculando velocidade da trajetoria "+trajectory.tid);
+//            System.out.println("calculando velocidade da trajetoria "+trajectory.tid);
             //calculates the speed of each point, and then runs the method
             if (trajectory.points.size()>5){
                 trajectory.calculatePointsSpeed();
@@ -403,8 +403,8 @@ public class TrajectoryFrame extends JDialog{
                 "    start_time timestamp without time zone,"+
                 "    end_time timestamp without time zone,"+
                 "    rf character varying,"+    
-                "    avg real," +
-                "    CONSTRAINT "+TrajectoryFrame.getCurrentNameTableStop()+"_gidkey PRIMARY KEY (gid)"+
+                "    avg real" +
+//                "    ,CONSTRAINT "+TrajectoryFrame.getCurrentNameTableStop()+"_gidkey PRIMARY KEY (gid)"+
                 ") WITHOUT OIDS;"    
             );            
               s.execute("SELECT AddGeometryColumn('"+TrajectoryFrame.getCurrentNameTableStop()+"', 'the_geom',"+table_srid+", 'MULTIPOLYGON', 2)");
@@ -422,7 +422,7 @@ public class TrajectoryFrame extends JDialog{
         //MOVES table (NOT USED YET)
         System.out.println("\t\tmoves table...");
         try {
-            s.execute("DROP TABLE moves");
+            s.execute("DROP TABLE IF EXISTS moves");
             s.execute("DELETE FROM geometry_columns WHERE f_table_name = 'moves'");
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -555,7 +555,7 @@ public class TrajectoryFrame extends JDialog{
             ResultSet Intercep = s.executeQuery(sql);
             fim2 = new java.util.Date();
             tempo2 = new java.util.Date(fim2.getTime()-ini2.getTime());
-            System.out.println("\t\t"+a.name+" time: " +tempo2.getTime()+" ms");
+//            System.out.println("\t\t"+a.name+" time: " +tempo2.getTime()+" ms");
             // then, save the registers from the query in an adequate struct 
                              
             while(Intercep.next()){            	
@@ -1144,7 +1144,9 @@ public class TrajectoryFrame extends JDialog{
 			
 			Statement s = conn.createStatement();
 
-            System.out.println("+++++++++++++++++++++");
+            
+
+			System.out.println("+++++++++++++++++++++");
 			if (jListTrajectoryTables.getSelectedIndex() != -1){
 				 ResultSet vTableName = s.executeQuery("SELECT f_table_name as tableName,type "+
 						"FROM geometry_columns " +

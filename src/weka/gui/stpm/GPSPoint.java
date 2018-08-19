@@ -56,6 +56,7 @@ public class GPSPoint implements Comparable<GPSPoint> {
         }
     }
     public double distance(GPSPoint p) {
+//    	System.out.println("point.getX(): " + point.getX() + "; p.point.getX(): " + p.point.getX() + "; point.getY(): " + point.getY() + "; p.point.getY(): " + p.point.getY());
         double dist = Math.pow(point.getX()-p.point.getX(),2) + Math.pow(point.getY()-p.point.getY(),2);
         dist = Math.sqrt(dist);
         return dist;

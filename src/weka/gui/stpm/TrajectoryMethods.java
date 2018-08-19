@@ -52,8 +52,7 @@ public class TrajectoryMethods {
                 } catch (IndexOutOfBoundsException eRight) {
                     break;
                 }
-                if (rightPoint.clusterId == GPSPoint.NULL_CLUSTER_ID
-                        && rightPoint.speed <= speedLimit) {
+                if (rightPoint.clusterId == GPSPoint.NULL_CLUSTER_ID && rightPoint.speed <= speedLimit) {
                     seeds.addToEnd(rightPoint);
                     continue;
                 } else {
@@ -63,20 +62,16 @@ public class TrajectoryMethods {
             try {
                 rightPoint = points.get(seeds.getLastPointTimeIndex()+1);
             } catch (IndexOutOfBoundsException eRight) {
-                if (leftPoint.clusterId == GPSPoint.NULL_CLUSTER_ID
-                        && leftPoint.speed <= speedLimit) {
+                if (leftPoint.clusterId == GPSPoint.NULL_CLUSTER_ID && leftPoint.speed <= speedLimit) {
                     seeds.addToBegin(leftPoint);
                     continue;
                 } else {
                     break;
                 }
             }
-            if ((leftPoint.speed <= rightPoint.speed)
-                    && leftPoint.clusterId == GPSPoint.NULL_CLUSTER_ID
-                    && leftPoint.speed <= speedLimit) {
+            if ((leftPoint.speed <= rightPoint.speed) && leftPoint.clusterId == GPSPoint.NULL_CLUSTER_ID && leftPoint.speed <= speedLimit) {
                 seeds.addToBegin(leftPoint);
-            } else if (rightPoint.clusterId == GPSPoint.NULL_CLUSTER_ID
-                    && rightPoint.speed <= speedLimit) {
+            } else if (rightPoint.clusterId == GPSPoint.NULL_CLUSTER_ID && rightPoint.speed <= speedLimit) {
                 seeds.addToEnd(rightPoint);
             } else {
                 break;
@@ -562,7 +557,7 @@ public class TrajectoryMethods {
                     "AND ST_Intersects(buf,T.the_geom)) " +
                     "ORDER BY time");            
 
-            System.out.println(sql.toString());
+//            System.out.println(sql.toString());
             java.util.Date ini = new java.util.Date();
             ResultSet rs = s.executeQuery(sql.toString());
             java.util.Date fim = new java.util.Date();
@@ -678,7 +673,7 @@ public class TrajectoryMethods {
                     "AND ST_Intersects(buf,T.the_geom)) " +
                     " ORDER BY time");
 
-            System.out.println(sql);
+//            System.out.println(sql);
             java.util.Date ini = new java.util.Date();            
             ResultSet rs = s.executeQuery(sql);            
             java.util.Date fim = new java.util.Date();
@@ -798,9 +793,9 @@ public class TrajectoryMethods {
             Object obj = list.elementAt(i);
             if (obj.getClass() == Stop.class) {
                 Stop stop = (Stop) obj;
-                String stopName = featureType ? stop.tableName : (stop.gid + "_" + stop.tableName);
+                String stopName = featureType ? stop.tableName : (stop.gid + "_" + stop.amenity);
                 sql = "INSERT INTO "+TrajectoryFrame.getCurrentNameTableStop()+" (tid,stopid,start_time,end_time,stop_gid,stop_name,the_geom,rf,avg_speed) VALUES "+
-                    "("+stop.tid+","+stopId+",'"+stop.enterTime.toString()+"','"+stop.leaveTime.toString()+"','"+stop.gid+"','"+stopName+"',"+stop.toSQL(buffer)+",'"+stop.tableName+"',"+stop.avgSpeed()+")";                
+                    "("+stop.tid+","+stopId+",'"+stop.enterTime.toString()+"','"+stop.leaveTime.toString()+"','"+stop.gid+"','"+stopName+"',"+stop.toSQL(buffer)+",'"+stop.amenity+"',"+stop.avgSpeed()+")";                
                 stopId++;
                 flag=false;
             }else if (obj.getClass() == Unknown.class) {
@@ -912,7 +907,10 @@ public class TrajectoryMethods {
 	        			// if it's the same stop...
 	        			//Interc j = rf.elementAt(0);//uses only the first Interc, cause a point do not Intercepts more than one RF at the same time
 	        			Interc j = rf;
-	        			if(j.gid==st.gid) st.addPoint(array.elementAt(i));
+	        			if(j.gid==st.gid){
+	        				st.amenity = rf.amenity;
+	        				st.addPoint(array.elementAt(i));
+	        			}
 	        			//or create another stop.
 	        			else{
 	        				if(st.check()){//tests the actual stop
@@ -930,6 +928,7 @@ public class TrajectoryMethods {
 		        				unk.organizedPoints();
 		        			}
 		        			st = new Stop(bufferChecked,SRID);//creates a new stop
+		        			st.amenity = rf.amenity;
 		        			st.addPoint(array.elementAt(i),j.rf,j.value,j.gid);
 	        			}
 	    			}
@@ -963,6 +962,7 @@ public class TrajectoryMethods {
 	            		first=false;
 	            		//Interc j = rf.elementAt(0);//uses only the first Interc, cause a point do not Intercepts more than one RF at the same time
 	            		Interc j = rf;
+	            		st.amenity = rf.amenity;
 	                    st.addPoint(array.elementAt(i),j.rf,j.value,j.gid); 
 	            	}
 	            	// in case of no Interc at all, we can continue normally putting new points in the unknown.
@@ -997,7 +997,7 @@ public class TrajectoryMethods {
 		            Stop stop = (Stop) obj;
 		            String stopName = featureType ? stop.tableName : (stop.gid + "_" + stop.amenity);
 		            sql = "INSERT INTO "+TrajectoryFrame.getCurrentNameTableStop()+" (tid,stopid,start_time,end_time,stop_gid,stop_name,the_geom,rf,avg) VALUES "+
-		                "("+stop.tid+","+stopId+",'"+stop.enterTime.toString()+"','"+stop.leaveTime.toString()+"','"+stop.gid+"','"+stopName+"',"+stop.toSQL(buffer)+",'"+stop.tableName+"',"+stop.avgSpeed()+")";                
+		                "("+stop.tid+","+stopId+",'"+stop.enterTime.toString()+"','"+stop.leaveTime.toString()+"','"+stop.gid+"','"+stopName+"',"+stop.toSQL(buffer)+",'"+stop.amenity+"',"+stop.avgSpeed()+")";                
 		            stopId++;
 		            flag=false;
 		        }else if (obj.getClass() == Unknown.class) {
@@ -1062,7 +1062,7 @@ public class TrajectoryMethods {
 	    		sql+= p.getX() + " " + p.getY() + ",";
 	    	}
 	    	sql=sql.substring(0,sql.length()-2) + ")',-1),10));";
-	    	System.out.println(sql);
+//	    	System.out.println(sql);
 	    	try{
 	    	s.execute(sql);
 	    	}
