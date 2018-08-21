@@ -1,10 +1,8 @@
 package weka.gui.stpm;
 
 import java.sql.SQLException;
-import java.util.logging.Logger;
 
 public class IBSMoT extends Method {
-    private final Logger LOG = Logger.getLogger("SMoT");
     private Double buffer;
     private Config config;
     private boolean enableBuffer;
@@ -19,8 +17,8 @@ public class IBSMoT extends Method {
 
     @Override
     public void run(Trajectory t, InterceptsG in, String targetFeature) {
-        long initialTime = System.currentTimeMillis();
-        LOG.info("Processing trajectory " + t.tid);
+//        long initialTime = System.currentTimeMillis();
+        System.out.println("Processing trajectory " + t.tid);
 
         try {
             TrajectoryMethods.smot2(enableBuffer, buffer, config, t, enableFType, in);
@@ -28,8 +26,8 @@ public class IBSMoT extends Method {
             e.printStackTrace();
         }
 
-        long tempo = System.currentTimeMillis() - initialTime;
-        LOG.info("Processing time: " + tempo + " ms");
+//        long tempo = System.currentTimeMillis() - initialTime;
+//        System.out.println("Processing time: " + tempo + " ms");
     }
 
     public String toString() {

@@ -16,7 +16,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static javax.swing.JOptionPane.showMessageDialog;
@@ -25,7 +24,6 @@ import static weka.gui.stpm.StringUtil.*;
 import static weka.gui.stpm.TrajectoryFrame.createTrajectoryTablesSelected;
 
 class GraphicComponents extends JDialog {
-    private final Logger LOGGER = Logger.getLogger(TrajectoryFrame.class.getName());
     private final Connection conn;
     private final Config config;
     /**
@@ -386,25 +384,25 @@ class GraphicComponents extends JDialog {
         }
     }
 
-    // change interface between IB or CB
     void jComboBoxMethodItemStateChanged() {
+//    	System.out.println("AQUI 11 : Interface = Seleção IB ou CB");
         Method alg = (Method) jComboBoxMethod.getSelectedItem();
         jComboBoxParam.removeAllItems();
         if (alg != null) {
-            for (int i = 0; i < alg.param.size(); i++) {
+            for (int i=0;i<alg.param.size();i++) {
                 jComboBoxParam.addItem(alg.param.elementAt(i));
             }
         }
 
         //prevents the SMoT methods to call upon parameters
-        if (alg != null && alg.toString().equals("SMoT")) {
-            jComboBoxParam.setEnabled(false);
-            jTextFieldParam.setEnabled(false);
-        } else {
-            jComboBoxParam.setEnabled(true);
-            jTextFieldParam.setEnabled(true);
+        if(alg.toString().compareTo("SMoT")==0){
+        	jComboBoxParam.setEnabled(false);
+        	jTextFieldParam.setEnabled(false);
         }
-
+        else{
+        	jComboBoxParam.setEnabled(true);
+        	jTextFieldParam.setEnabled(true);
+        }
     }
 
     private boolean checkBufferState() {
@@ -511,13 +509,17 @@ class GraphicComponents extends JDialog {
 
     private void OKActionPerformed() {
         if (jCheckBoxBuffer.isSelected()) {
-            if (!checkBufferState()) {
-                showMessageDialog(this, "Buffer expects a number.");
-                return;
-            }
+        	if(checkBufferState()){    		
+    			System.out.println("Buffer of "+buffer+" saved.");
+    		}
+    		else{
+    			showMessageDialog(this,"Buffer expects a number.");
+    			return;
+    		}
         } else {
             this.buffer = 50.0; // default value
         }
+
 
         //cause CB-SMoT has a version without RFs
         if (jListRF.getSelectedIndex() == -1 && isNotEquals(jComboBoxMethod.getSelectedItem(), "CB-SMoT")) {
@@ -543,8 +545,8 @@ class GraphicComponents extends JDialog {
         config.table = str[0];
         String error = checkSRIDs(); //att the variable 'table_srid'
 
-        if (isEmpty(error)) {
-            showMessageDialog(this, error);
+        if(error.compareTo("")!=0){
+        	JOptionPane.showMessageDialog(this,error);
             return;
         }
 
@@ -576,11 +578,11 @@ class GraphicComponents extends JDialog {
                 count++;
 
                 if (count == tam) {
-                    LOGGER.info("Processing time: " + time + " ms");
+                	System.out.println("Processing time: " + time + " ms");
                     showMessageDialog(this, "Operation finished successfully.");
                 }
             } catch (Exception e) {
-                LOGGER.severe("Error: \n" + e.getMessage());
+            	System.out.println("Error: \n" + e.getMessage());
                 showMessageDialog(this, "Error during operation");
             }
         }
@@ -617,8 +619,7 @@ class GraphicComponents extends JDialog {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.severe(e.getMessage());
-
+        	System.out.println(e.getMessage());
         }
         return "";
     }
@@ -668,7 +669,7 @@ class GraphicComponents extends JDialog {
             }
 
         } catch (SQLException e) {
-            LOGGER.severe(e.getMessage());
+        	System.out.println(e.getMessage());
         }
     }
 
@@ -707,5 +708,4 @@ class GraphicComponents extends JDialog {
         List<Parameter> parameters = parametersCluster();
         return createNameOfStopTable(sp, parameters);
     }
-
 }

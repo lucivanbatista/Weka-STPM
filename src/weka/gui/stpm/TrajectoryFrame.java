@@ -10,14 +10,12 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 import static weka.gui.stpm.Constants.*;
 import static weka.gui.stpm.Parameter.Type.DOUBLE;
 import static weka.gui.stpm.StringUtil.isEmpty;
 
 public class TrajectoryFrame extends JDialog {
-    private static final Logger LOGGER = Logger.getLogger(TrajectoryFrame.class.getName());
     /**
      * Spatial reference for ALL trajectory_table
      */
@@ -40,12 +38,11 @@ public class TrajectoryFrame extends JDialog {
             loadPropertiesFromFile(user, pass, url);
 
             this.graphicComponents = new GraphicComponents(conn, userConfigurations);
-            this.graphicComponents.jComboBoxMethodItemStateChanged();
             this.graphicComponents.initGraphicComponents(algorithms);
             List<String> schemas = loadSchemas();
             this.graphicComponents.initComboBoxSchemas(schemas);
         } catch (Exception e) {
-            LOGGER.severe(e.toString());
+            System.out.println(e.toString());
             JOptionPane.showMessageDialog(this, "Error in connection with DB.");
             dispose();
         }
@@ -54,7 +51,6 @@ public class TrajectoryFrame extends JDialog {
     // TID dos taxis and ur points
     private static void loadTrajectories(String trajectoryTable,
                                          String tid,
-                                         String tableUser,
                                          String time, Object[] objects,
                                          Double buffer,
                                          Method method,
@@ -67,12 +63,12 @@ public class TrajectoryFrame extends JDialog {
 
         Statement s = conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_UPDATABLE);
         // selects the trajectory-tid to be processed
-        String sql = "SELECT " + tid + " as tid, count(*) FROM " + tableUser + " GROUP BY " + tid + " ORDER BY tid DESC";
+        String sql = "SELECT " + tid + " as tid, count(*) FROM " + trajectoryTable + " GROUP BY " + tid + " ORDER BY tid DESC";
         ResultSet rs = s.executeQuery(sql);
 
-        LOGGER.info("Creating interceptions...");
-        i = createIntercepts(objects, buffer, tableUser, enableBuffer);
-        LOGGER.info("Interceptions created ");
+        System.out.println("Creating interceptions...");
+        i = createIntercepts(objects, buffer, trajectoryTable, enableBuffer);
+        System.out.println("Interceptions created ");
 
 
         File speedFile = null;
@@ -82,7 +78,7 @@ public class TrajectoryFrame extends JDialog {
 
         // Add hash index on tid if it doesn't exists to boost perf
         Statement s0a = conn.createStatement();
-        String sql0a = "with x as (select oid from pg_class where relname = '" + tableUser + "') " +
+        String sql0a = "with x as (select oid from pg_class where relname = '" + trajectoryTable + "') " +
                 "select 1 from (select attnum from pg_attribute where attrelid IN (select * from x) and attname = '" + tid + "') a" +
                 "inner join (select indkey from pg_index where indrelid IN (select * from x)) b on attnum = ALL(indkey);";
         ResultSet rs0 = s0a.executeQuery(sql0a);
@@ -92,13 +88,13 @@ public class TrajectoryFrame extends JDialog {
 
         // Change of methods is here
         if (!indexTimeExists){
-            LOGGER.info("Creating Index on " + tid);
+        	System.out.println("Creating Index on " + tid);
             Statement s0b = conn.createStatement();
-            String sql0b = "CREATE INDEX ON " + tableUser + " USING hash (" + tid + ") WITH (FILLFACTOR=100);";
+            String sql0b = "CREATE INDEX ON " + trajectoryTable + " USING hash (" + tid + ") WITH (FILLFACTOR=100);";
             s0b.execute(sql0b);
             s0b.close();
         } else {
-            LOGGER.severe("Tid index on " + tableUser + " exists. Performance will be good.");
+        	System.out.println("Tid index on " + trajectoryTable + " exists. Performance will be good.");
         }
 
         //for each trajectory... (select que pega os tid dos taxistas e ordena de forma decrescente)
@@ -115,7 +111,7 @@ public class TrajectoryFrame extends JDialog {
                         " WHERE " + tid + "=" +
                         trajectory.tid +
                         " ORDER BY " + time;
-
+ 
                 //ordered by time
                 ResultSet rs2 = s1.executeQuery(sql2);
 
@@ -143,11 +139,11 @@ public class TrajectoryFrame extends JDialog {
                     }
                     // Run do CB
 
-                    LOGGER.info("BEFORE EXECUTION OF METHOD");
+//                    System.out.println("BEFORE EXECUTION OF METHOD");
 
-                    for (GPSPoint p : trajectory.points) {
-                        LOGGER.info("GID: " + p.gid + "; SPEED: " + p.speed);
-                    }
+//                    for (GPSPoint p : trajectory.points) {
+//                    	System.out.println("GID: " + p.gid + "; SPEED: " + p.speed);
+//                    }
                     CB_SMoT_RUN.setInformation(
                             buffer,
                             userConfigurations,
@@ -159,28 +155,18 @@ public class TrajectoryFrame extends JDialog {
                     CB_SMoT_RUN.run(trajectory, i, trajectoryTable);
 
                 } else {
-                    LOGGER.severe("Trajectory " + trajectory.tid + " has less than 5 points.");
+                	System.out.println("Trajectory " + trajectory.tid + " has less than 5 points.");
                 }
 
-                LOGGER.info("--- TEST ---");
-                LOGGER.info("speedAverage: " +
-                        trajectory.meanSpeed() +
-                        "; distanceAverage: " +
-                        trajectory.meanDist() +
-                        "; duration: " +
-                        trajectory.duration());
+                System.out.println("--- TEST ---");
+                System.out.println("speedAverage: " + trajectory.meanSpeed() + "; distanceAverage: " + trajectory.meanDist() + "; duration: " + trajectory.duration());
 
             }
             //just runs the method chosen, applied to one trajectory
             //also see initAlgorithms();
             // Run do IB
             else{
-                IB_SMoT_RUN.setInformation(
-                        buffer,
-                        userConfigurations,
-                        enableBuffer,
-                        enableFType
-                );
+                IB_SMoT_RUN.setInformation(buffer, userConfigurations, enableBuffer, enableFType);
                 IB_SMoT_RUN.run(trajectory, i, trajectoryTable);
             }
 
@@ -210,7 +196,6 @@ public class TrajectoryFrame extends JDialog {
             //select the points of the trajectory in sequential time
             Statement s1 = config.conn.createStatement();
             String sql2 = "SELECT "+config.time+" as time,the_geom,gid FROM "+tableTraj+" WHERE "+config.tid+"="+trajectory.tid+" ORDER BY "+config.time;
-            //System.out.println(sql2);
 
             ResultSet rs2 = s1.executeQuery(sql2);
             //for each of these points of the trajectory...
@@ -262,15 +247,14 @@ public class TrajectoryFrame extends JDialog {
         }
 
         //end of srid checking
-        LOGGER.info("Creating tables...");
+        System.out.println("Creating tables...");
 
         createTables(tableStopName);
 
-        LOGGER.info("Processing the trajectories...");
+        System.out.println("Processing the trajectories...");
 
-        loadTrajectories(tableStopName,
+        loadTrajectories(tableName,
                 tid,
-                tableName,
                 dateTime,
                 objects,
                 buffer,
@@ -292,15 +276,16 @@ public class TrajectoryFrame extends JDialog {
         TrajectoryFrame.setCurrentNameTableStop(tableStopName);
 
         // STOPS table
+        System.out.println("\t\tstops table...");
         try {
-            s.execute("DROP TABLE "+TrajectoryFrame.getCurrentNameTableStop());
+            s.execute("DROP TABLE IF EXISTS "+TrajectoryFrame.getCurrentNameTableStop());
             s.execute("DELETE FROM geometry_columns WHERE f_table_name = '"+TrajectoryFrame.getCurrentNameTableStop()+"'");
 
         }catch (SQLException ex) {
             ex.printStackTrace();
         } finally {
             s.execute(
-                    "CREATE TABLE " + TrajectoryFrame.getCurrentNameTableStop() + " (" +
+                    "CREATE TABLE IF NOT EXISTS " + TrajectoryFrame.getCurrentNameTableStop() + " (" +
                             "    gid serial NOT NULL," +
                             "    tid integer NOT NULL," +
                             "    stopid integer NOT NULL," +
@@ -309,8 +294,8 @@ public class TrajectoryFrame extends JDialog {
                             "    start_time timestamp without time zone," +
                             "    end_time timestamp without time zone," +
                             "    rf character varying," +
-                            "    avg real," +
-                            "    CONSTRAINT " + TrajectoryFrame.getCurrentNameTableStop() + "_gidkey PRIMARY KEY (gid)" +
+                            "    avg real" +
+//                            "    CONSTRAINT " + TrajectoryFrame.getCurrentNameTableStop() + "_gidkey PRIMARY KEY (gid)" +
                             ") WITHOUT OIDS;"
             );
 
@@ -320,13 +305,13 @@ public class TrajectoryFrame extends JDialog {
         //MOVES table (NOT USED YET)
         System.out.println("\t\tmoves table...");
         try {
-            s.execute("DROP TABLE moves");
+            s.execute("DROP TABLE IF EXISTS moves");
             s.execute("DELETE FROM geometry_columns WHERE f_table_name = 'moves'");
         } catch (SQLException ex) {
             ex.printStackTrace();
         }finally {
             s.execute(
-                    "CREATE TABLE moves (" +
+                    "CREATE TABLE IF NOT EXISTS moves (" +
                             "      tid integer NOT NULL," +
                             "      moveid integer NOT NULL," +
                             "      start_time timestamp without time zone," +
@@ -355,14 +340,15 @@ public class TrajectoryFrame extends JDialog {
         //for each rf, execute the query and save, in main memory, the results
         Statement s = conn.createStatement();
         InterceptsG intercs = new InterceptsG();
-        for(AssociatedParameter a:relevantFeatures){
+        for(AssociatedParameter a : relevantFeatures){
             // Create a table of registers with:
             // pt -> gid of the trajectory point
             // gid -> gid from RF wich intercept it
             // rf -> rf_name
 
             java.util.Date tempo2, fim2, ini2 = new java.util.Date();
-
+            System.out.println("\t\t...with " + a.name);
+            
             String sql;
             if (a.type.contains("POINT") || a.type.contains("LINE")) {// if any kind of POINT or LINE
                 try {
