@@ -31,8 +31,8 @@ public class CBSMoT extends Method {
 		int minTimeMili = ((Integer) minTime.value).intValue() * 1000;
 
 //		java.util.Date ini = new java.util.Date();
-
-		System.out.println("\t\tStarting Trajectory "+t.tid+"\n\t\tavg= "+((Double) avg.value).doubleValue()+" ;\n\t\tminTime= "+minTimeMili+" ;\n\t\tSL= "+SL+" ; ");
+		System.out.println("\t\tStarting Trajectory "+t.tid);
+//		System.out.println("\t\tStarting Trajectory "+t.tid+"\n\t\tavg= "+((Double) avg.value).doubleValue()+" ;\n\t\tminTime= "+minTimeMili+" ;\n\t\tSL= "+SL+" ; ");
 
 		// the clustering method, which will use the points in 't'	
 		Vector<ClusterPoints> clusters = TrajectoryMethods.speedClustering(t,((Double) avg.value).doubleValue(),minTimeMili,SL);                    

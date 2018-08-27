@@ -158,8 +158,8 @@ public class TrajectoryFrame extends JDialog {
                 	System.out.println("Trajectory " + trajectory.tid + " has less than 5 points.");
                 }
 
-                System.out.println("--- TEST ---");
-                System.out.println("speedAverage: " + trajectory.meanSpeed() + "; distanceAverage: " + trajectory.meanDist() + "; duration: " + trajectory.duration());
+//                System.out.println("--- TEST ---");
+//                System.out.println("speedAverage: " + trajectory.meanSpeed() + "; distanceAverage: " + trajectory.meanDist() + "; duration: " + trajectory.duration());
 
             }
             //just runs the method chosen, applied to one trajectory
@@ -249,7 +249,7 @@ public class TrajectoryFrame extends JDialog {
         //end of srid checking
         System.out.println("Creating tables...");
 
-        createTables(tableStopName);
+        createTables(tableStopName, method);
 
         System.out.println("Processing the trajectories...");
 
@@ -270,11 +270,12 @@ public class TrajectoryFrame extends JDialog {
         return finalTime - initialTime;
     }
 
-    private static void createTables(String tableStopName) throws SQLException {
+    private static void createTables(String tableStopName, Method method) throws SQLException {
         Statement s = conn.createStatement();
-
-        TrajectoryFrame.setCurrentNameTableStop(tableStopName);
-
+        
+//        TrajectoryFrame.setCurrentNameTableStop(tableStopName);
+        TrajectoryFrame.setCurrentNameTableStop(method);
+        
         // STOPS table
         System.out.println("\t\tstops table...");
         try {
@@ -487,8 +488,13 @@ public class TrajectoryFrame extends JDialog {
         algorithms[i].param.add(new Parameter("MaxSpeed", DOUBLE, 1.1));
     }
 
-    private static void setCurrentNameTableStop(String currentNameTableStop) {
-        TrajectoryFrame.currentNameTableStop = currentNameTableStop;
+    private static void setCurrentNameTableStop(Method method) {
+    	String meth = method.toString();
+    	String choosedName = "stops_" + JOptionPane.showInputDialog("Escolha um nome para a tabela de stops");
+        if(meth.startsWith("SMoT")) {
+        	TrajectoryFrame.currentNameTableStop = "ib_" + choosedName;
+        }else {
+        	TrajectoryFrame.currentNameTableStop = "cb_" + choosedName;
+        }
     }
-
 }
