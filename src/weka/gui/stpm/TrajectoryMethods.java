@@ -557,7 +557,6 @@ public class TrajectoryMethods {
                     "AND ST_Intersects(buf,T.the_geom)) " +
                     "ORDER BY time");            
 
-//            System.out.println(sql.toString());
             java.util.Date ini = new java.util.Date();
             ResultSet rs = s.executeQuery(sql.toString());
             java.util.Date fim = new java.util.Date();
@@ -673,7 +672,6 @@ public class TrajectoryMethods {
                     "AND ST_Intersects(buf,T.the_geom)) " +
                     " ORDER BY time");
 
-//            System.out.println(sql);
             java.util.Date ini = new java.util.Date();            
             ResultSet rs = s.executeQuery(sql);            
             java.util.Date fim = new java.util.Date();
@@ -993,7 +991,6 @@ public class TrajectoryMethods {
 		    	s1 = conn.createStatement();	
 		        Object obj = list.elementAt(i);
 		        if (obj.getClass() == Stop.class) {
-//		        	System.out.println("TESTE 1");
 		            Stop stop = (Stop) obj;
 		            String stopName = featureType ? stop.tableName : (stop.gid + "_" + stop.amenity);
 		            sql = "INSERT INTO "+TrajectoryFrame.getCurrentNameTableStop()+" (tid,stopid,start_time,end_time,stop_gid,stop_name,the_geom,rf,avg) VALUES "+
@@ -1001,22 +998,17 @@ public class TrajectoryMethods {
 		            stopId++;
 		            flag=false;
 		        }else if (obj.getClass() == Unknown.class) {
-//		        	System.out.println("TESTE 2");
 		            Unknown unk = (Unknown) obj;
 		            int tid = unk.pontos.firstElement().tid;
 		            if(unk.pontos.size()>=4){//to prevent the_geom null, nb: added by yipeng 080115
-//		            	System.out.println("TESTE 3");
 		            	String query = "select stop_name from "+TrajectoryFrame.getCurrentNameTableStop()+" where rf='unknown' AND ST_Intersects(the_geom,"+unk.toSQL(buffer)+");";
 		            	ResultSet rs = s1.executeQuery(query);
 		            	if(rs.next()){
-//		            		System.out.println("TESTE 4");
 		            		//joining same unknowns...
-		            		//System.out.println("aqui");
 		            		sql = "INSERT INTO "+TrajectoryFrame.getCurrentNameTableStop()+" (tid,stopid,start_time,end_time,stop_gid,stop_name,the_geom,rf,avg) VALUES "+
 		            		"("+tid+","+stopId+",'"+unk.enterTime.toString()+"','"+unk.leaveTime.toString()+"',"+stopId+",'"+rs.getString("stop_name")+"',"+unk.toSQL(buffer)+",'unknown',"+unk.avgSpeed()+")";
 		            	}
 		            	else {//or creating another
-//		            		System.out.println("TESTE 5");
 		            		sql = "INSERT INTO "+TrajectoryFrame.getCurrentNameTableStop()+" (tid,stopid,start_time,end_time,stop_gid,stop_name,the_geom,rf,avg) VALUES "+
 		            		"("+tid+","+stopId+",'"+unk.enterTime.toString()+"','"+unk.leaveTime.toString()+"',"+stopId+",'"+nextUnknown()+"_unknown',"+unk.toSQL(buffer)+",'unknown',"+unk.avgSpeed()+")";
 		            	}
@@ -1028,7 +1020,6 @@ public class TrajectoryMethods {
 		        
 		        if(!flag){//teste pra saber se executa ou nao a query
 //		        	System.out.print("Stop "+i+" saving... ");
-//		        	System.out.println(sql);
 		        	s.execute(sql);
 //		        	System.out.println("Saved");
 		        }
@@ -1062,7 +1053,6 @@ public class TrajectoryMethods {
 	    		sql+= p.getX() + " " + p.getY() + ",";
 	    	}
 	    	sql=sql.substring(0,sql.length()-2) + ")',-1),10));";
-//	    	System.out.println(sql);
 	    	try{
 	    	s.execute(sql);
 	    	}
@@ -1093,7 +1083,6 @@ public class TrajectoryMethods {
 		org.postgis.PGgeometry geom /*= new PGgeometry()*/;
 		Statement s=config.conn.createStatement();
 		String sql = "select "+config.tid+",gid,"+config.time+",the_geom from "+config.table+" where "+config.tid+"="+t.tid+" order by time;";
-		System.out.println("Aplying method smot...\n"+sql);
 		ResultSet rs = s.executeQuery(sql);
 		Vector stops = new Vector();
 	    ActiveStops activeStops = new ActiveStops();

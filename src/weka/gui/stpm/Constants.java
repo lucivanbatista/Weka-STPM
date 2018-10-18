@@ -10,5 +10,6 @@ public class Constants {
     public static final String DETECTION_TIME  = "detectionTime";
     public static final String TRAJECTORY_TABLE  = "trajectoryTable";
     public static final String TRAJECTORY_ID  = "trajectoryId";
+    public static final String POINTS_INTEREST  = "pointsInterest";
     public static final String VOID = "";
 }
