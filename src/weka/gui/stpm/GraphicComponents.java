@@ -374,8 +374,8 @@ class GraphicComponents extends JDialog {
     private void configureActionPerformed(ActionEvent e) {
         int[] i = jListTrajectoryTables.getSelectedIndices();
         if (i.length == 1) {
-            Object[] temp = jListTrajectoryTables.getSelectedValuesList().toArray(); // COMENTAR DEPOIS
-            config.table = (String) temp[0]; // COMENTAR DEPOIS
+//            Object[] temp = jListTrajectoryTables.getSelectedValuesList().toArray(); // COMENTAR DEPOIS
+//            config.table = (String) temp[0]; // COMENTAR DEPOIS
             config.conn = conn;
             TrajectoryConfig tc = new TrajectoryConfig();
             tc.setConfig(config);
@@ -451,8 +451,8 @@ class GraphicComponents extends JDialog {
 
     // Add valor para o RFMinTime ao select Relevant Features
     private void jListRFValueChanged() {
-        AssociatedParameter par = (AssociatedParameter) jListRF.getSelectedValue(); // COMENTAR DEPOIS
-//    	AssociatedParameter par = poi_associated; // DESCOMENTAR DEPOIS
+//        AssociatedParameter par = (AssociatedParameter) jListRF.getSelectedValue(); // COMENTAR DEPOIS
+    	AssociatedParameter par = poi_associated; // DESCOMENTAR DEPOIS
         if (par != null)
             RFMinTime.setText(par.value.toString());
     }
@@ -547,7 +547,7 @@ class GraphicComponents extends JDialog {
         //controls if SRID of RFs are different from trajectories...
         // ALL the trajectories should have the SAME srid
         // it is checked ahead in the foreach.
-        config.table = str[0]; // COMENTAR DEPOIS
+//        config.table = str[0]; // COMENTAR DEPOIS
         String error = checkSRIDs(); //att the variable 'table_srid'
 
         if(error.compareTo("")!=0){
@@ -556,8 +556,8 @@ class GraphicComponents extends JDialog {
         }
 
         //for each of the trajectory table selected...
-        Object[] selectedValues = jListRF.getSelectedValuesList().toArray(); // COMENTAR DEPOIS
-//        Object[] selectedValues = new Object[]{poi_associated}; // DESCOMENTAR DEPOIS
+//        Object[] selectedValues = jListRF.getSelectedValuesList().toArray(); // COMENTAR DEPOIS
+        Object[] selectedValues = new Object[]{poi_associated}; // DESCOMENTAR DEPOIS
         Method method = (Method) jComboBoxMethod.getSelectedItem();
         Boolean enableBuffer = jCheckBoxBuffer.isSelected();
         int maxSelectedIndex = jListRF.getMaxSelectionIndex();
@@ -612,9 +612,9 @@ class GraphicComponents extends JDialog {
 
 
             
-//            java.util.List<AssociatedParameter> objects = new ArrayList<AssociatedParameter>(); // DESCOMENTAR DEPOIS
-//            objects.add(poi_associated); // DESCOMENTAR DEPOIS
-            java.util.List<AssociatedParameter> objects = jListRF.getSelectedValuesList(); // COMENTAR DEPOIS
+            java.util.List<AssociatedParameter> objects = new ArrayList<AssociatedParameter>(); // DESCOMENTAR DEPOIS
+            objects.add(poi_associated); // DESCOMENTAR DEPOIS
+//            java.util.List<AssociatedParameter> objects = jListRF.getSelectedValuesList(); // COMENTAR DEPOIS
             java.util.List<AssociatedParameter> relevantFeatures = new ArrayList<>(objects);
 
             //comparing their SRIDs with the trajectory
