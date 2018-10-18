@@ -22,6 +22,7 @@ public class Config {
 	public String limit;
 	public String latitude;
 	public String longitude;
+	public String poi; // Point Of Interest
 	
     
     /** Creates a new instance of Config */

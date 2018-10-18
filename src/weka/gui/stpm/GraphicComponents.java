@@ -97,6 +97,7 @@ class GraphicComponents extends JDialog {
      */
     private javax.swing.JList jListTrajectoryTables;
     private Double buffer = 50.0;    // variable buffer, initialized
+    private AssociatedParameter poi_associated = null;
 
     GraphicComponents(Connection conn, Config config) {
         this.conn = conn;
@@ -373,8 +374,8 @@ class GraphicComponents extends JDialog {
     private void configureActionPerformed(ActionEvent e) {
         int[] i = jListTrajectoryTables.getSelectedIndices();
         if (i.length == 1) {
-            Object[] temp = jListTrajectoryTables.getSelectedValuesList().toArray();
-            config.table = (String) temp[0];
+            Object[] temp = jListTrajectoryTables.getSelectedValuesList().toArray(); // COMENTAR DEPOIS
+            config.table = (String) temp[0]; // COMENTAR DEPOIS
             config.conn = conn;
             TrajectoryConfig tc = new TrajectoryConfig();
             tc.setConfig(config);
@@ -385,7 +386,6 @@ class GraphicComponents extends JDialog {
     }
 
     void jComboBoxMethodItemStateChanged() {
-//    	System.out.println("AQUI 11 : Interface = Seleção IB ou CB");
         Method alg = (Method) jComboBoxMethod.getSelectedItem();
         jComboBoxParam.removeAllItems();
         if (alg != null) {
@@ -451,7 +451,8 @@ class GraphicComponents extends JDialog {
 
     // Add valor para o RFMinTime ao select Relevant Features
     private void jListRFValueChanged() {
-        AssociatedParameter par = (AssociatedParameter) jListRF.getSelectedValue();
+        AssociatedParameter par = (AssociatedParameter) jListRF.getSelectedValue(); // COMENTAR DEPOIS
+//    	AssociatedParameter par = poi_associated; // DESCOMENTAR DEPOIS
         if (par != null)
             RFMinTime.setText(par.value.toString());
     }
@@ -498,7 +499,11 @@ class GraphicComponents extends JDialog {
                         vTableName.getString("tableName"),
                         vTableName.getString("type"))
                 );// RFs
-
+                
+                if(vTableName.getString("tableName").equals(config.poi)){
+                	poi_associated = new AssociatedParameter(vTableName.getString("tableName"), vTableName.getString("type"));
+                }
+                
                 model.addElement(vTableName.getString(1));//Trajectory tables
             }
         } catch (Exception vErro) {
@@ -542,7 +547,7 @@ class GraphicComponents extends JDialog {
         //controls if SRID of RFs are different from trajectories...
         // ALL the trajectories should have the SAME srid
         // it is checked ahead in the foreach.
-        config.table = str[0];
+        config.table = str[0]; // COMENTAR DEPOIS
         String error = checkSRIDs(); //att the variable 'table_srid'
 
         if(error.compareTo("")!=0){
@@ -551,12 +556,13 @@ class GraphicComponents extends JDialog {
         }
 
         //for each of the trajectory table selected...
-        Object[] selectedValues = jListRF.getSelectedValuesList().toArray();
+        Object[] selectedValues = jListRF.getSelectedValuesList().toArray(); // COMENTAR DEPOIS
+//        Object[] selectedValues = new Object[]{poi_associated}; // DESCOMENTAR DEPOIS
         Method method = (Method) jComboBoxMethod.getSelectedItem();
         Boolean enableBuffer = jCheckBoxBuffer.isSelected();
         int maxSelectedIndex = jListRF.getMaxSelectionIndex();
         Boolean enableFType = jRadioButtonFType.isSelected();
-
+        System.out.println(method);
         final int tam = str.length;
         for (int count = 0; count < tam; ) {
             config.table = str[count];
@@ -605,7 +611,10 @@ class GraphicComponents extends JDialog {
             TrajectoryFrame.table_srid = rsn.getInt(param);
 
 
-            java.util.List<AssociatedParameter> objects = jListRF.getSelectedValuesList();
+            
+//            java.util.List<AssociatedParameter> objects = new ArrayList<AssociatedParameter>(); // DESCOMENTAR DEPOIS
+//            objects.add(poi_associated); // DESCOMENTAR DEPOIS
+            java.util.List<AssociatedParameter> objects = jListRF.getSelectedValuesList(); // COMENTAR DEPOIS
             java.util.List<AssociatedParameter> relevantFeatures = new ArrayList<>(objects);
 
             //comparing their SRIDs with the trajectory

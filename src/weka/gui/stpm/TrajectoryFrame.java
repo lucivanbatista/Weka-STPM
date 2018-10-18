@@ -139,11 +139,6 @@ public class TrajectoryFrame extends JDialog {
                     }
                     // Run do CB
 
-//                    System.out.println("BEFORE EXECUTION OF METHOD");
-
-//                    for (GPSPoint p : trajectory.points) {
-//                    	System.out.println("GID: " + p.gid + "; SPEED: " + p.speed);
-//                    }
                     CB_SMoT_RUN.setInformation(
                             buffer,
                             userConfigurations,
@@ -157,9 +152,6 @@ public class TrajectoryFrame extends JDialog {
                 } else {
                 	System.out.println("Trajectory " + trajectory.tid + " has less than 5 points.");
                 }
-
-//                System.out.println("--- TEST ---");
-//                System.out.println("speedAverage: " + trajectory.meanSpeed() + "; distanceAverage: " + trajectory.meanDist() + "; duration: " + trajectory.duration());
 
             }
             //just runs the method chosen, applied to one trajectory
@@ -176,7 +168,6 @@ public class TrajectoryFrame extends JDialog {
     }
 
     public static List<Trajectory> getTrajectoriesWithSpeeds(String tableTraj, Config config, Integer table_srid) throws SQLException {
-//    	System.out.println("AQUI 6");
         List<Trajectory> trajectorys = new ArrayList<Trajectory>();
         Statement s = config.conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_UPDATABLE);
         // selects the trajectory-tid to be processed
@@ -443,6 +434,7 @@ public class TrajectoryFrame extends JDialog {
             userConfigurations.table = properties.getProperty(TRAJECTORY_TABLE);
             userConfigurations.tid = properties.getProperty(TRAJECTORY_ID);
             userConfigurations.time = properties.getProperty(DETECTION_TIME);
+            userConfigurations.poi = properties.getProperty(POINTS_INTEREST);
 
         } catch (IOException ex) {
             ex.printStackTrace();
