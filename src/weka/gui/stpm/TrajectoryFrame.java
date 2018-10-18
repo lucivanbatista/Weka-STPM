@@ -202,7 +202,7 @@ public class TrajectoryFrame extends JDialog {
                 timeIndex++;
 
             }
-            System.out.println("calculando velocidade da trajetoria "+trajectory.tid);
+//            System.out.println("calculando velocidade da trajetoria "+trajectory.tid);
             //calculates the speed of each point, and then runs the method
             if (trajectory.points.size()>5){
                 trajectory.calculatePointsSpeed();

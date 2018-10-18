@@ -247,6 +247,7 @@ public class Trajectory {
     		GPSPoint currentPoint = points.elementAt(i);
     		double distance = lastPoint.distance(currentPoint);
     		long time = currentPoint.time.getTime() - lastPoint.time.getTime();
+//    		System.out.println("time: " + time + "; currentPoint.time.getTime(): " + currentPoint.time.getTime() + "; lastPoint.time.getTime(): " +  lastPoint.time.getTime());
     		points.elementAt(i).speed = distance / (time/1000.0);
     		/**
     		 * technically speed is inf when dist !=0 and time=0 
