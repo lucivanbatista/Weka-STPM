@@ -159,6 +159,9 @@ public class TrajectoryFrame extends JDialog {
             // Run do IB
             else{
                 IB_SMoT_RUN.setInformation(buffer, userConfigurations, enableBuffer, enableFType);
+                for(GPSPoint x : trajectory.points){
+                	System.out.println(x.gid);
+                }
                 IB_SMoT_RUN.run(trajectory, i, trajectoryTable);
             }
 

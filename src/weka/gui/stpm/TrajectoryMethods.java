@@ -10,6 +10,8 @@ package weka.gui.stpm;
 
 import java.util.*;
 
+import org.postgis.Point;
+
 import java.sql.*;
 /**
  *
@@ -979,12 +981,28 @@ public class TrajectoryMethods {
         System.out.println("\t\tSaving: "+stops.size()+" stops.");
         stopid=saveStopsAndMoves2(stops,config.conn,featureType,bufferValue,++stopid);        
     }
+    
+    protected static void enriquecimentoSemantico(Stop stop, Connection conn, int count){
+    	Statement s2;
+    	String sql_enriquecimento="";
+		try {
+			s2 = conn.createStatement();
+			for(GPSPoint g : stop.pts){
+	        	System.out.println(g.gid);
+	           	sql_enriquecimento = "INSERT INTO con (gid_point, gid_stop) VALUES " + " ( "+g.gid+" , "+count+")";
+	           	s2.execute(sql_enriquecimento);
+	        }
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    }
 
 	protected static int saveStopsAndMoves2(Vector list, Connection conn, boolean featureType, double buffer,int stopextern){
 	    Statement s,s1;
 	    boolean flag=false;
 	    int stopId=stopextern;
 	    String sql="";
+	    int count = 1; // contador do serial
 	    for (int i=0;i<list.size();i++) {
 	    	try{
 	    		s = conn.createStatement();
@@ -993,9 +1011,12 @@ public class TrajectoryMethods {
 		        if (obj.getClass() == Stop.class) {
 		            Stop stop = (Stop) obj;
 		            String stopName = featureType ? stop.tableName : (stop.gid + "_" + stop.amenity);
+		            System.out.println("EXECUTADO");
+		            enriquecimentoSemantico(stop, conn, count);
 		            sql = "INSERT INTO "+TrajectoryFrame.getCurrentNameTableStop()+" (tid,stopid,start_time,end_time,stop_gid,stop_name,the_geom,rf,avg) VALUES "+
 		                "("+stop.tid+","+stopId+",'"+stop.enterTime.toString()+"','"+stop.leaveTime.toString()+"','"+stop.gid+"','"+stopName+"',"+stop.toSQL(buffer)+",'"+stop.amenity+"',"+stop.avgSpeed()+")";                
 		            stopId++;
+		            count++;
 		            flag=false;
 		        }else if (obj.getClass() == Unknown.class) {
 		            Unknown unk = (Unknown) obj;
@@ -1089,7 +1110,6 @@ public class TrajectoryMethods {
 	    boolean first=true;
 	    Stop st = new Stop();
 	    int gidRelevantFeature = -1;
-	    //String nameRelevantFeature = "";
 	    
 	    while(rs.next()){
 	    	System.out.print(".");//just for visualization
@@ -1107,18 +1127,12 @@ public class TrajectoryMethods {
 	    	if(!first){//the others not-the-first need to control if the gid is or not sequential  
 	    		//before it, there's an Interc ?
 	    		Interc rf=intercepts.is_in(pt.gid);
-	    		//Interc rf = intercepts.getRFIntercept(pt.gid, gidRelevantFeature);
 	    		if((rf!=null) && (rf.gid == gidRelevantFeature) /*&& (rf.rf == nameRelevantFeature)*/) {//yes, it intercepts something, so...
-	    		//if (rf != null) {
 	    			//... we have to test that sequential control, then...
-				//	if(timeaux!=serial_time){// the times of the points (this and the anterior), can't be the same !!
 						if(gidaux - serial_gid <= 1){ // the diference between gid's can't exceed 1
 							st.amenity = rf.amenity;
 							st.addPoint(pt);
 						}
-						//else...
-				//	}
-					//else...
 				}
 	    		else {//no, it didn't have an Interc, so...
 	    			if(st.check()) {//tests the actual stop
@@ -1130,7 +1144,6 @@ public class TrajectoryMethods {
 	        			st.addPoint(pt,rf.rf,rf.value,rf.gid); // saves the enterTime
 		        		first=false;
 		        		gidRelevantFeature = rf.gid;
-		        		//nameRelevantFeature = rf.rf;
 	        		}
 	        		else {
 	        			first = true;
@@ -1144,7 +1157,6 @@ public class TrajectoryMethods {
 	        		st.addPoint(pt,rf.rf,rf.value,rf.gid); // saves the enterTime
 	        		first=false;
 	        		gidRelevantFeature = rf.gid;
-	        		//nameRelevantFeature = rf.rf;
 	        	}
 	        	// in case of no Interc at all, we can continue normally.
 	    	}
@@ -1154,8 +1166,16 @@ public class TrajectoryMethods {
 	    if ((!first) && (st.check())) {
 	    	stops.addElement(st);//if passes, it's added
 	    }
+	    
+	    for (int m=0;m<stops.size();m++) {
+	    	Stop obj = (Stop) stops.elementAt(m);
+            System.out.println("aqui: " + m + " ----- size: " + obj.pts.size());
+            for(GPSPoint g : obj.pts){
+            	System.out.println(g.gid);
+            }
+	    }
+	    
 	    System.out.println("");	
-	    //System.out.println("/aqui/");
 	    saveStopsAndMoves2(stops,config.conn,featureType,buffer,0);
 	    rs.close();
 	}
