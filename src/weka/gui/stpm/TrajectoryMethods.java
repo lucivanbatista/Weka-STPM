@@ -982,14 +982,14 @@ public class TrajectoryMethods {
         stopid=saveStopsAndMoves2(stops,config.conn,featureType,bufferValue,++stopid);        
     }
     
-    protected static void enriquecimentoSemantico(Stop stop, Connection conn, int count){
+    protected static void enriquecimentoSemanticoStopCon(Stop stop, Connection conn, int count){
     	Statement s2;
     	String sql_enriquecimento="";
 		try {
 			s2 = conn.createStatement();
 			for(GPSPoint g : stop.pts){
-	        	System.out.println(g.gid);
-	           	sql_enriquecimento = "INSERT INTO con (gid_point, gid_stop) VALUES " + " ( "+g.gid+" , "+count+")";
+//	        	System.out.println(g.gid);
+	           	sql_enriquecimento = "INSERT INTO " + " con_" + TrajectoryFrame.getCurrentNameTableStop() + "(gid_point, gid_stop) VALUES " + " ( "+g.gid+" , "+count+")";
 	           	s2.execute(sql_enriquecimento);
 	        }
 		} catch (SQLException e) {
@@ -1011,8 +1011,7 @@ public class TrajectoryMethods {
 		        if (obj.getClass() == Stop.class) {
 		            Stop stop = (Stop) obj;
 		            String stopName = featureType ? stop.tableName : (stop.gid + "_" + stop.amenity);
-		            System.out.println("EXECUTADO");
-		            enriquecimentoSemantico(stop, conn, count);
+		            enriquecimentoSemanticoStopCon(stop, conn, count);
 		            sql = "INSERT INTO "+TrajectoryFrame.getCurrentNameTableStop()+" (tid,stopid,start_time,end_time,stop_gid,stop_name,the_geom,rf,avg) VALUES "+
 		                "("+stop.tid+","+stopId+",'"+stop.enterTime.toString()+"','"+stop.leaveTime.toString()+"','"+stop.gid+"','"+stopName+"',"+stop.toSQL(buffer)+",'"+stop.amenity+"',"+stop.avgSpeed()+")";                
 		            stopId++;
@@ -1167,13 +1166,13 @@ public class TrajectoryMethods {
 	    	stops.addElement(st);//if passes, it's added
 	    }
 	    
-	    for (int m=0;m<stops.size();m++) {
-	    	Stop obj = (Stop) stops.elementAt(m);
-            System.out.println("aqui: " + m + " ----- size: " + obj.pts.size());
-            for(GPSPoint g : obj.pts){
-            	System.out.println(g.gid);
-            }
-	    }
+//	    for (int m=0;m<stops.size();m++) {
+//	    	Stop obj = (Stop) stops.elementAt(m);
+//            System.out.println("aqui: " + m + " ----- size: " + obj.pts.size());
+//            for(GPSPoint g : obj.pts){
+//            	System.out.println(g.gid);
+//            }
+//	    }
 	    
 	    System.out.println("");	
 	    saveStopsAndMoves2(stops,config.conn,featureType,buffer,0);
