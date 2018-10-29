@@ -12,5 +12,8 @@ public class Constants {
     public static final String TRAJECTORY_ID  = "trajectoryId";
     public static final String POINTS_INTEREST  = "pointsInterest";
     public static final String SCHEMA  = "schema";
+//    public static final boolean FTYPE = "ftype";
+    public static final String USERBUFF = "userBuff";
+    public static final String RFMINTIME = "rfMinTime";
     public static final String VOID = "";
 }

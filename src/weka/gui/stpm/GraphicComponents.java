@@ -34,19 +34,11 @@ class GraphicComponents extends JDialog {
     javax.swing.JComboBox jComboBoxStreet;
     javax.swing.JComboBox jComboBoxStreetLimit;
     javax.swing.JList jListRF;
-    javax.swing.JTextField jTextFieldBuffer;
-    javax.swing.JCheckBox jCheckBoxBuffer;
     javax.swing.JTextField RFMinTime;
-    javax.swing.JRadioButton jRadioButtonFInstance;
-    javax.swing.JRadioButton jRadioButtonFType;
-    javax.swing.JButton jButtonGenArffFile;
     JComboBox<String> jComboBoxSchema;
-    javax.swing.JComboBox jComboBoxTF;
-    javax.swing.ButtonGroup buttonGroup1;//used in the genarfffile frame
     javax.swing.ButtonGroup buttonGroupItem;// the same
     javax.swing.ButtonGroup buttonGroupTime;//the same
     private javax.swing.JList jListTrajectoryTables;
-    private Double buffer = 50.0;    // variable buffer, initialized
     private AssociatedParameter poi_associated = null;
 
     GraphicComponents(Connection conn, Config config) {
@@ -54,33 +46,14 @@ class GraphicComponents extends JDialog {
         this.config = config;
     }
 
-    // Comentado, por causa dos schemas
-//    void initComboBoxSchemas(List<String> schemas) {
-//        schemas.forEach(schema -> jComboBoxSchema.addItem(schema));
-//    }
-
     void initGraphicComponents(Method[] algorithms) {
 
         Container container = getContentPane();
 
         container.setLayout(new BorderLayout());
-
-        JPanel panelSchema = new JPanel();
-        panelSchema.setBorder(BorderFactory.createEtchedBorder());
-        JLabel schemaLabel = new JLabel("Schema:");
-        panelSchema.add(schemaLabel, BorderLayout.CENTER);
+        
         jComboBoxSchema = new JComboBox<>();
         jComboBoxSchema.setPreferredSize(new Dimension(150, 22));
-        panelSchema.add(jComboBoxSchema, BorderLayout.CENTER);
-
-        JButton Load = new JButton("Load");
-        Load.addActionListener(event -> LoadActionPerformed());
-        panelSchema.add(Load);
-
-        JButton configure = new JButton("Configure Trajectory Table");
-        configure.addActionListener(this::configureActionPerformed);
-        panelSchema.add(configure);
-
         
         //PANEL CONTENT
         JPanel panelContent = new JPanel();
@@ -115,25 +88,6 @@ class GraphicComponents extends JDialog {
         c.gridwidth = 5;
         c.gridheight = 1;
 
-        //Granularity Level-Panel Granularity
-        JPanel panelGranularity = new JPanel();
-        panelGranularity.setBorder(BorderFactory.createTitledBorder("Granularity Level"));
-
-        jRadioButtonFType = new JRadioButton("Feature Type", false);
-        jRadioButtonFInstance = new JRadioButton("Feature Instance", true);
-        ButtonGroup group = new ButtonGroup();
-        group.add(jRadioButtonFType);
-        group.add(jRadioButtonFInstance);
-
-        panelGranularity.add(jRadioButtonFType);
-        panelGranularity.add(jRadioButtonFInstance);
-
-        c.gridx = 5;
-        c.gridy = 0;
-        c.gridwidth = 5;
-        c.gridheight = 3;
-        panelContent.add(panelGranularity, c);
-
         //Relevant Features
         c.gridx = 0;
         c.gridy = 1;
@@ -156,32 +110,14 @@ class GraphicComponents extends JDialog {
         validate();
 
         //Buffer
-        JPanel bufPanel = new JPanel();
-        bufPanel.setBorder(BorderFactory.createEtchedBorder());
         GridBagLayout gbag = new GridBagLayout();
-        bufPanel.setLayout(gbag);
         GridBagConstraints c2 = new GridBagConstraints();
         c2.insets = new Insets(5, 5, 5, 5);
-
-        c2.gridx = 0;
-        c2.gridy = 0;
-        jCheckBoxBuffer = new JCheckBox();
-        jCheckBoxBuffer.setSelected(true);
-        jCheckBoxBuffer.setText("User Buffer (m):");
-        bufPanel.add(jCheckBoxBuffer, c2);
-
-        c2.gridy = 2;
-        c2.gridheight = 2;
-        jTextFieldBuffer = new JTextField();
-        jTextFieldBuffer.setPreferredSize(new Dimension(60, 20));
-        jTextFieldBuffer.setText("50.0");
-        bufPanel.add(jTextFieldBuffer, c2);
 
         c.gridx = 3;
         c.gridy = 2;
         c.gridheight = 2;
         c.gridwidth = 2;
-        panelContent.add(bufPanel, c);
 
         //MinTimeBox
         JPanel mtPanel = new JPanel();
@@ -272,12 +208,6 @@ class GraphicComponents extends JDialog {
         c.fill = GridBagConstraints.BOTH;
         c.insets = new Insets(10, 10, 10, 10);
 
-        jButtonGenArffFile = new JButton("Generate Arff File...");
-        jButtonGenArffFile.addActionListener(event -> jButtonGenArffFileActionPerformed());
-        c.gridx = 0;
-        c.gridy = 0;
-        panelDown.add(jButtonGenArffFile, c);
-
         JButton jButtonOK = new JButton("OK");
         jButtonOK.addActionListener(event -> OKActionPerformed());
 
@@ -342,21 +272,6 @@ class GraphicComponents extends JDialog {
         }
     }
 
-    private boolean checkBufferState() {
-        try {
-            buffer = Double.valueOf(jTextFieldBuffer.getText());
-            return true;
-        } catch (NumberFormatException e) {
-            jTextFieldBuffer.setText("50.0");
-            return false;
-        }
-    }
-
-    private void jButtonGenArffFileActionPerformed() {
-        GenArffFile gaf = new GenArffFile(conn, jRadioButtonFType.isSelected());
-        gaf.setVisible(true);
-    }
-
     private void jButtonCancelActionPerformed() {
         this.dispose();
     }
@@ -413,7 +328,6 @@ class GraphicComponents extends JDialog {
                 AssociatedParameter p = (AssociatedParameter) obj;
                 p.value = Integer.parseInt(RFMinTime.getText());
             }
-            jTextFieldBuffer.grabFocus();
         } catch (java.lang.NumberFormatException e) {
             showMessageDialog(this, e.toString());
             RFMinTime.grabFocus();
@@ -450,19 +364,8 @@ class GraphicComponents extends JDialog {
     }
 
     private void OKActionPerformed() {
-        if (jCheckBoxBuffer.isSelected()) {
-        	if(checkBufferState()){    		
-    			System.out.println("Buffer of "+buffer+" saved.");
-    		}
-    		else{
-    			showMessageDialog(this,"Buffer expects a number.");
-    			return;
-    		}
-        } else {
-            this.buffer = 50.0; // default value
-        }
-
-
+    	System.out.println("Buffer of "+config.userBuff+" saved.");	
+    	
         //cause CB-SMoT has a version without RFs
         if (jListRF.getSelectedIndex() == -1 && isNotEquals(jComboBoxMethod.getSelectedItem(), "CB-SMoT")) {
             showMessageDialog(this, "Select one or more relevant features.");
@@ -493,13 +396,13 @@ class GraphicComponents extends JDialog {
         }
 
         //for each of the trajectory table selected...
-//        Object[] selectedValues = jListRF.getSelectedValuesList().toArray(); // COMENTAR DEPOIS
-        Object[] selectedValues = new Object[]{poi_associated}; // DESCOMENTAR DEPOIS
+        Object[] selectedValues = jListRF.getSelectedValuesList().toArray(); // COMENTAR DEPOIS (URGENTE ESSE E O DEBAIXO!)
+//        Object[] selectedValues = new Object[]{poi_associated}; // DESCOMENTAR DEPOIS
         Method method = (Method) jComboBoxMethod.getSelectedItem();
-        Boolean enableBuffer = jCheckBoxBuffer.isSelected();
+        Boolean enableBuffer = true; // Always True, isso interfere com base na área, sempre é bom ter uma área ao redor do POI
         int maxSelectedIndex = jListRF.getMaxSelectionIndex();
-        Boolean enableFType = jRadioButtonFType.isSelected();
-        System.out.println(method);
+        Boolean enableFType = config.ftype;
+        Double buffer = config.userBuff;
         final int tam = str.length;
         for (int count = 0; count < tam; ) {
             config.table = str[count];

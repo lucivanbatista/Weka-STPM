@@ -491,6 +491,9 @@ public class TrajectoryFrame extends JDialog {
             userConfigurations.time = properties.getProperty(DETECTION_TIME);
             userConfigurations.poi = properties.getProperty(POINTS_INTEREST);
             userConfigurations.schema = properties.getProperty(SCHEMA);
+//            userConfigurations.ftype = properties.getProperty(FTYPE);
+            userConfigurations.userBuff = Double.parseDouble(properties.getProperty(USERBUFF));
+            userConfigurations.rfMinTime = Double.parseDouble(properties.getProperty(RFMINTIME));
 
         } catch (IOException ex) {
             ex.printStackTrace();

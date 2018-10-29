@@ -24,6 +24,9 @@ public class Config {
 	public String longitude;
 	public String poi; // Point Of Interest
 	public String schema; // Schema
+	public Boolean ftype = false; // Type (true) or Instance (false), padrão é false
+	public Double userBuff;
+	public Double rfMinTime;
 	
     
     /** Creates a new instance of Config */
