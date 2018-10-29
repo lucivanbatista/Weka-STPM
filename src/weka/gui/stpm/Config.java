@@ -23,6 +23,7 @@ public class Config {
 	public String latitude;
 	public String longitude;
 	public String poi; // Point Of Interest
+	public String schema; // Schema
 	
     
     /** Creates a new instance of Config */

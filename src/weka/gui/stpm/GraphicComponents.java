@@ -26,75 +26,25 @@ import static weka.gui.stpm.TrajectoryFrame.createTrajectoryTablesSelected;
 class GraphicComponents extends JDialog {
     private final Connection conn;
     private final Config config;
-    /**
-     * trying to make the bird to fly...
-     */
-    private final WekaTaskMonitor tm = new WekaTaskMonitor();
-    /**
-     * Selects the appropriate method to be applied
-     */
-    JComboBox<Method> jComboBoxMethod;
-    /**
-     * Select the parameters of each method
-     */
-    JComboBox<Parameter> jComboBoxParam;
-    /**
-     * Enters the numbers atributed to each parameter here.
-     */
-    javax.swing.JTextField jTextFieldParam;
-    /**
-     * The name of the table with streets information.
-     */
-    javax.swing.JComboBox jComboBoxStreet;
-    /**
-     * The column of that table with information about speed limit (in meters/second).
-     */
-    javax.swing.JComboBox jComboBoxStreetLimit;
-    /**
-     * List of relevant features, the tables to use to try to discover the places in trajectory.
-     */
-    javax.swing.JList jListRF;
-    /**
-     * Indicates the distance in meters of the buffer in the relevant features.
-     */
-    //private javax.swing.JSpinner jSpinnerBuffer;
-    javax.swing.JTextField jTextFieldBuffer;
-    /**
-     * Use or not buffer in the relevant features
-     */
-    javax.swing.JCheckBox jCheckBoxBuffer;
 
-    //Feature type/instance
-    /**
-     * Text field for entering the min time. Must enter the seconds and press 'TAB', for recording.
-     */
+    private final WekaTaskMonitor tm = new WekaTaskMonitor();
+    JComboBox<Method> jComboBoxMethod;
+    JComboBox<Parameter> jComboBoxParam;
+    javax.swing.JTextField jTextFieldParam;
+    javax.swing.JComboBox jComboBoxStreet;
+    javax.swing.JComboBox jComboBoxStreetLimit;
+    javax.swing.JList jListRF;
+    javax.swing.JTextField jTextFieldBuffer;
+    javax.swing.JCheckBox jCheckBoxBuffer;
     javax.swing.JTextField RFMinTime;
-    /**
-     * If selected, says that we are working with Feature Instance.
-     */
     javax.swing.JRadioButton jRadioButtonFInstance;
-    /**
-     * If selected, says that we are working with Feature Type.
-     */
     javax.swing.JRadioButton jRadioButtonFType;
-    /**
-     * Opens the Generate Arff File Frame
-     */
     javax.swing.JButton jButtonGenArffFile;
-    /**
-     * Select the schema of DB, usually 'public' for localhost tests.
-     */
     JComboBox<String> jComboBoxSchema;
-    /**
-     * DEPRECATED
-     */
     javax.swing.JComboBox jComboBoxTF;
     javax.swing.ButtonGroup buttonGroup1;//used in the genarfffile frame
     javax.swing.ButtonGroup buttonGroupItem;// the same
     javax.swing.ButtonGroup buttonGroupTime;//the same
-    /**
-     * The thing (trajectories tables) which we want to apply the method selected
-     */
     private javax.swing.JList jListTrajectoryTables;
     private Double buffer = 50.0;    // variable buffer, initialized
     private AssociatedParameter poi_associated = null;
@@ -104,9 +54,10 @@ class GraphicComponents extends JDialog {
         this.config = config;
     }
 
-    void initComboBoxSchemas(List<String> schemas) {
-        schemas.forEach(schema -> jComboBoxSchema.addItem(schema));
-    }
+    // Comentado, por causa dos schemas
+//    void initComboBoxSchemas(List<String> schemas) {
+//        schemas.forEach(schema -> jComboBoxSchema.addItem(schema));
+//    }
 
     void initGraphicComponents(Method[] algorithms) {
 
@@ -130,21 +81,7 @@ class GraphicComponents extends JDialog {
         configure.addActionListener(this::configureActionPerformed);
         panelSchema.add(configure);
 
-
-        //bruno
-        JButton show = new JButton("Visualization");
-        show.addActionListener(evt -> showGeographicData());
-        panelSchema.add(show);
-        //bruno
-
-
-        //@Hercules
-        JButton filter = new JButton("Trajectory cleaning");
-        filter.addActionListener(event -> filterActionPerformed());
-        panelSchema.add(filter);
-        //HMA
-        container.add(panelSchema, BorderLayout.NORTH);
-
+        
         //PANEL CONTENT
         JPanel panelContent = new JPanel();
         panelContent.setBorder(BorderFactory.createEtchedBorder());
@@ -483,11 +420,11 @@ class GraphicComponents extends JDialog {
         }
     }
 
-    private void LoadActionPerformed() {
+    public void LoadActionPerformed() {
         try { //load the tables in a list of auxiliary strings
             Statement s = conn.createStatement();
             final String sql = "SELECT f_table_name as tableName,type FROM geometry_columns " +
-                    "WHERE f_table_schema=trim('" + jComboBoxSchema.getSelectedItem() + "') ORDER BY tableName";
+                    "WHERE f_table_schema=trim('"+ config.schema + "') ORDER BY tableName";
 
             ResultSet vTableName = s.executeQuery(sql);
             DefaultListModel model = (DefaultListModel) jListTrajectoryTables.getModel();//Trajct Tables list
@@ -631,78 +568,6 @@ class GraphicComponents extends JDialog {
         	System.out.println(e.getMessage());
         }
         return "";
-    }
-
-    private void showGeographicData() {
-        try {
-            Statement s = conn.createStatement();
-
-            if (jListTrajectoryTables.getSelectedIndex() == -1) {
-                ShowGeoData rep = new ShowGeoData(conn);
-                JFrame f = new JFrame("Geographic Data Visualizer");
-                f.setFocusable(true);
-                f.requestFocus();
-                f.getContentPane().setLayout(new BorderLayout());
-                f.getContentPane().add(rep, BorderLayout.CENTER);
-                f.pack();
-                f.setVisible(true);
-                f.setSize(new Dimension(800, 600));
-                f.setResizable(false);
-
-                rep.paintAll(f.getGraphics());
-                return;
-            }
-
-            final String sql = String.format("SELECT f_table_name as tableName,type FROM geometry_columns WHERE f_table_schema=trim('%s') ORDER BY tableName",
-                    jComboBoxSchema.getSelectedItem());
-
-            ResultSet vTableName = s.executeQuery(sql);
-            int indexActualVT = 0;
-            while (vTableName.next()) {
-                if (indexActualVT++ == jListTrajectoryTables.getSelectedIndex()) {
-                    ShowGeoData rep = new ShowGeoData(conn);
-                    JFrame f = new JFrame("Geographic Data Visualizer");
-                    f.setFocusable(true);
-                    f.requestFocus();
-                    f.getContentPane().setLayout(new BorderLayout());
-                    f.getContentPane().add(rep, BorderLayout.CENTER);
-                    f.pack();
-                    f.setVisible(true);
-                    f.setSize(new Dimension(800, 600));
-                    f.setResizable(false);
-
-                    rep.loadPoints(vTableName.getString("tableName"), Color.BLUE, 2);
-
-                    rep.paintAll(f.getGraphics());
-                }
-            }
-
-        } catch (SQLException e) {
-        	System.out.println(e.getMessage());
-        }
-    }
-
-    // Format name of parameters
-
-    private void filterActionPerformed() {
-        int[] i = jListTrajectoryTables.getSelectedIndices();
-
-        if (i.length < 1) {
-            showMessageDialog(this, "Select one or more Trajectory Table.");
-            return;
-        }
-
-        String schema = (String) jComboBoxSchema.getSelectedItem();
-        Object[] temp = jListTrajectoryTables.getSelectedValues();
-
-        TrajectoryClean tc = new TrajectoryClean(conn, Arrays.stream(temp)
-                .map(ob -> (String) ob)
-                .collect(Collectors.toList()));
-
-        tc.setConfig(this.config);
-        tc.setEsquema(schema);
-        tc.setVisibleFrame(true);
-
     }
 
     private List<Parameter> parametersCluster() {

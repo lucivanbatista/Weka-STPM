@@ -39,8 +39,9 @@ public class TrajectoryFrame extends JDialog {
 
             this.graphicComponents = new GraphicComponents(conn, userConfigurations);
             this.graphicComponents.initGraphicComponents(algorithms);
-            List<String> schemas = loadSchemas();
-            this.graphicComponents.initComboBoxSchemas(schemas);
+//            List<String> schemas = loadSchemas();
+//            this.graphicComponents.initComboBoxSchemas(schemas);
+            this.graphicComponents.LoadActionPerformed();
         } catch (Exception e) {
             System.out.println(e.toString());
             JOptionPane.showMessageDialog(this, "Error in connection with DB.");
@@ -489,26 +490,28 @@ public class TrajectoryFrame extends JDialog {
             userConfigurations.tid = properties.getProperty(TRAJECTORY_ID);
             userConfigurations.time = properties.getProperty(DETECTION_TIME);
             userConfigurations.poi = properties.getProperty(POINTS_INTEREST);
+            userConfigurations.schema = properties.getProperty(SCHEMA);
 
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
-    private List<String> loadSchemas() {
-        List<String> schemas = new ArrayList<>();
-        try {
-            Statement statement = conn.createStatement();
-            ResultSet rs = statement.executeQuery("SELECT DISTINCT f_table_schema FROM geometry_columns");
-            while (rs.next()) {
-                schemas.add(rs.getString(1));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Failed loading schemas");
-        }
-        return schemas;
-    }
+    // COMENTADO, motivo: O schema é escolhido em config.properties
+//    private List<String> loadSchemas() {
+//        List<String> schemas = new ArrayList<>();
+//        try {
+//            Statement statement = conn.createStatement();
+//            ResultSet rs = statement.executeQuery("SELECT DISTINCT f_table_schema FROM geometry_columns");
+//            while (rs.next()) {
+//                schemas.add(rs.getString(1));
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//            JOptionPane.showMessageDialog(this, "Failed loading schemas");
+//        }
+//        return schemas;
+//    }
 
     /**
      * Algorithm's IB-SMoT and CB-SMoT
