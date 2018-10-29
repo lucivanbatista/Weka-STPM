@@ -985,13 +985,12 @@ public class TrajectoryMethods {
     protected static void enriquecimentoSemanticoStopCon(Stop stop, Connection conn, int count){
     	Statement s2;
     	String sql_enriquecimento="";
+    	for(GPSPoint g : stop.pts){
+           	sql_enriquecimento = sql_enriquecimento + "INSERT INTO " + " con_" + TrajectoryFrame.getCurrentNameTableStop() + "(gid_point, gid_stop) VALUES " + " ( "+g.gid+" , "+count+");";
+        }
 		try {
 			s2 = conn.createStatement();
-			for(GPSPoint g : stop.pts){
-//	        	System.out.println(g.gid);
-	           	sql_enriquecimento = "INSERT INTO " + " con_" + TrajectoryFrame.getCurrentNameTableStop() + "(gid_point, gid_stop) VALUES " + " ( "+g.gid+" , "+count+")";
-	           	s2.execute(sql_enriquecimento);
-	        }
+			s2.execute(sql_enriquecimento);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

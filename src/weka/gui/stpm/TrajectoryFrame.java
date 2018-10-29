@@ -171,12 +171,12 @@ public class TrajectoryFrame extends JDialog {
     // TrajectoryTable e a con
     public static void enriquecimentoSemanticoStopComplete(Config userConfigurations){
     	Statement s2;
-    	String sql_enriquecimento="";
+    	String sql_enriquecimento_stop="";
 		try {
 			s2 = conn.createStatement();
-			sql_enriquecimento = "INSERT INTO complete_" + TrajectoryFrame.getCurrentNameTableStop() + " select m.*, c.gid_stop " + 
-								"from con_" + TrajectoryFrame.getCurrentNameTableStop() + " as c, " + userConfigurations.table + " as m where c.gid_point = m.gid";
-	           	s2.execute(sql_enriquecimento);
+			sql_enriquecimento_stop = "INSERT INTO complete_" + TrajectoryFrame.getCurrentNameTableStop() + " select m.*, c.gid_stop " + 
+								"from con_" + TrajectoryFrame.getCurrentNameTableStop() + " as c, " + userConfigurations.table + " as m where m.gid = c.gid_point";
+	           	s2.execute(sql_enriquecimento_stop);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -299,7 +299,7 @@ public class TrajectoryFrame extends JDialog {
                             "    \"offset\" double precision," +
                             "    gid integer NOT NULL," +
                             "    the_geom geometry," +
-                            "	 gid_stop integer NOT NULL"	+
+                            "	 gid_stop integer"	+
                             ") WITHOUT OIDS;"  
             );
         }
