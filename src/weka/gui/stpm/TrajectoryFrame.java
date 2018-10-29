@@ -165,6 +165,21 @@ public class TrajectoryFrame extends JDialog {
 
         }
         TrajectoryMethods.resetunknown();
+        enriquecimentoSemanticoStopComplete(userConfigurations);
+    }
+    
+    // TrajectoryTable e a con
+    public static void enriquecimentoSemanticoStopComplete(Config userConfigurations){
+    	Statement s2;
+    	String sql_enriquecimento_stop="";
+		try {
+			s2 = conn.createStatement();
+			sql_enriquecimento_stop = "INSERT INTO complete_" + TrajectoryFrame.getCurrentNameTableStop() + " select m.*, c.gid_stop " + 
+								"from con_" + TrajectoryFrame.getCurrentNameTableStop() + " as c, " + userConfigurations.table + " as m where m.gid = c.gid_point";
+	           	s2.execute(sql_enriquecimento_stop);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
     }
 
     public static List<Trajectory> getTrajectoriesWithSpeeds(String tableTraj, Config config, Integer table_srid) throws SQLException {
@@ -173,7 +188,7 @@ public class TrajectoryFrame extends JDialog {
         // selects the trajectory-tid to be processed
         String sql = "SELECT "+config.tid+" as tid, count(*) FROM "+tableTraj+" GROUP BY "+config.tid+" ORDER BY tid DESC";
         ResultSet rs = s.executeQuery(sql);
-
+        
         //for each trajectory...
         while (rs.next()) {
             Trajectory trajectory = null;
@@ -263,9 +278,48 @@ public class TrajectoryFrame extends JDialog {
 
     private static void createTables(String tableStopName, Method method) throws SQLException {
         Statement s = conn.createStatement();
-        
 //        TrajectoryFrame.setCurrentNameTableStop(tableStopName);
         TrajectoryFrame.setCurrentNameTableStop(method);
+        
+        //Table completa com os novos enriquecimentos semânticos de stops (APENAS)
+        try {
+            s.execute("DROP TABLE IF EXISTS " + "complete_" + TrajectoryFrame.getCurrentNameTableStop());
+            s.execute("DELETE FROM geometry_columns WHERE f_table_name = '"+"complete_"+TrajectoryFrame.getCurrentNameTableStop()+"'");
+
+        }catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            s.execute(
+                    "CREATE TABLE IF NOT EXISTS " + "complete_" + TrajectoryFrame.getCurrentNameTableStop() + " (" +
+                            "    tid integer NOT NULL," +
+                            "    latitude double precision," +
+                            "    longitude double precision," +
+                            "    \"time\" timestamp without time zone," +
+                            "    edge_id bigint," +
+                            "    \"offset\" double precision," +
+                            "    gid integer NOT NULL," +
+                            "    the_geom geometry," +
+                            "	 gid_stop integer"	+
+                            ") WITHOUT OIDS;"  
+            );
+        }
+        
+        
+        //Conexão Intermediária entre stops e os pontos normais
+        try {
+            s.execute("DROP TABLE IF EXISTS " + "con_" + TrajectoryFrame.getCurrentNameTableStop());
+
+        }catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            s.execute(
+                    "CREATE TABLE IF NOT EXISTS " + "con_" + TrajectoryFrame.getCurrentNameTableStop() + " (" +
+                            "    gid_point integer," +
+                            "    gid_stop integer" +
+                            ");"
+            );
+        }
+        
         
         // STOPS table
         System.out.println("\t\tstops table...");
