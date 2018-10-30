@@ -1,14 +1,7 @@
 package weka.gui.stpm;
 
-import weka.gui.WekaTaskMonitor;
-import weka.gui.geodata.visualizer.ShowGeoData;
-import weka.gui.stpm.clean.TrajectoryClean;
-
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,10 +16,11 @@ class GraphicComponents extends JDialog {
     private final Connection conn;
     private final Config config;
     private Method[] algorithms;
-
-    javax.swing.JList jListRF;
-    JComboBox<String> jComboBoxSchema;
     private AssociatedParameter poi_associated = null;
+    private ArrayList<AssociatedParameter> rf_poi = new ArrayList<>();
+
+    JComboBox<String> jComboBoxSchema;
+    
 
     GraphicComponents(Connection conn, Config config, Method[] algorithms) {
         this.conn = conn;
@@ -63,20 +57,7 @@ class GraphicComponents extends JDialog {
         jLabel2.setText("Relevant Features");
         panelContent.add(jLabel2, c);
 
-        c.gridy = 3;
-        c.gridwidth = 3;
-        c.weightx = 1.0;
-        JScrollPane jScrollPane1 = new JScrollPane();
-        DefaultListModel modelRF = new DefaultListModel();
-        jListRF = new JList(modelRF);
-        jListRF.setVisibleRowCount(4);
-        jListRF.setFixedCellWidth(4);
-        jScrollPane1.setViewportView(jListRF);
-        panelContent.add(jScrollPane1, c);
-        validate();
-
         //Buffer
-        GridBagLayout gbag = new GridBagLayout();
         GridBagConstraints c2 = new GridBagConstraints();
         c2.insets = new Insets(5, 5, 5, 5);
 
@@ -130,22 +111,13 @@ class GraphicComponents extends JDialog {
     public void LoadActionPerformed() {
         try { //load the tables in a list of auxiliary strings
             Statement s = conn.createStatement();
-            final String sql = "SELECT f_table_name as tableName,type FROM geometry_columns " +
-                    "WHERE f_table_schema=trim('"+ config.schema + "') ORDER BY tableName";
+            final String sql = "SELECT f_table_name as tableName, type FROM geometry_columns " +
+                    "WHERE f_table_schema=trim('"+ config.schema + "') AND f_table_name = '"+ config.poi +"' ORDER BY tableName";
 
             ResultSet vTableName = s.executeQuery(sql);
-            DefaultListModel model2 = (DefaultListModel) jListRF.getModel();//RF list
-            model2.removeAllElements();
             while (vTableName.next()) {/* creates a new table for each table that has objects with topological relation to vRegion */
-                model2.addElement(new AssociatedParameter(
-                        vTableName.getString("tableName"),
-                        vTableName.getString("type"),
-                        config.rfMinTime)
-                );// RFs
-                
-                if(vTableName.getString("tableName").equals(config.poi)){
-                	poi_associated = new AssociatedParameter(vTableName.getString("tableName"), vTableName.getString("type"), config.rfMinTime);
-                }
+                rf_poi.add(new AssociatedParameter(vTableName.getString("tableName"), vTableName.getString("type"), config.rfMinTime));// RFs          
+             	poi_associated = new AssociatedParameter(vTableName.getString("tableName"), vTableName.getString("type"), config.rfMinTime);
             }
         } catch (Exception vErro) {
             vErro.printStackTrace();
@@ -154,12 +126,6 @@ class GraphicComponents extends JDialog {
 
     private void OKActionPerformed() {
     	System.out.println("Buffer of "+config.userBuff+" saved.");	
-    	
-        //cause CB-SMoT has a version without RFs
-        if (jListRF.getSelectedIndex() == -1 && isNotEquals(config.method, "CB-SMoT")) {
-            showMessageDialog(this, "Select one or more relevant features.");
-            return;
-        }
 
         //controls if SRID of RFs are different from trajectories...
         // ALL the trajectories should have the SAME srid
@@ -172,7 +138,8 @@ class GraphicComponents extends JDialog {
         }
 
         //for each of the trajectory table selected...
-        Object[] selectedValues = jListRF.getSelectedValuesList().toArray(); // COMENTAR DEPOIS (URGENTE ESSE E O DEBAIXO!)
+//        Object[] selectedValues = jListRF.getSelectedValuesList().toArray(); // COMENTAR DEPOIS (URGENTE ESSE E O DEBAIXO!)
+        Object[] selectedValues = rf_poi.toArray();
 //        Object[] selectedValues = new Object[]{poi_associated}; // DESCOMENTAR DEPOIS
         Method method = null;
         if(config.method.equals("SMoT")){
