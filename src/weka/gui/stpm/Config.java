@@ -27,6 +27,11 @@ public class Config {
 	public Boolean ftype = false; // Type (true) or Instance (false), padrão é false
 	public Double userBuff;
 	public Double rfMinTime;
+	public String method;
+	// CB parameters: 
+	public Double maxAvgSpeed;
+	public Integer minTime;
+	public Double maxSpeed;
 	
     
     /** Creates a new instance of Config */

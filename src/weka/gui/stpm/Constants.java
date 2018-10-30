@@ -15,5 +15,13 @@ public class Constants {
 //    public static final boolean FTYPE = "ftype";
     public static final String USERBUFF = "userBuff";
     public static final String RFMINTIME = "rfMinTime";
+    public static final String METHOD = "methodName";
+    
+    // CB Parameters: 
+    public static final String MAXAVGSPEED = "maxAvgSpeed";
+    public static final String MINTIME = "minTime";
+    public static final String MAXSPEED = "maxSpeed";
+    
+    
     public static final String VOID = "";
 }

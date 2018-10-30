@@ -26,11 +26,9 @@ import static weka.gui.stpm.TrajectoryFrame.createTrajectoryTablesSelected;
 class GraphicComponents extends JDialog {
     private final Connection conn;
     private final Config config;
+    private Method[] algorithms;
 
     private final WekaTaskMonitor tm = new WekaTaskMonitor();
-    JComboBox<Method> jComboBoxMethod;
-    JComboBox<Parameter> jComboBoxParam;
-    javax.swing.JTextField jTextFieldParam;
     javax.swing.JComboBox jComboBoxStreet;
     javax.swing.JComboBox jComboBoxStreetLimit;
     javax.swing.JList jListRF;
@@ -41,12 +39,13 @@ class GraphicComponents extends JDialog {
     private javax.swing.JList jListTrajectoryTables;
     private AssociatedParameter poi_associated = null;
 
-    GraphicComponents(Connection conn, Config config) {
+    GraphicComponents(Connection conn, Config config, Method[] algorithms) {
         this.conn = conn;
         this.config = config;
+        this.algorithms = algorithms;
     }
 
-    void initGraphicComponents(Method[] algorithms) {
+    void initGraphicComponents() {
 
         Container container = getContentPane();
 
@@ -150,52 +149,6 @@ class GraphicComponents extends JDialog {
         panelContent.add(mtPanel, c);
 
         //Method Panel
-        JPanel panelMethod = new JPanel();
-        panelMethod.setBorder(BorderFactory.createTitledBorder("Method"));
-        gbag = new GridBagLayout();
-        panelMethod.setLayout(gbag);
-        c2 = new GridBagConstraints();
-        c2.insets = new Insets(3, 3, 3, 3);
-
-        c2.gridx = 0;
-        c2.gridy = 0;
-        c2.gridwidth = 6;
-        jComboBoxMethod = new JComboBox<>(algorithms);
-        jComboBoxMethod.setPreferredSize(new Dimension(210, 20));
-        jComboBoxMethod.addItemListener(event -> jComboBoxMethodItemStateChanged());
-        panelMethod.add(jComboBoxMethod, c2);
-
-        c2.gridx = 0;
-        c2.gridy = 2;
-        c2.gridwidth = 3;
-        JLabel jLabel4 = new JLabel("Parameter: ");
-        panelMethod.add(jLabel4, c2);
-
-        c2.gridx = 3;
-        JLabel jLabel5 = new JLabel("Value: ");
-        panelMethod.add(jLabel5, c2);
-
-        c2.gridx = 3;
-        c2.gridy = 3;
-        jTextFieldParam = new JTextField();
-        jTextFieldParam.setPreferredSize(new Dimension(40, 20));
-        jTextFieldParam.addFocusListener(new FocusAdapter() {
-            public void focusLost(FocusEvent evt) {
-                jTextFieldParamFocusLost();
-            }
-        });
-        panelMethod.add(jTextFieldParam, c2);
-
-        c2.gridx = 0;
-        c2.gridy = 3;
-        jComboBoxParam = new JComboBox<>();
-        jComboBoxParam.setPreferredSize(new Dimension(160, 20));
-        jComboBoxParam.addItemListener(this::jComboBoxParamItemStateChanged);
-        panelMethod.add(jComboBoxParam, c2);
-
-        c.gridx = 5;
-        c.gridy = 3;
-        panelContent.add(panelMethod, c);
         container.add(panelContent, BorderLayout.CENTER);
 
         JPanel panelDown = new JPanel();
@@ -252,53 +205,8 @@ class GraphicComponents extends JDialog {
         }
     }
 
-    void jComboBoxMethodItemStateChanged() {
-        Method alg = (Method) jComboBoxMethod.getSelectedItem();
-        jComboBoxParam.removeAllItems();
-        if (alg != null) {
-            for (int i=0;i<alg.param.size();i++) {
-                jComboBoxParam.addItem(alg.param.elementAt(i));
-            }
-        }
-
-        //prevents the SMoT methods to call upon parameters
-        if(alg.toString().compareTo("SMoT")==0){
-        	jComboBoxParam.setEnabled(false);
-        	jTextFieldParam.setEnabled(false);
-        }
-        else{
-        	jComboBoxParam.setEnabled(true);
-        	jTextFieldParam.setEnabled(true);
-        }
-    }
-
     private void jButtonCancelActionPerformed() {
         this.dispose();
-    }
-
-    private void jTextFieldParamFocusLost() {
-        Parameter p = (Parameter) jComboBoxParam.getSelectedItem();
-        try {
-            if (p != null) {
-                if (DOUBLE == p.type) {
-                    p.value = Double.valueOf(jTextFieldParam.getText());
-                } else {
-                    p.value = Integer.valueOf(jTextFieldParam.getText());
-                }
-            }
-        } catch (NumberFormatException e) {
-            showMessageDialog(this, "Parameter value invalid!");
-        }
-    }
-
-    // Campos CB ao ser ativado
-    private void jComboBoxParamItemStateChanged(java.awt.event.ItemEvent evt) {
-        Parameter p = (Parameter) evt.getItem();
-        if (p.type == DOUBLE) {
-            jTextFieldParam.setText(p.value.toString());
-        } else {
-            jTextFieldParam.setText(((Integer) p.value).toString());
-        }
     }
 
     // Add valor para o RFMinTime ao select Relevant Features
@@ -367,7 +275,7 @@ class GraphicComponents extends JDialog {
     	System.out.println("Buffer of "+config.userBuff+" saved.");	
     	
         //cause CB-SMoT has a version without RFs
-        if (jListRF.getSelectedIndex() == -1 && isNotEquals(jComboBoxMethod.getSelectedItem(), "CB-SMoT")) {
+        if (jListRF.getSelectedIndex() == -1 && isNotEquals(config.method, "CB-SMoT")) {
             showMessageDialog(this, "Select one or more relevant features.");
             return;
         }
@@ -398,11 +306,14 @@ class GraphicComponents extends JDialog {
         //for each of the trajectory table selected...
         Object[] selectedValues = jListRF.getSelectedValuesList().toArray(); // COMENTAR DEPOIS (URGENTE ESSE E O DEBAIXO!)
 //        Object[] selectedValues = new Object[]{poi_associated}; // DESCOMENTAR DEPOIS
-        Method method = (Method) jComboBoxMethod.getSelectedItem();
+        Method method = null;
+        if(config.method.equals("SMoT")){
+        	method = (Method) algorithms[0];
+        }else{
+        	method = (Method) algorithms[1];
+        }
         Boolean enableBuffer = true; // Always True, isso interfere com base na área, sempre é bom ter uma área ao redor do POI
         int maxSelectedIndex = jListRF.getMaxSelectionIndex();
-        Boolean enableFType = config.ftype;
-        Double buffer = config.userBuff;
         final int tam = str.length;
         for (int count = 0; count < tam; ) {
             config.table = str[count];
@@ -413,16 +324,14 @@ class GraphicComponents extends JDialog {
                         config.tid,
                         config.time,
                         selectedValues,
-                        buffer,
+                        config.userBuff,
                         method,
                         enableBuffer,
                         config,
-                        enableFType,
+                        config.ftype,
                         maxSelectedIndex
                 );
-
                 count++;
-
                 if (count == tam) {
                 	System.out.println("Processing time: " + time + " ms");
                     showMessageDialog(this, "Operation finished successfully.");
@@ -432,7 +341,6 @@ class GraphicComponents extends JDialog {
                 showMessageDialog(this, "Error during operation");
             }
         }
-
         Runtime.getRuntime().gc();
     }
 
@@ -449,9 +357,7 @@ class GraphicComponents extends JDialog {
 
             rsn.next();
             TrajectoryFrame.table_srid = rsn.getInt(param);
-
-
-            
+ 
             java.util.List<AssociatedParameter> objects = new ArrayList<AssociatedParameter>(); // DESCOMENTAR DEPOIS
             objects.add(poi_associated); // DESCOMENTAR DEPOIS
 //            java.util.List<AssociatedParameter> objects = jListRF.getSelectedValuesList(); // COMENTAR DEPOIS
@@ -476,8 +382,8 @@ class GraphicComponents extends JDialog {
     private List<Parameter> parametersCluster() {
         List<Parameter> list = new ArrayList<>();
         int tamParams = 0;
-        while (tamParams < jComboBoxParam.getModel().getSize())
-            list.add(jComboBoxParam.getModel().getElementAt(tamParams++));
+//        while (tamParams < jComboBoxParam.getModel().getSize())
+//            list.add(jComboBoxParam.getModel().getElementAt(tamParams++));
         return list;
     }
 
