@@ -24,18 +24,7 @@ class GraphicComponents extends JDialog {
     }
 
     void initGraphicComponents() {
-        Container container = getContentPane();
-
-        JPanel panelDown = new JPanel();        
-        JButton jButtonOK = new JButton("OK");
-        jButtonOK.addActionListener(event -> OKActionPerformed());
-        panelDown.add(jButtonOK);
-
-        container.add(panelDown, BorderLayout.SOUTH);
-
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        this.setSize(680, 360);
-        this.setVisible(true);
+    	OKActionPerformed();
     }
 
     public void LoadActionPerformed() {
@@ -57,9 +46,6 @@ class GraphicComponents extends JDialog {
     private void OKActionPerformed() {
     	System.out.println("Buffer of "+config.userBuff+" saved.");	
 
-        //controls if SRID of RFs are different from trajectories...
-        // ALL the trajectories should have the SAME srid
-        // it is checked ahead in the foreach.
         String error = checkSRIDs(); //att the variable 'table_srid'
 
         if(error.compareTo("")!=0){
@@ -83,6 +69,7 @@ class GraphicComponents extends JDialog {
 	                        config, config.ftype, maxSelectedIndex);
 	        System.out.println("Processing time: " + time + " ms");
 	        System.out.println("Operation finished successfully.");
+	        System.exit(0);
         } catch (Exception e) {
         	System.out.println("Error during operation: \n" + e.getMessage());
         }

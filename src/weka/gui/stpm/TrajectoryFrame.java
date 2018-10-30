@@ -39,8 +39,8 @@ public class TrajectoryFrame extends JDialog {
             loadPropertiesFromFile(user, pass, url);
 
             this.graphicComponents = new GraphicComponents(conn, userConfigurations, algorithms);
-            this.graphicComponents.initGraphicComponents();
             this.graphicComponents.LoadActionPerformed();
+            this.graphicComponents.initGraphicComponents();
         } catch (Exception e) {
             System.out.println(e.toString());
             System.out.println("Error in connection with DB.");
