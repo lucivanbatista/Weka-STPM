@@ -26,7 +26,7 @@ public class Config {
 	public String schema; // Schema
 	public Boolean ftype = false; // Type (true) or Instance (false), padrão é false
 	public Double userBuff;
-	public Double rfMinTime;
+	public Integer rfMinTime;
 	public String method;
 	// CB parameters: 
 	public Double maxAvgSpeed;

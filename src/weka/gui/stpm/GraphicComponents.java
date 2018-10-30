@@ -25,7 +25,6 @@ class GraphicComponents extends JDialog {
     private Method[] algorithms;
 
     javax.swing.JList jListRF;
-    javax.swing.JTextField RFMinTime;
     JComboBox<String> jComboBoxSchema;
     private AssociatedParameter poi_associated = null;
 
@@ -72,7 +71,6 @@ class GraphicComponents extends JDialog {
         jListRF = new JList(modelRF);
         jListRF.setVisibleRowCount(4);
         jListRF.setFixedCellWidth(4);
-        jListRF.addListSelectionListener(event -> jListRFValueChanged());
         jScrollPane1.setViewportView(jListRF);
         panelContent.add(jScrollPane1, c);
         validate();
@@ -86,36 +84,6 @@ class GraphicComponents extends JDialog {
         c.gridy = 2;
         c.gridheight = 2;
         c.gridwidth = 2;
-
-        //MinTimeBox
-        JPanel mtPanel = new JPanel();
-        mtPanel.setBorder(BorderFactory.createEtchedBorder());
-        gbag = new GridBagLayout();
-        mtPanel.setLayout(gbag);
-        c2 = new GridBagConstraints();
-
-        c2.gridx = 0;
-        c2.gridy = 0;
-        JLabel jLabel3 = new JLabel("RF Min Time (sec): ");
-        mtPanel.add(jLabel3, c2);
-
-        c2.gridx = 0;
-        c2.gridy = 1;
-        RFMinTime = new JTextField();
-        RFMinTime.setPreferredSize(new Dimension(40, 20));
-        RFMinTime.setColumns(6);
-        RFMinTime.addFocusListener(new FocusAdapter() {
-            public void focusLost(FocusEvent evt) {
-                RFMinTimeFocusLost();
-            }
-        });
-
-        RFMinTime.addActionListener(event -> RFMinTimeActionPerformed());
-        mtPanel.add(RFMinTime, c2);
-
-        c.gridx = 3;
-        c.gridy = 4;
-        panelContent.add(mtPanel, c);
 
         //Method Panel
         container.add(panelContent, BorderLayout.CENTER);
@@ -159,39 +127,6 @@ class GraphicComponents extends JDialog {
         this.dispose();
     }
 
-    // Add valor para o RFMinTime ao select Relevant Features
-    private void jListRFValueChanged() {
-//        AssociatedParameter par = (AssociatedParameter) jListRF.getSelectedValue(); // COMENTAR DEPOIS
-    	AssociatedParameter par = poi_associated; // DESCOMENTAR DEPOIS
-        if (par != null)
-            RFMinTime.setText(par.value.toString());
-    }
-
-    // Box do RFMinTime
-    private void RFMinTimeFocusLost() {
-        Object[] objs = jListRF.getSelectedValuesList().toArray();
-
-        associateValuesFromRFMinTime(objs);
-    }
-
-    private void RFMinTimeActionPerformed() {
-        Object[] objs = jListRF.getSelectedValuesList().toArray();
-
-        associateValuesFromRFMinTime(objs);
-    }
-
-    private void associateValuesFromRFMinTime(Object[] objs) {
-        try {
-            for (Object obj : objs) {
-                AssociatedParameter p = (AssociatedParameter) obj;
-                p.value = Integer.parseInt(RFMinTime.getText());
-            }
-        } catch (java.lang.NumberFormatException e) {
-            showMessageDialog(this, e.toString());
-            RFMinTime.grabFocus();
-        }
-    }
-
     public void LoadActionPerformed() {
         try { //load the tables in a list of auxiliary strings
             Statement s = conn.createStatement();
@@ -204,11 +139,12 @@ class GraphicComponents extends JDialog {
             while (vTableName.next()) {/* creates a new table for each table that has objects with topological relation to vRegion */
                 model2.addElement(new AssociatedParameter(
                         vTableName.getString("tableName"),
-                        vTableName.getString("type"))
+                        vTableName.getString("type"),
+                        config.rfMinTime)
                 );// RFs
                 
                 if(vTableName.getString("tableName").equals(config.poi)){
-                	poi_associated = new AssociatedParameter(vTableName.getString("tableName"), vTableName.getString("type"));
+                	poi_associated = new AssociatedParameter(vTableName.getString("tableName"), vTableName.getString("type"), config.rfMinTime);
                 }
             }
         } catch (Exception vErro) {

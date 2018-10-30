@@ -428,7 +428,7 @@ public class TrajectoryFrame extends JDialog {
             userConfigurations.poi = properties.getProperty(POINTS_INTEREST);
             userConfigurations.schema = properties.getProperty(SCHEMA);
             userConfigurations.userBuff = Double.parseDouble(properties.getProperty(USERBUFF));
-            userConfigurations.rfMinTime = Double.parseDouble(properties.getProperty(RFMINTIME));
+            userConfigurations.rfMinTime = Integer.parseInt(properties.getProperty(RFMINTIME));
             userConfigurations.method = properties.getProperty(METHOD);
             userConfigurations.maxAvgSpeed = Double.parseDouble(properties.getProperty(MAXAVGSPEED));
             userConfigurations.minTime = Integer.parseInt(properties.getProperty(MINTIME));

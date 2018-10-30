@@ -11,16 +11,17 @@ package weka.gui.stpm;
  */
 public class AssociatedParameter {
     String name;
-    Integer value = new Integer(120);
+    Integer value;
     String type;
 
     public AssociatedParameter(String p) {
         name = p;
     }
     
-    public AssociatedParameter(String p,String t) {
+    public AssociatedParameter(String p,String t, Integer v) {
         name = p;
         type = t;
+        value = v;
     }
 
     public String toString() {
