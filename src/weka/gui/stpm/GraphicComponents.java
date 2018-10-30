@@ -320,7 +320,6 @@ class GraphicComponents extends JDialog {
             try {
                 long time = createTrajectoryTablesSelected(
                         config.table,
-                        nameTableStop(config.table),
                         config.tid,
                         config.time,
                         selectedValues,
@@ -377,18 +376,5 @@ class GraphicComponents extends JDialog {
         	System.out.println(e.getMessage());
         }
         return "";
-    }
-
-    private List<Parameter> parametersCluster() {
-        List<Parameter> list = new ArrayList<>();
-        int tamParams = 0;
-//        while (tamParams < jComboBoxParam.getModel().getSize())
-//            list.add(jComboBoxParam.getModel().getElementAt(tamParams++));
-        return list;
-    }
-
-    private String nameTableStop(String sp) {
-        List<Parameter> parameters = parametersCluster();
-        return createNameOfStopTable(sp, parameters);
     }
 }

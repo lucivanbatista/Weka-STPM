@@ -204,7 +204,7 @@ public class TrajectoryFrame extends JDialog {
         return trajectorys;
     }
 
-    public static long createTrajectoryTablesSelected(String tableName, String tableStopName, String tid, String dateTime, Object[] objects, Double buffer,
+    public static long createTrajectoryTablesSelected(String tableName, String tid, String dateTime, Object[] objects, Double buffer,
                                                       Method method, boolean enableBuffer, Config userConfigurations, boolean enableFType,
                                                       int maxSelectedIndex) throws SQLException {
 
@@ -222,7 +222,7 @@ public class TrajectoryFrame extends JDialog {
         //end of srid checking
         System.out.println("Creating tables...");
 
-        createTables(tableStopName, method);
+        createTables(method);
 
         System.out.println("Processing the trajectories...");
 
@@ -233,7 +233,7 @@ public class TrajectoryFrame extends JDialog {
         return finalTime - initialTime;
     }
 
-    private static void createTables(String tableStopName, Method method) throws SQLException {
+    private static void createTables(Method method) throws SQLException {
         Statement s = conn.createStatement();
         TrajectoryFrame.setCurrentNameTableStop(method);
         
