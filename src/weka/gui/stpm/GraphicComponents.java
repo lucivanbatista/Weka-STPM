@@ -8,8 +8,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import static javax.swing.JOptionPane.showMessageDialog;
-import static weka.gui.stpm.StringUtil.*;
 import static weka.gui.stpm.TrajectoryFrame.createTrajectoryTablesSelected;
 
 class GraphicComponents extends JDialog {
@@ -19,9 +17,6 @@ class GraphicComponents extends JDialog {
     private AssociatedParameter poi_associated = null;
     private ArrayList<AssociatedParameter> rf_poi = new ArrayList<>();
 
-    JComboBox<String> jComboBoxSchema;
-    
-
     GraphicComponents(Connection conn, Config config, Method[] algorithms) {
         this.conn = conn;
         this.config = config;
@@ -29,83 +24,18 @@ class GraphicComponents extends JDialog {
     }
 
     void initGraphicComponents() {
-
         Container container = getContentPane();
 
-        container.setLayout(new BorderLayout());
-        
-        jComboBoxSchema = new JComboBox<>();
-        jComboBoxSchema.setPreferredSize(new Dimension(150, 22));
-        
-        //PANEL CONTENT
-        JPanel panelContent = new JPanel();
-        panelContent.setBorder(BorderFactory.createEtchedBorder());
-
-        GridBagLayout gridbag = new GridBagLayout();
-        panelContent.setLayout(gridbag);
-        GridBagConstraints c = new GridBagConstraints();
-
-        c.fill = GridBagConstraints.BOTH;
-        c.insets = new Insets(5, 10, 5, 10);
-
-        
-        //Relevant Features
-        c.gridx = 0;
-        c.gridy = 1;
-        c.gridheight = 2;
-        JLabel jLabel2 = new JLabel();
-        jLabel2.setText("Relevant Features");
-        panelContent.add(jLabel2, c);
-
-        //Buffer
-        GridBagConstraints c2 = new GridBagConstraints();
-        c2.insets = new Insets(5, 5, 5, 5);
-
-        c.gridx = 3;
-        c.gridy = 2;
-        c.gridheight = 2;
-        c.gridwidth = 2;
-
-        //Method Panel
-        container.add(panelContent, BorderLayout.CENTER);
-
-        JPanel panelDown = new JPanel();
-        panelDown.setBorder(BorderFactory.createEtchedBorder());
-
-        gridbag = new GridBagLayout();
-        panelDown.setLayout(gridbag);
-        c = new GridBagConstraints();
-
-        c.fill = GridBagConstraints.BOTH;
-        c.insets = new Insets(10, 10, 10, 10);
-
+        JPanel panelDown = new JPanel();        
         JButton jButtonOK = new JButton("OK");
         jButtonOK.addActionListener(event -> OKActionPerformed());
-
-        c.gridx = 3;
-        c.gridy = 0;
-        c.gridwidth = 2;
-        panelDown.add(jButtonOK, c);
-
-        JButton jButtonCancel = new JButton("Close");
-        jButtonCancel.addActionListener(event -> jButtonCancelActionPerformed());
-        c.gridx = 5;
-        c.gridy = 0;
-        c.gridwidth = 2;
-        panelDown.add(jButtonCancel, c);
+        panelDown.add(jButtonOK);
 
         container.add(panelDown, BorderLayout.SOUTH);
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        this.pack();
-        jComboBoxSchema.requestFocusInWindow();
-        this.setMaximumSize(new Dimension(600, 360));
         this.setSize(680, 360);
         this.setVisible(true);
-    }
-
-    private void jButtonCancelActionPerformed() {
-        this.dispose();
     }
 
     public void LoadActionPerformed() {
@@ -133,14 +63,12 @@ class GraphicComponents extends JDialog {
         String error = checkSRIDs(); //att the variable 'table_srid'
 
         if(error.compareTo("")!=0){
-        	JOptionPane.showMessageDialog(this,error);
+        	System.out.println(error);
             return;
         }
 
         //for each of the trajectory table selected...
-//        Object[] selectedValues = jListRF.getSelectedValuesList().toArray(); // COMENTAR DEPOIS (URGENTE ESSE E O DEBAIXO!)
         Object[] selectedValues = rf_poi.toArray();
-//        Object[] selectedValues = new Object[]{poi_associated}; // DESCOMENTAR DEPOIS
         Method method = null;
         if(config.method.equals("SMoT")){
         	method = (Method) algorithms[0];
@@ -148,21 +76,19 @@ class GraphicComponents extends JDialog {
         	method = (Method) algorithms[1];
         }
         Boolean enableBuffer = true; // Always True, isso interfere com base na área, sempre é bom ter uma área ao redor do POI
-        int maxSelectedIndex = jListRF.getMaxSelectionIndex();
+        int maxSelectedIndex = 1;
         
         try {
 	        long time = createTrajectoryTablesSelected(config.table, config.tid, config.time, selectedValues, config.userBuff, method, enableBuffer,
 	                        config, config.ftype, maxSelectedIndex);
 	        System.out.println("Processing time: " + time + " ms");
-	        showMessageDialog(this, "Operation finished successfully.");
+	        System.out.println("Operation finished successfully.");
         } catch (Exception e) {
-        	System.out.println("Error: \n" + e.getMessage());
-            showMessageDialog(this, "Error during operation");
+        	System.out.println("Error during operation: \n" + e.getMessage());
         }
         Runtime.getRuntime().gc();
     }
 
-    @SuppressWarnings("unchecked")
     private String checkSRIDs() {
         Statement sn;
         try {
@@ -178,7 +104,6 @@ class GraphicComponents extends JDialog {
  
             java.util.List<AssociatedParameter> objects = new ArrayList<AssociatedParameter>(); // DESCOMENTAR DEPOIS
             objects.add(poi_associated); // DESCOMENTAR DEPOIS
-//            java.util.List<AssociatedParameter> objects = jListRF.getSelectedValuesList(); // COMENTAR DEPOIS
             java.util.List<AssociatedParameter> relevantFeatures = new ArrayList<>(objects);
 
             //comparing their SRIDs with the trajectory

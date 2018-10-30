@@ -43,12 +43,11 @@ public class TrajectoryFrame extends JDialog {
             this.graphicComponents.LoadActionPerformed();
         } catch (Exception e) {
             System.out.println(e.toString());
-            JOptionPane.showMessageDialog(this, "Error in connection with DB.");
-            dispose();
+            System.out.println("Error in connection with DB.");
         }
     }
 
-    // TID dos taxis and ur points
+    // TID dos taxis and points
     private static void loadTrajectories(String trajectoryTable, String tid, String time, Object[] objects, Double buffer, Method method, boolean enableBuffer,
                                          Config userConfigurations, boolean enableFType, int maxSelectedIndex) throws SQLException {
 
@@ -303,29 +302,29 @@ public class TrajectoryFrame extends JDialog {
         }
 
         //MOVES table (NOT USED YET)
-        System.out.println("\t\tmoves table...");
-        try {
-            s.execute("DROP TABLE IF EXISTS moves");
-            s.execute("DELETE FROM geometry_columns WHERE f_table_name = 'moves'");
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }finally {
-            s.execute(
-                    "CREATE TABLE IF NOT EXISTS moves (" +
-                            "      tid integer NOT NULL," +
-                            "      moveid integer NOT NULL," +
-                            "      start_time timestamp without time zone," +
-                            "      end_time timestamp without time zone," +
-                            "      start_stop character varying," +
-                            "      end_stop character varying," +
-                            "      start_stop_pk integer," +
-                            "      end_stop_pk integer," +
-                            "      rf character varying," +
-                            "      CONSTRAINT moves_pkey PRIMARY KEY (tid,rf,moveid)" +
-                            ")WITHOUT OIDS"
-            );
-            s.execute("SELECT AddGeometryColumn('moves', 'the_geom',"+table_srid+", 'LINESTRING', 2)");
-        }
+//        System.out.println("\t\tmoves table...");
+//        try {
+//            s.execute("DROP TABLE IF EXISTS moves");
+//            s.execute("DELETE FROM geometry_columns WHERE f_table_name = 'moves'");
+//        } catch (SQLException ex) {
+//            ex.printStackTrace();
+//        }finally {
+//            s.execute(
+//                    "CREATE TABLE IF NOT EXISTS moves (" +
+//                            "      tid integer NOT NULL," +
+//                            "      moveid integer NOT NULL," +
+//                            "      start_time timestamp without time zone," +
+//                            "      end_time timestamp without time zone," +
+//                            "      start_stop character varying," +
+//                            "      end_stop character varying," +
+//                            "      start_stop_pk integer," +
+//                            "      end_stop_pk integer," +
+//                            "      rf character varying," +
+//                            "      CONSTRAINT moves_pkey PRIMARY KEY (tid,rf,moveid)" +
+//                            ")WITHOUT OIDS"
+//            );
+//            s.execute("SELECT AddGeometryColumn('moves', 'the_geom',"+table_srid+", 'LINESTRING', 2)");
+//        }
 
     }
 

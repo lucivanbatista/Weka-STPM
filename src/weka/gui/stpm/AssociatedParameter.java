@@ -25,6 +25,6 @@ public class AssociatedParameter {
     }
 
     public String toString() {
-        return name;
+        return "Nome: " + name + "; Value: " + value;
     }
 }
