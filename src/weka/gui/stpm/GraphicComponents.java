@@ -14,12 +14,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static javax.swing.JOptionPane.showMessageDialog;
-import static weka.gui.stpm.Parameter.Type.DOUBLE;
 import static weka.gui.stpm.StringUtil.*;
 import static weka.gui.stpm.TrajectoryFrame.createTrajectoryTablesSelected;
 
@@ -28,15 +24,9 @@ class GraphicComponents extends JDialog {
     private final Config config;
     private Method[] algorithms;
 
-    private final WekaTaskMonitor tm = new WekaTaskMonitor();
-    javax.swing.JComboBox jComboBoxStreet;
-    javax.swing.JComboBox jComboBoxStreetLimit;
     javax.swing.JList jListRF;
     javax.swing.JTextField RFMinTime;
     JComboBox<String> jComboBoxSchema;
-    javax.swing.ButtonGroup buttonGroupItem;// the same
-    javax.swing.ButtonGroup buttonGroupTime;//the same
-    private javax.swing.JList jListTrajectoryTables;
     private AssociatedParameter poi_associated = null;
 
     GraphicComponents(Connection conn, Config config, Method[] algorithms) {
@@ -65,28 +55,7 @@ class GraphicComponents extends JDialog {
         c.fill = GridBagConstraints.BOTH;
         c.insets = new Insets(5, 10, 5, 10);
 
-        //Config of trajectory Table
-        c.gridx = 0;
-        c.gridy = 0;
-        JLabel jLabel1 = new JLabel("Trajectory Table: ");
-        panelContent.add(jLabel1, c);
-
-        c.gridx = 2;
-        c.gridwidth = 2;
-        c.weightx = 1.0;
-        JScrollPane sc1 = new JScrollPane();
-        DefaultListModel modelsc = new DefaultListModel();
-        jListTrajectoryTables = new JList(modelsc);
-        jListTrajectoryTables.setVisibleRowCount(2);
-        jListTrajectoryTables.setFixedCellWidth(2);
-        sc1.setViewportView(jListTrajectoryTables);
-        panelContent.add(sc1, c);
-
-        c.gridx = 0;
-        c.gridy = 1;
-        c.gridwidth = 5;
-        c.gridheight = 1;
-
+        
         //Relevant Features
         c.gridx = 0;
         c.gridy = 1;
@@ -176,10 +145,6 @@ class GraphicComponents extends JDialog {
         c.gridwidth = 2;
         panelDown.add(jButtonCancel, c);
 
-        c.gridx = 9;
-        c.gridy = 0;
-        panelDown.add(tm, c);
-
         container.add(panelDown, BorderLayout.SOUTH);
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -188,21 +153,6 @@ class GraphicComponents extends JDialog {
         this.setMaximumSize(new Dimension(600, 360));
         this.setSize(680, 360);
         this.setVisible(true);
-    }
-
-
-    private void configureActionPerformed(ActionEvent e) {
-        int[] i = jListTrajectoryTables.getSelectedIndices();
-        if (i.length == 1) {
-//            Object[] temp = jListTrajectoryTables.getSelectedValuesList().toArray(); // COMENTAR DEPOIS
-//            config.table = (String) temp[0]; // COMENTAR DEPOIS
-            config.conn = conn;
-            TrajectoryConfig tc = new TrajectoryConfig();
-            tc.setConfig(config);
-            tc.setVisible(true);
-        } else {
-            showMessageDialog(this, "Select only one Trajectory Table.");
-        }
     }
 
     private void jButtonCancelActionPerformed() {
@@ -249,8 +199,6 @@ class GraphicComponents extends JDialog {
                     "WHERE f_table_schema=trim('"+ config.schema + "') ORDER BY tableName";
 
             ResultSet vTableName = s.executeQuery(sql);
-            DefaultListModel model = (DefaultListModel) jListTrajectoryTables.getModel();//Trajct Tables list
-            model.removeAllElements();
             DefaultListModel model2 = (DefaultListModel) jListRF.getModel();//RF list
             model2.removeAllElements();
             while (vTableName.next()) {/* creates a new table for each table that has objects with topological relation to vRegion */
@@ -262,13 +210,10 @@ class GraphicComponents extends JDialog {
                 if(vTableName.getString("tableName").equals(config.poi)){
                 	poi_associated = new AssociatedParameter(vTableName.getString("tableName"), vTableName.getString("type"));
                 }
-                
-                model.addElement(vTableName.getString(1));//Trajectory tables
             }
         } catch (Exception vErro) {
             vErro.printStackTrace();
         }
-
     }
 
     private void OKActionPerformed() {
@@ -280,22 +225,9 @@ class GraphicComponents extends JDialog {
             return;
         }
 
-        if (jListTrajectoryTables.getSelectedIndex() == -1) {
-            showMessageDialog(this, "Select one or more trajectory table.");
-            return;
-        }
-
-        //get the thing in 'things', those trajectories tables to be executed
-        final Object[] objects = jListTrajectoryTables.getSelectedValuesList().toArray();
-        String[] str = new String[objects.length];
-        for (int i = 0; i < objects.length; i++) {
-            str[i] = (String) objects[i];
-        }
-
         //controls if SRID of RFs are different from trajectories...
         // ALL the trajectories should have the SAME srid
         // it is checked ahead in the foreach.
-//        config.table = str[0]; // COMENTAR DEPOIS
         String error = checkSRIDs(); //att the variable 'table_srid'
 
         if(error.compareTo("")!=0){
@@ -314,31 +246,15 @@ class GraphicComponents extends JDialog {
         }
         Boolean enableBuffer = true; // Always True, isso interfere com base na área, sempre é bom ter uma área ao redor do POI
         int maxSelectedIndex = jListRF.getMaxSelectionIndex();
-        final int tam = str.length;
-        for (int count = 0; count < tam; ) {
-            config.table = str[count];
-            try {
-                long time = createTrajectoryTablesSelected(
-                        config.table,
-                        config.tid,
-                        config.time,
-                        selectedValues,
-                        config.userBuff,
-                        method,
-                        enableBuffer,
-                        config,
-                        config.ftype,
-                        maxSelectedIndex
-                );
-                count++;
-                if (count == tam) {
-                	System.out.println("Processing time: " + time + " ms");
-                    showMessageDialog(this, "Operation finished successfully.");
-                }
-            } catch (Exception e) {
-            	System.out.println("Error: \n" + e.getMessage());
-                showMessageDialog(this, "Error during operation");
-            }
+        
+        try {
+	        long time = createTrajectoryTablesSelected(config.table, config.tid, config.time, selectedValues, config.userBuff, method, enableBuffer,
+	                        config, config.ftype, maxSelectedIndex);
+	        System.out.println("Processing time: " + time + " ms");
+	        showMessageDialog(this, "Operation finished successfully.");
+        } catch (Exception e) {
+        	System.out.println("Error: \n" + e.getMessage());
+            showMessageDialog(this, "Error during operation");
         }
         Runtime.getRuntime().gc();
     }
