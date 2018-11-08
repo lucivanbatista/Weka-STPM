@@ -1,7 +1,5 @@
 package weka.gui.stpm;
 
-import javax.swing.*;
-import java.awt.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,7 +8,7 @@ import java.util.ArrayList;
 
 import static weka.gui.stpm.TrajectoryFrame.createTrajectoryTablesSelected;
 
-class GraphicComponents extends JDialog {
+class GraphicComponents {
     private final Connection conn;
     private final Config config;
     private Method[] algorithms;

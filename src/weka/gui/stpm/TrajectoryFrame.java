@@ -32,19 +32,18 @@ public class TrajectoryFrame extends JDialog {
 
     public TrajectoryFrame(String user, String pass, String url) {
         this.userConfigurations = new Config();
-        this.setTitle("Trajectory");
         initAlgorithms();
 
         try {
             loadPropertiesFromFile(user, pass, url);
-
+            
             this.graphicComponents = new GraphicComponents(conn, userConfigurations, algorithms);
             this.graphicComponents.LoadActionPerformed();
             this.graphicComponents.initGraphicComponents();
         } catch (Exception e) {
             System.out.println(e.toString());
             System.out.println("Error in connection with DB.");
-        }
+        }      
     }
 
     // TID dos taxis and points
@@ -405,18 +404,22 @@ public class TrajectoryFrame extends JDialog {
 
     private void loadPropertiesFromFile(String userFromInput, String passFromInput, String urlFromInput) throws SQLException {
         Properties properties = new Properties();
+        
 
         try {
+        	System.out.println("1");
             properties.load(ClassLoader.getSystemResourceAsStream(CONFIG_PROPERTIES));
-
+            System.out.println("2");
 
             String user = (userFromInput != null) ? userFromInput : properties.getProperty(DB_USER);
             String pass = (userFromInput != null) ? passFromInput : properties.getProperty(DB_PASS);
-            String url = (userFromInput != null) ? urlFromInput :
-                    properties.getProperty(DB_URL) + properties.getProperty(DB_NAME);
-
-            if (user.equals(VOID)) conn = DriverManager.getConnection(url);
-            else conn = DriverManager.getConnection(url, user, pass);
+            String url = (userFromInput != null) ? urlFromInput : properties.getProperty(DB_URL) + properties.getProperty(DB_NAME);
+            
+            if (user.equals(VOID)){
+            	conn = DriverManager.getConnection(url);
+            }else{
+            	conn = DriverManager.getConnection(url, user, pass);
+            }
 
             ((org.postgresql.PGConnection) conn).addDataType(DB_TYPE_GEOMETRY, org.postgis.PGgeometry.class);
 
