@@ -126,5 +126,35 @@ public class Stop {
     	}
     	else return false;
     }
+	public int getTid() {
+		return tid;
+	}
+	public void setTid(int tid) {
+		this.tid = tid;
+	}
+	public Timestamp getEnterTime() {
+		return enterTime;
+	}
+	public void setEnterTime(Timestamp enterTime) {
+		this.enterTime = enterTime;
+	}
+	public Timestamp getLeaveTime() {
+		return leaveTime;
+	}
+	public void setLeaveTime(Timestamp leaveTime) {
+		this.leaveTime = leaveTime;
+	}
+	public int getGid() {
+		return gid;
+	}
+	public void setGid(int gid) {
+		this.gid = gid;
+	}
+	public String getAmenity() {
+		return amenity;
+	}
+	public void setAmenity(String amenity) {
+		this.amenity = amenity;
+	}
     
 }

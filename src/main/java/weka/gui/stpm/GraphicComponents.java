@@ -59,7 +59,7 @@ class GraphicComponents {
         }else{
         	method = (Method) algorithms[1];
         }
-        Boolean enableBuffer = true; // Always True, isso interfere com base na área, sempre é bom ter uma área ao redor do POI
+        Boolean enableBuffer = true; // Always True, isso interfere com base na ï¿½rea, sempre ï¿½ bom ter uma ï¿½rea ao redor do POI
         int maxSelectedIndex = 1;
         
         try {
@@ -67,7 +67,6 @@ class GraphicComponents {
 	                        config, config.ftype, maxSelectedIndex);
 	        System.out.println("Processing time: " + time + " ms");
 	        System.out.println("Operation finished successfully.");
-	        System.exit(0);
         } catch (Exception e) {
         	System.out.println("Error during operation: \n" + e.getMessage());
         }

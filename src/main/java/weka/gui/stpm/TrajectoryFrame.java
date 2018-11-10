@@ -9,7 +9,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.Scanner;
 
 import static weka.gui.stpm.Constants.*;
 import static weka.gui.stpm.Parameter.Type.DOUBLE;
@@ -27,10 +26,12 @@ public class TrajectoryFrame {
     private Method[] algorithms;
     private Config userConfigurations;
     private GraphicComponents graphicComponents;
+    private static String tableName;
 
 
-    public TrajectoryFrame(String user, String pass, String url) {
-        this.userConfigurations = new Config();
+    public TrajectoryFrame(String user, String pass, String url, String tableName, Config config) {
+        this.userConfigurations = config;
+        this.tableName = tableName;
         initAlgorithms();
 
         try {
@@ -39,10 +40,44 @@ public class TrajectoryFrame {
             this.graphicComponents = new GraphicComponents(conn, userConfigurations, algorithms);
             this.graphicComponents.LoadActionPerformed();
             this.graphicComponents.initGraphicComponents();
+            
         } catch (Exception e) {
             System.out.println(e.toString());
             System.out.println("Error in connection with DB.");
         }      
+    }
+    
+    public List<String> getTables(){
+    	List<String> tables = new ArrayList<>();
+        try {
+        	Statement s = conn.createStatement();
+        	String sql = "select table_name"
+        			+ " from information_schema.tables"
+        			+ " where table_schema not in ('pg_catalog', 'information_schema') AND table_type <> 'VIEW'";
+			ResultSet rs = s.executeQuery(sql);
+			while(rs.next()) {
+				tables.add(rs.getString("table_name"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+        return tables;        
+    }
+    
+    public List<Stop> getStops(){
+    	List<Stop> stops = new ArrayList<>();
+        try {
+        	Statement s = conn.createStatement();
+        	String sql = "select * from " + getCurrentNameTableStop();
+			ResultSet rs = s.executeQuery(sql);
+			while(rs.next()) {
+				stops.add(new Stop(rs.getInt("tid"), rs.getTimestamp("start_time"), rs.getTimestamp("end_time"), rs.getInt("gid"),
+						getCurrentNameTableStop(), rs.getString("stop_name")));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+        return stops;        
     }
 
     // TID dos taxis and points
@@ -401,12 +436,48 @@ public class TrajectoryFrame {
         return isEmpty(currentNameTableStop) ? "stops" : currentNameTableStop;
     }
 
+    // Using Congi.properties
+//    private void loadPropertiesFromFile(String userFromInput, String passFromInput, String urlFromInput) throws SQLException {
+//        Properties properties = new Properties();
+//        
+//
+//        try {
+//            properties.load(ClassLoader.getSystemResourceAsStream(CONFIG_PROPERTIES));
+//
+//            String user = (userFromInput != null) ? userFromInput : properties.getProperty(DB_USER);
+//            String pass = (userFromInput != null) ? passFromInput : properties.getProperty(DB_PASS);
+//            String url = (userFromInput != null) ? urlFromInput : properties.getProperty(DB_URL) + properties.getProperty(DB_NAME);
+//            
+//            if (user.equals(VOID)){
+//            	conn = DriverManager.getConnection(url);
+//            }else{
+//            	conn = DriverManager.getConnection(url, user, pass);
+//            }
+//
+//            ((org.postgresql.PGConnection) conn).addDataType(DB_TYPE_GEOMETRY, org.postgis.PGgeometry.class);
+//
+//            userConfigurations.conn = conn;
+//            userConfigurations.table = properties.getProperty(TRAJECTORY_TABLE);
+//            userConfigurations.tid = properties.getProperty(TRAJECTORY_ID);
+//            userConfigurations.time = properties.getProperty(DETECTION_TIME);
+//            userConfigurations.poi = properties.getProperty(POINTS_INTEREST);
+//            userConfigurations.schema = properties.getProperty(SCHEMA);
+//            userConfigurations.userBuff = Double.parseDouble(properties.getProperty(USERBUFF));
+//            userConfigurations.rfMinTime = Integer.parseInt(properties.getProperty(RFMINTIME));
+//            userConfigurations.method = properties.getProperty(METHOD);
+//            userConfigurations.maxAvgSpeed = Double.parseDouble(properties.getProperty(MAXAVGSPEED));
+//            userConfigurations.minTime = Integer.parseInt(properties.getProperty(MINTIME));
+//            userConfigurations.maxSpeed = Double.parseDouble(properties.getProperty(MAXSPEED));
+//        } catch (IOException ex) {
+//            ex.printStackTrace();
+//        }
+//    }
+
     private void loadPropertiesFromFile(String userFromInput, String passFromInput, String urlFromInput) throws SQLException {
-        Properties properties = new Properties();
-        
+    	Properties properties = new Properties();
 
         try {
-            properties.load(ClassLoader.getSystemResourceAsStream(CONFIG_PROPERTIES));
+        	properties.load(ClassLoader.getSystemResourceAsStream(CONFIG_PROPERTIES));
 
             String user = (userFromInput != null) ? userFromInput : properties.getProperty(DB_USER);
             String pass = (userFromInput != null) ? passFromInput : properties.getProperty(DB_PASS);
@@ -421,22 +492,11 @@ public class TrajectoryFrame {
             ((org.postgresql.PGConnection) conn).addDataType(DB_TYPE_GEOMETRY, org.postgis.PGgeometry.class);
 
             userConfigurations.conn = conn;
-            userConfigurations.table = properties.getProperty(TRAJECTORY_TABLE);
-            userConfigurations.tid = properties.getProperty(TRAJECTORY_ID);
-            userConfigurations.time = properties.getProperty(DETECTION_TIME);
-            userConfigurations.poi = properties.getProperty(POINTS_INTEREST);
-            userConfigurations.schema = properties.getProperty(SCHEMA);
-            userConfigurations.userBuff = Double.parseDouble(properties.getProperty(USERBUFF));
-            userConfigurations.rfMinTime = Integer.parseInt(properties.getProperty(RFMINTIME));
-            userConfigurations.method = properties.getProperty(METHOD);
-            userConfigurations.maxAvgSpeed = Double.parseDouble(properties.getProperty(MAXAVGSPEED));
-            userConfigurations.minTime = Integer.parseInt(properties.getProperty(MINTIME));
-            userConfigurations.maxSpeed = Double.parseDouble(properties.getProperty(MAXSPEED));
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
-
+    
     private void initAlgorithms() {
         algorithms = new Method[2];
         int i = 0;
@@ -451,9 +511,7 @@ public class TrajectoryFrame {
 
     private static void setCurrentNameTableStop(Method method) {
     	String meth = method.toString();
-    	Scanner s = new Scanner(System.in);
-    	System.out.println("--> Escolha um nome para a tabela de stops: ");
-    	String choosedName = "stops_" + s.nextLine();
+    	String choosedName = "stops_" + tableName;
         if(meth.startsWith("SMoT")) {
         	TrajectoryFrame.currentNameTableStop = "ib_" + choosedName;
         }else {

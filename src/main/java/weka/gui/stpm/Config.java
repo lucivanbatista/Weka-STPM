@@ -24,7 +24,7 @@ public class Config {
 	public String longitude;
 	public String poi; // Point Of Interest
 	public String schema; // Schema
-	public Boolean ftype = false; // Type (true) or Instance (false), padrão é false
+	public Boolean ftype = false; // Type (true) or Instance (false), padrï¿½o ï¿½ false
 	public Double userBuff;
 	public Integer rfMinTime;
 	public String method;
@@ -37,4 +37,115 @@ public class Config {
     /** Creates a new instance of Config */
     public Config() {
     }
+    
+    public Config(String schema, String trajectoryTable, String trajectoryId, String detectionTime, String pointsInterest, Double userBuff, Integer rfMinTime,
+    		String methodName, Double maxAvgSpeed, Integer minTime, Double maxSpeed) {
+    	this.table = trajectoryTable;
+    	this.tid = trajectoryId;
+    	this.time = detectionTime;
+    	this.poi = pointsInterest; 
+    	this.schema = schema;
+    	this.userBuff = userBuff;
+    	this.rfMinTime = rfMinTime;
+    	this.method = methodName;
+    	this.maxAvgSpeed = maxAvgSpeed;
+    	this.minTime = minTime;
+    	this.maxSpeed = maxSpeed;
+    }
+
+	public Connection getConn() {
+		return conn;
+	}
+
+	public void setConn(Connection conn) {
+		this.conn = conn;
+	}
+
+	public String getTable() {
+		return table;
+	}
+
+	public void setTable(String table) {
+		this.table = table;
+	}
+
+	public String getTid() {
+		return tid;
+	}
+
+	public void setTid(String tid) {
+		this.tid = tid;
+	}
+
+	public String getTime() {
+		return time;
+	}
+
+	public void setTime(String time) {
+		this.time = time;
+	}
+
+	public String getPoi() {
+		return poi;
+	}
+
+	public void setPoi(String poi) {
+		this.poi = poi;
+	}
+
+	public String getSchema() {
+		return schema;
+	}
+
+	public void setSchema(String schema) {
+		this.schema = schema;
+	}
+
+	public Double getUserBuff() {
+		return userBuff;
+	}
+
+	public void setUserBuff(Double userBuff) {
+		this.userBuff = userBuff;
+	}
+
+	public Integer getRfMinTime() {
+		return rfMinTime;
+	}
+
+	public void setRfMinTime(Integer rfMinTime) {
+		this.rfMinTime = rfMinTime;
+	}
+
+	public String getMethod() {
+		return method;
+	}
+
+	public void setMethod(String method) {
+		this.method = method;
+	}
+
+	public Double getMaxAvgSpeed() {
+		return maxAvgSpeed;
+	}
+
+	public void setMaxAvgSpeed(Double maxAvgSpeed) {
+		this.maxAvgSpeed = maxAvgSpeed;
+	}
+
+	public Integer getMinTime() {
+		return minTime;
+	}
+
+	public void setMinTime(Integer minTime) {
+		this.minTime = minTime;
+	}
+
+	public Double getMaxSpeed() {
+		return maxSpeed;
+	}
+
+	public void setMaxSpeed(Double maxSpeed) {
+		this.maxSpeed = maxSpeed;
+	}
 }
