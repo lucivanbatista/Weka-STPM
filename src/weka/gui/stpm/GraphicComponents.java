@@ -5,17 +5,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 
 import static weka.gui.stpm.TrajectoryFrame.createTrajectoryTablesSelected;
 
 class GraphicComponents {
     private final Connection conn;
     private final Config config;
-    private Method[] algorithms;
+    private List<Method> algorithms;
     private AssociatedParameter poi_associated = null;
     private ArrayList<AssociatedParameter> rf_poi = new ArrayList<>();
 
-    GraphicComponents(Connection conn, Config config, Method[] algorithms) {
+    GraphicComponents(Connection conn, Config config, List<Method> algorithms) {
         this.conn = conn;
         this.config = config;
         this.algorithms = algorithms;
@@ -55,9 +56,9 @@ class GraphicComponents {
         Object[] selectedValues = rf_poi.toArray();
         Method method = null;
         if(config.method.equals("SMoT")){
-        	method = (Method) algorithms[0];
+        	method = algorithms.get(0);
         }else{
-        	method = (Method) algorithms[1];
+        	method = algorithms.get(1);
         }
         Boolean enableBuffer = true; // Always True, isso interfere com base na área, sempre é bom ter uma área ao redor do POI
         int maxSelectedIndex = 1;

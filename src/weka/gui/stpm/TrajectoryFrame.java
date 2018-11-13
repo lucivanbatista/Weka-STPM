@@ -11,38 +11,36 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 import static weka.gui.stpm.Constants.*;
-import static weka.gui.stpm.Parameter.Type.DOUBLE;
 import static weka.gui.stpm.StringUtil.isEmpty;
 
 public class TrajectoryFrame extends JDialog {
     /**
      * Spatial reference for ALL trajectory_table
      */
-    static Integer table_srid; //spatial reference ID,google it
+    static Integer spatialReferenceID; 
     private static Connection conn;
     private static String currentNameTableStop;
     private static IBSMoT IB_SMoT_RUN = new IBSMoT();
     private static CBSMoT CB_SMoT_RUN = new CBSMoT();
-    private Method[] algorithms;
+    private List<Method> algorithms;
     private Config userConfigurations;
-    private GraphicComponents graphicComponents;
-
-
+    
     public TrajectoryFrame(String user, String pass, String url) {
         this.userConfigurations = new Config();
         initAlgorithms();
 
         try {
             loadPropertiesFromFile(user, pass, url);
-            
-            this.graphicComponents = new GraphicComponents(conn, userConfigurations, algorithms);
-            this.graphicComponents.LoadActionPerformed();
-            this.graphicComponents.initGraphicComponents();
+
+            GraphicComponents graphicComponents = new GraphicComponents(conn, userConfigurations, algorithms);
+            graphicComponents.LoadActionPerformed();
+            graphicComponents.initGraphicComponents();
         } catch (Exception e) {
-            System.out.println(e.toString());
-            System.out.println("Error in connection with DB.");
+            LOG.info(e.toString());
+            LOG.info("Error in connection with DB.");
         }      
     }
 
@@ -57,9 +55,9 @@ public class TrajectoryFrame extends JDialog {
         String sql = "SELECT " + tid + " as tid, count(*) FROM " + trajectoryTable + " GROUP BY " + tid + " ORDER BY tid DESC";
         ResultSet rs = s.executeQuery(sql);
 
-        System.out.println("Creating interceptions...");
+        LOG.info("Creating interceptions...");
         i = createIntercepts(objects, buffer, trajectoryTable, enableBuffer);
-        System.out.println("Interceptions created ");
+        LOG.info("Interceptions created ");
 
         File speedFile = null;
         if (TrajectoryClean.isPrintSpeedToFileXls()) {
@@ -78,18 +76,18 @@ public class TrajectoryFrame extends JDialog {
 
         // Change of methods is here
         if (!indexTimeExists){
-        	System.out.println("Creating Index on " + tid);
+        	LOG.info("Creating Index on " + tid);
             Statement s0b = conn.createStatement();
             String sql0b = "CREATE INDEX ON " + trajectoryTable + " USING hash (" + tid + ") WITH (FILLFACTOR=100);";
             s0b.execute(sql0b);
             s0b.close();
         } else {
-        	System.out.println("Tid index on " + trajectoryTable + " exists. Performance will be good.");
+        	LOG.info("Tid index on " + trajectoryTable + " exists. Performance will be good.");
         }
 
         //for each trajectory... (select que pega os tid dos taxistas e ordena de forma decrescente)
         while (rs.next()) {
-            Trajectory trajectory = new Trajectory(table_srid);
+            Trajectory trajectory = new Trajectory(spatialReferenceID);
             trajectory.tid = rs.getInt("tid");
             String meth = method.toString();
             if (!meth.startsWith("SMoT")) {
@@ -124,16 +122,16 @@ public class TrajectoryFrame extends JDialog {
                         Util.imprimeVelocidades(trajectory.points, speedFile, rs.isFirst());
                     }
                     // Run do CB
-                    CB_SMoT_RUN.setInformation(buffer, userConfigurations, enableBuffer, enableFType, table_srid, maxSelectedIndex);
+                    CB_SMoT_RUN.setInformation(buffer, userConfigurations, enableBuffer, enableFType, spatialReferenceID, maxSelectedIndex);
                     CB_SMoT_RUN.run(trajectory, i, trajectoryTable);
                 } else {
-                	System.out.println("Trajectory " + trajectory.tid + " has less than 5 points.");
+                	LOG.info("Trajectory " + trajectory.tid + " has less than 5 points.");
                 }
 
             }
             // Run do IB
             else{
-                IB_SMoT_RUN.setInformation(buffer, userConfigurations, enableBuffer, enableFType);
+                IB_SMoT_RUN.setInformation(buffer, userConfigurations, enableFType);
                 IB_SMoT_RUN.run(trajectory, i, trajectoryTable);
             }
         }
@@ -155,7 +153,7 @@ public class TrajectoryFrame extends JDialog {
 		}
     }
 
-    public static List<Trajectory> getTrajectoriesWithSpeeds(String tableTraj, Config config, Integer table_srid) throws SQLException {
+    public static List<Trajectory> getTrajectoriesWithSpeeds(String tableTraj, Config config, Integer spatialReferenceID) throws SQLException {
         List<Trajectory> trajectorys = new ArrayList<Trajectory>();
         Statement s = config.conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_UPDATABLE);
         // selects the trajectory-tid to be processed
@@ -165,8 +163,8 @@ public class TrajectoryFrame extends JDialog {
         //for each trajectory...
         while (rs.next()) {
             Trajectory trajectory = null;
-            if(table_srid != null){
-                trajectory = new Trajectory(table_srid);
+            if(spatialReferenceID != null){
+                trajectory = new Trajectory(spatialReferenceID);
             }else{
                 trajectory = new Trajectory();
             }
@@ -190,13 +188,13 @@ public class TrajectoryFrame extends JDialog {
                 timeIndex++;
 
             }
-//            System.out.println("calculando velocidade da trajetoria "+trajectory.tid);
+//            LOG.info("calculando velocidade da trajetoria "+trajectory.tid);
             //calculates the speed of each point, and then runs the method
             if (trajectory.points.size()>5){
                 trajectory.calculatePointsSpeed();
             }
             trajectorys.add(trajectory);
-            System.out.println("add trajetoria " + trajectory.tid);
+            LOG.info("add trajetoria " + trajectory.tid);
             System.gc();
         }
         return trajectorys;
@@ -213,16 +211,16 @@ public class TrajectoryFrame extends JDialog {
         ResultSet rsn = sn.executeQuery("select srid from geometry_columns where f_table_name='" + tableName + "'");
         rsn.next();
 
-        if (table_srid != rsn.getInt("srid")) {
+        if (spatialReferenceID != rsn.getInt("srid")) {
             throw new SQLException("SRID incompatibilities. Trajectory table " + tableName + " should be changed.");
         }
 
         //end of srid checking
-        System.out.println("Creating tables...");
+        LOG.info("Creating tables...");
 
         createTables(method);
 
-        System.out.println("Processing the trajectories...");
+        LOG.info("Processing the trajectories...");
 
         loadTrajectories(tableName, tid, dateTime, objects, buffer, method, enableBuffer, userConfigurations, enableFType, maxSelectedIndex);
 
@@ -274,7 +272,7 @@ public class TrajectoryFrame extends JDialog {
         }        
         
         // STOPS table
-        System.out.println("\t\tstops table...");
+        LOG.info("\t\tstops table...");
         try {
             s.execute("DROP TABLE IF EXISTS "+TrajectoryFrame.getCurrentNameTableStop());
             s.execute("DELETE FROM geometry_columns WHERE f_table_name = '"+TrajectoryFrame.getCurrentNameTableStop()+"'");
@@ -297,34 +295,9 @@ public class TrajectoryFrame extends JDialog {
                             ") WITHOUT OIDS;"
             );
 
-            s.execute("SELECT AddGeometryColumn('" + TrajectoryFrame.getCurrentNameTableStop() + "', 'the_geom'," + table_srid + ", 'MULTIPOLYGON', 2)");
+            s.execute("SELECT AddGeometryColumn('" + TrajectoryFrame.getCurrentNameTableStop() + "', 'the_geom'," + spatialReferenceID + ", 'MULTIPOLYGON', 2)");
         }
-
-        //MOVES table (NOT USED YET)
-//        System.out.println("\t\tmoves table...");
-//        try {
-//            s.execute("DROP TABLE IF EXISTS moves");
-//            s.execute("DELETE FROM geometry_columns WHERE f_table_name = 'moves'");
-//        } catch (SQLException ex) {
-//            ex.printStackTrace();
-//        }finally {
-//            s.execute(
-//                    "CREATE TABLE IF NOT EXISTS moves (" +
-//                            "      tid integer NOT NULL," +
-//                            "      moveid integer NOT NULL," +
-//                            "      start_time timestamp without time zone," +
-//                            "      end_time timestamp without time zone," +
-//                            "      start_stop character varying," +
-//                            "      end_stop character varying," +
-//                            "      start_stop_pk integer," +
-//                            "      end_stop_pk integer," +
-//                            "      rf character varying," +
-//                            "      CONSTRAINT moves_pkey PRIMARY KEY (tid,rf,moveid)" +
-//                            ")WITHOUT OIDS"
-//            );
-//            s.execute("SELECT AddGeometryColumn('moves', 'the_geom',"+table_srid+", 'LINESTRING', 2)");
-//        }
-
+        
     }
 
     // Creating Interest Points
@@ -345,7 +318,7 @@ public class TrajectoryFrame extends JDialog {
             // rf -> rf_name
 
             java.util.Date tempo2, fim2, ini2 = new java.util.Date();
-            System.out.println("\t\t...with " + a.name);
+            LOG.info("\t\t...with " + a.name);
             
             String sql;
             if (a.type.contains("POINT") || a.type.contains("LINE")) {// if any kind of POINT or LINE
@@ -386,7 +359,7 @@ public class TrajectoryFrame extends JDialog {
             ResultSet Intercep = s.executeQuery(sql);
             fim2 = new java.util.Date();
             tempo2 = new java.util.Date(fim2.getTime()-ini2.getTime());
-            System.out.println("\t\t"+a.name+" time: " +tempo2.getTime()+" ms");
+            LOG.info("\t\t"+a.name+" time: " +tempo2.getTime()+" ms");
             // then, save the registers from the query in an adequate struct
 
             while (Intercep.next()) {
@@ -407,9 +380,9 @@ public class TrajectoryFrame extends JDialog {
         
 
         try {
-        	System.out.println("1");
+        	LOG.info("1");
             properties.load(ClassLoader.getSystemResourceAsStream(CONFIG_PROPERTIES));
-            System.out.println("2");
+            LOG.info("2");
 
             String user = (userFromInput != null) ? userFromInput : properties.getProperty(DB_USER);
             String pass = (userFromInput != null) ? passFromInput : properties.getProperty(DB_PASS);
@@ -441,21 +414,20 @@ public class TrajectoryFrame extends JDialog {
     }
 
     private void initAlgorithms() {
-        algorithms = new Method[2];
-        int i = 0;
-
-        algorithms[i] = IB_SMoT_RUN;
-        algorithms[++i] = CB_SMoT_RUN;
-
-        algorithms[i].param.add(new Parameter("MaxAvgSpeed", DOUBLE, userConfigurations.maxAvgSpeed));
-        algorithms[i].param.add(new Parameter("MinTime (seconds)", Parameter.Type.INT, userConfigurations.minTime));
-        algorithms[i].param.add(new Parameter("MaxSpeed", DOUBLE, userConfigurations.maxSpeed));
+        algorithms = new ArrayList<>();
+        
+        algorithms.add(IB_SMoT_RUN);
+        
+        CB_SMoT_RUN.parameters = new SMoTConfigurationParameters(userConfigurations.maxAvgSpeed, userConfigurations.minTime, userConfigurations.maxAvgSpeed);
+        
+        algorithms.add(CB_SMoT_RUN);
+        
     }
 
     private static void setCurrentNameTableStop(Method method) {
     	String meth = method.toString();
     	Scanner s = new Scanner(System.in);
-    	System.out.println("--> Escolha um nome para a tabela de stops: ");
+    	LOG.info("--> Escolha um nome para a tabela de stops: ");
     	String choosedName = "stops_" + s.nextLine();
         if(meth.startsWith("SMoT")) {
         	TrajectoryFrame.currentNameTableStop = "ib_" + choosedName;
@@ -463,4 +435,6 @@ public class TrajectoryFrame extends JDialog {
         	TrajectoryFrame.currentNameTableStop = "cb_" + choosedName;
         }
     }
+    
+    private static Logger LOG = Logger.getLogger(TrajectoryFrame.class.getName());
 }

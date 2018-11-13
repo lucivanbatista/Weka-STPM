@@ -8,40 +8,28 @@
  */
 package weka.gui.stpm;
 
-import java.util.*;
-
-import org.postgis.Point;
-
 import java.sql.*;
-/**
- *
- * @author Administrador
- */
-public class TrajectoryMethods {
-    protected static int clusterID = -1;    
-    protected static int unkID=-1;
-    
-    // Don't try to understand why is it here... 
-    public void speedClusteringNotStatic(Trajectory t, double avgFactor, long minTimeMili, double SLFactor,Config conf) {
-    	speedClustering(t,avgFactor,minTimeMili,SLFactor,conf);
-    }
-    
-    private static Vector<GPSPoint> getPointsSortedBySpeed(Vector<GPSPoint> points) {
-        Vector<GPSPoint> pointsCopy = new Vector<GPSPoint>();
-        for (GPSPoint p: points) {
-            pointsCopy.add(p);
-        }
+import java.util.Collections;
+import java.util.List;
+import java.util.Vector;
+import java.util.logging.Logger;
 
-        Collections.sort(pointsCopy, new Comparator<GPSPoint>() {
-                                            public int compare(GPSPoint p1, GPSPoint p2) {
-                                                double s1 = p1.speed;
-                                                double s2 = p2.speed;
-                                                return s1 < s2 ? -1 : (s1 > s2 ? +1 : 0);
-                                            }
+public class TrajectoryMethods {
+    private static int clusterID = -1;
+    private static int unkID = -1;
+
+    private static Vector<GPSPoint> getPointsSortedBySpeed(Vector<GPSPoint> points) {
+        Vector<GPSPoint> pointsCopy = new Vector<>(points);
+
+        pointsCopy.sort((p1, p2) -> {
+            double s1 = p1.speed;
+            double s2 = p2.speed;
+            return Double.compare(s1, s2);
         });
+
         return pointsCopy;
     }
-    
+
     private static void slowestNeighborhood(Vector<GPSPoint> points, SetOfPoints seeds, double speedLimit, long minTimeMilliseconds) {
         GPSPoint leftPoint;
         GPSPoint rightPoint;
@@ -80,7 +68,7 @@ public class TrajectoryMethods {
             }
         } while (seeds.duration() < minTimeMilliseconds);
     }
-    
+
     private static GPSPoint addSlowerNeighborToSeeds(Vector<GPSPoint> points, SetOfPoints seeds) {
         GPSPoint leftPoint;
         GPSPoint rightPoint;
@@ -105,7 +93,7 @@ public class TrajectoryMethods {
             return rightPoint;
         }
     }
-    
+
     private static boolean limitedNeighborhood(Vector<GPSPoint> points, GPSPoint point, int clusterId, double avgSpeed, long minTimeMilliseconds, double speedLimit) {
         if (point.speed > speedLimit) {
             return false;
@@ -138,12 +126,12 @@ public class TrajectoryMethods {
         }
         return true;
     }
-    
+
     private static void unifyAdjacentClusters(Vector<GPSPoint> points) {
         if (points.size() < 2) {
             return;
         }
-        
+
         int i = 1;
         while (i < points.size()) {
             GPSPoint p = points.get(i); // gets the second point ordered by time
@@ -157,16 +145,16 @@ public class TrajectoryMethods {
             i++;
         }
     }
-    
+
     private static Vector<ClusterPoints> createClusters(Vector<GPSPoint> points) {
-        Vector<GPSPoint> clusterPoints = new Vector<GPSPoint>();
+        Vector<GPSPoint> clusterPoints = new Vector<>();
         for (GPSPoint p: points) {
             if (p.clusterId != GPSPoint.NULL_CLUSTER_ID) {
                 clusterPoints.add(p);
             }
         }
 
-        Vector<ClusterPoints> clustrs = new Vector<ClusterPoints>();
+        Vector<ClusterPoints> clustrs = new Vector<>();
         ClusterPoints cluster = new ClusterPoints();
 
         if (clusterPoints.size() > 0) {
@@ -188,22 +176,21 @@ public class TrajectoryMethods {
             }
             clustrs.add(cluster); // adiciona o ultimo cluster
         }
-        
+
         return clustrs;
     }
-    
+
     public static Vector<ClusterPoints> speedClustering(Trajectory t,double avgFactor, long minTimeMilli, double speedLimitFactor) {
     	Vector<GPSPoint> points = t.points;
-//    	System.out.println("t.meanSpeed:" + t.meanSpeed());
+
     	// avgSpeedOfTrajectory OU meanSpeed - Distancia de todos os pontos somados e depois dividido pela diferen�a do primeiro e ultimo
     	// avgFactor - MaxAvgSpeed
     	// speedLimitFactor - MaxSpeed
     	double avgSpeedOfTrajectory = t.meanSpeed();
-//    	System.out.println("avgSpeedOfTrajectory * avgFactor:" + avgSpeedOfTrajectory * avgFactor);
-//    	System.out.println("avgSpeedOfTrajectory * speedLimitFactor:" + avgSpeedOfTrajectory * speedLimitFactor);
+
     	double avgSpeed = avgSpeedOfTrajectory * avgFactor; //0.9 and 1.1 are pretty generic
     	double speedLimit = avgSpeedOfTrajectory * speedLimitFactor;
-    	
+
     	int clusterId = 1;
         Vector<GPSPoint> pointsSorted = getPointsSortedBySpeed(points);
         for (GPSPoint point: pointsSorted) { // for each point, consider a limited neighborhood of points
@@ -213,12 +200,12 @@ public class TrajectoryMethods {
                 }
             }
         }
-        
+
         unifyAdjacentClusters(points);
         return createClusters(points);
-     
+
     }
-    
+
     /**Main method for clustering trajectory points.
      * 
      * @param t 			The Trajectory.
@@ -240,15 +227,15 @@ public class TrajectoryMethods {
         
         //seta as variaveis de controle...
         double SL = t.meanSpeed(); // SL=mean speed of trajectory;
-        System.out.println("mean speed of trajectory = "+SL);
+        LOG.info("mean speed of trajectory = "+SL);
         double avg = avgFactor * SL;// avg = percentage of mean speed to be considered 
         SL = SLFactor * SL;// SL = max accepted speed (as an percentage of the mean speed of the trajectory) 
                 
         int ClusterId = nextId();
         //for each point c (GPSPoint) in array 'objs',organized by time
-        System.out.println("Starting clusterization...");
+        LOG.info("Starting clusterization...");
         for (GPSPoint c:objs) {
-            //System.out.println("Speed "+c.speed+" for gid "+c.gid);
+
         	if (c.speed > avg)
                 break;
             // if the point have no cluster yet...
@@ -256,7 +243,6 @@ public class TrajectoryMethods {
             	//try to generate a cluster with it and att the ClusterID if it works
             	if(limitedNeighborhood(array,c,ClusterId,avg,minTimeMili,SL)) {
                     ClusterId = nextId();
-                    System.out.println();
                 }
             }
         }
@@ -266,89 +252,14 @@ public class TrajectoryMethods {
         Vector<ClusterPoints> clusters = NewTrajectoryMethods.unifyAdjacentNeighbors(array,minTimeMili);
         
         return clusters;
-    }    
-    /** Try to create a maximal cluster with the point received.
-     * 
-     *@param array  		list organized by time 
-     *@param point  		point received
-     *@param cId    		Identificator of the cluster to be created
-     *@param avg			Maximal meanspead to be reached 	  
-     *@param minTimeMili	Maximal time to be reached
-     *@param SL				Superior Limit of the speed of one point,based in the mean-speed
-     *  
-     *@return 				'true' if cluster was created, or 'false' if not  
-     */
-    /*
-    private static boolean limitedNeighborhood(Vector<GPSPoint> array,GPSPoint point,int cId,double avg,long minTimeMili,double SL) {
-        //iniciate the cluster creation...
-    	Vector<GPSPoint> seeds = new Vector<GPSPoint>();
-        //prevents against epty-clusters
-    	seeds.add(point);
-    	//expands the cluster in such a way that its' speed do not pass SL    	
-    	slowestNeighborhood(seeds,array,minTimeMili,SL);
-        //re-organize by time 
-        Collections.sort(seeds);
-        
-        double newMeanSpeed,meanSpeed = meanSpeed(seeds);
-        long duration = duration(seeds);
-        
-        // If mean speed over-pass the limit mean speed 
-        // OR the duration do not exceed minimal time (eg. it passes so little time in slow speed)
-        if (meanSpeed > avg || duration < minTimeMili) {
-            point.cluster = Cluster.MOVE;
-            return false;
-        }
-        // In case of mean speed <= limit mean speed 
-        //AND cluster duration exceed the minimum time
-        // it's called, for now on, a CORE-NEIGHBORHOOD
-        else {
-        	// marks the points in trajectory as STOP Points and give each of them an ID
-        	for (int i=0;i<seeds.size();i++) {
-                seeds.get(i).cluster = Cluster.STOP;
-                seeds.get(i).clusterId = cId;
-            }            
-        	// try to add more slow points, neighbors in the trajectory, in such way we have an STOP with the
-        	// max number of slow points  as possible.
-        	GPSPoint lastPoint;
-        	while (true) {
-            	//gets an neighbor point
-                lastPoint = slowerNeighbor(seeds,array);
-                if (lastPoint != null)
-                    seeds.add(lastPoint);
-                else
-                    break;
-                //organize by time
-                Collections.sort(seeds);
-
-                //recalculate variables of control	
-                newMeanSpeed = meanSpeed(seeds);
-                duration = duration(seeds);
-                
-                // tests to check that controls' variables
-                // newMeanSpeed <= avg ::::> with the point added, the speed still slower than the minimal ?
-                // newMeanSpeed <= meanSpeed :::::> the new mean speed is slower than the old one ?
-                // lastPoint.speed <= SL ::::> the point speed do not pass the threshold ?
-                if (newMeanSpeed <= avg && (newMeanSpeed <= meanSpeed || lastPoint.speed <= SL)) {
-                    if (lastPoint.cluster != Cluster.STOP) {
-                        lastPoint.cluster = Cluster.STOP;
-                        lastPoint.clusterId = cId;
-                    }else
-                        break;
-                }else
-                    break;
-                //for the next iteration, att the mean speed
-                meanSpeed = newMeanSpeed;
-            }
-            return true;
-        }        
     }
-    */
-    /**Fills the cluster with such points that its' time do not exceed the limite minTime. 
-     *  
+
+    /**Fills the cluster with such points that its' time do not exceed the limite minTime.
+     *
      *@param  cluster 		the cluster to be filled, wich should not be empty.
-     *@param  array   		the GPSPoints organized by speed, to identify the slower. 
+     *@param  array   		the GPSPoints organized by speed, to identify the slower.
      *@param  minTimeMili 	the amount of time to consider the neighborhood a cluster
-     */        
+     */
     private static void slowestNeighborhood(Vector<GPSPoint> cluster,Vector<GPSPoint> array,long minTimeMili,double SL) {
         long duration=0;
         int flag=0;//flag to avoid infinites loops...
@@ -371,34 +282,35 @@ public class TrajectoryMethods {
             flag=0;
             }
             else flag++;//... if didn't change, up flag
-        
+
             if(flag>=10) break;// if the duration didn't change in 10 slower points, stop lhe loop
-        
-        //keep calculating the 'neighbohood until the trajectory reach the threshold    
-        }while (duration < minTimeMili);
+
+        //keep calculating the 'neighbohood until the trajectory reach the threshold
+        } while (duration < minTimeMili);
     }
-    /** It's the slower point neighbor (adjacent, on the trajectory) to the cluster received. 
-     * 
+
+    /** It's the slower point neighbor (adjacent, on the trajectory) to the cluster received.
+     *
      * @param cluster cluster to be analyzed.
      * @param array   list os GPSPoints organized by speed.
-     * 
+     *
      * @return GPSPoint p1 or p2 or null
      */
     private static GPSPoint slowerNeighbor(Vector<GPSPoint> cluster,Vector<GPSPoint> array) {
-            ///	MinIndex = index in speed array from the FIRST cluster point 
+            ///	MinIndex = index in speed array from the FIRST cluster point
     	    int MinIndex = array.indexOf(cluster.get(0));
     	    // MaxIndex = index in speed array from the LAST cluster point
             int MaxIndex = array.indexOf(cluster.get(cluster.size()-1));
             /**
     			p1 = index in speed array from the point before the first point of the cluster
     			p2 = index in speed array from the next point after the last point of the cluster
-    			
+
     			Such a way that neither p1 and p2 are in the cluster.
              */
             GPSPoint p1 = MinIndex > 0 ? array.get(MinIndex - 1) : null;
-            GPSPoint p2 = MaxIndex < array.size()-1 ? array.get(MaxIndex+1) : null;            
+            GPSPoint p2 = MaxIndex < array.size()-1 ? array.get(MaxIndex+1) : null;
             GPSPoint candidate1 = null,candidate2 = null;
-            
+
             //take decision such as the slower of p1 and p2 are returned, or null if there aren't any
             if (p1 != null && p2 != null) {
                 if (p1.speed <= p2.speed) {
@@ -410,9 +322,9 @@ public class TrajectoryMethods {
                 candidate1 = p1;
             else if (p2 != null)
                 candidate1 = p2;
-            else 
+            else
                 return null;
-            
+
             if (candidate1.cluster != Cluster.STOP) {
                 return candidate1;
             }else if (candidate2 != null && candidate2.cluster != Cluster.STOP) {
@@ -420,6 +332,7 @@ public class TrajectoryMethods {
             }else
                 return null;
     }
+
     /**Unify clusters within the max distance between points.
      * 
      * @param array			The trajectorys' points.
@@ -484,21 +397,21 @@ public class TrajectoryMethods {
         }
     }
     
-    
+
     /** Calculates the diference (variation), with respect of time, of the trajectory.
-     * 
+     *
      * @param array list organized by time.
-     * 
+     *
      * @return duration (aka, number) of the trajectory.
      */
     protected static long duration(Vector<GPSPoint> array) {
         return array.lastElement().time.getTime() - array.firstElement().time.getTime();
     }
-    
+
     /** "Calculates the average speed of the respective trajectory time interval."
-     * 
+     *
      * @param array list organized by time.
-     * 
+     *
      * @return average speed of the trajectory.
      */
     protected static double meanSpeed(Vector<GPSPoint> array) {
@@ -508,9 +421,9 @@ public class TrajectoryMethods {
             p2 = array.elementAt(i);
             totalDist += p1.distance(p2);
             p1 = p2;
-        }        
-        //System.out.println("Distance (?): "+totalDist+"\nDuration: "+duration(array));
-        return (totalDist / ((array.lastElement().time.getTime()-array.firstElement().time.getTime())/1000));        
+        }
+
+        return (totalDist / ((array.lastElement().time.getTime() - array.firstElement().time.getTime()) / 1000));
     }
     
     /** Control and return the clusterID variable.
@@ -563,7 +476,7 @@ public class TrajectoryMethods {
             ResultSet rs = s.executeQuery(sql.toString());
             java.util.Date fim = new java.util.Date();
             java.util.Date tempo = new java.util.Date(fim.getTime()-ini.getTime());
-            System.out.println("Main Query (RF:"+rf+"): " +tempo.getTime()+" ms");
+            LOG.info("Main Query (RF:"+rf+"): " +tempo.getTime()+" ms");
 
             Vector<Stop> stops = new Vector<Stop>();
             ActiveStops activeStops = new ActiveStops();
@@ -665,20 +578,20 @@ public class TrajectoryMethods {
              * The table rf_envelope has in its buf attribute the buffer value of the relevant or the the_geom value of the relevan,
              * depends on the choice of the user. See the createTables method at TrajectoryFrame.
              */
-            String sql = new String("SELECT * FROM " +
-                    "(SELECT "+config.tid+" as tid, "+config.time+" as time, the_geom, gid as serial_time FROM "+config.table+" WHERE "+config.tid+"="+traj.tid+traj.clusterPoints()+") T JOIN (" +
+            String sql = "SELECT * FROM " +
+                    "(SELECT " + config.tid + " as tid, " + config.time + " as time, the_geom, gid as serial_time FROM " + config.table + " WHERE " + config.tid + "=" + traj.tid + traj.clusterPoints() + ") T JOIN (" +
                     //"SELECT '"+rf.name+"' as table_name,A.gid,A.lid,the_geom as rf_the_geom,bufenv,buf FROM "+rf.name+" A JOIN "+rf+"_envelope B ON (A.gid = B.gid) ) R" +
-                    "SELECT '"+rf.name+"' as table_name,A.gid,the_geom as rf_the_geom,bufenv,buf FROM "+rf.name+" A JOIN "+rf+"_envelope B ON (A.gid = B.gid) ) R" +
+                    "SELECT '" + rf.name + "' as table_name,A.gid,the_geom as rf_the_geom,bufenv,buf FROM " + rf.name + " A JOIN " + rf + "_envelope B ON (A.gid = B.gid) ) R" +
                     " ON (ST_Intersects(bufenv,T.the_geom) " +
                     //"AND T.the_geom && rf_the_geom " +
                     "AND ST_Intersects(buf,T.the_geom)) " +
-                    " ORDER BY time");
+                    " ORDER BY time";
 
             java.util.Date ini = new java.util.Date();            
             ResultSet rs = s.executeQuery(sql);            
             java.util.Date fim = new java.util.Date();
             java.util.Date tempo = new java.util.Date(fim.getTime()-ini.getTime());
-            System.out.println("Main Query (RF:"+rf+"): " +tempo.getTime()+" ms");
+            LOG.info("Main Query (RF:"+rf+"): " +tempo.getTime()+" ms");
 
             //Vector stops = new Vector();
             //ActiveStops activeStops = new ActiveStops();
@@ -737,9 +650,9 @@ public class TrajectoryMethods {
             for (int i=0;i<clusters.size();i++) {
                 ClusterPoints cluster = clusters.elementAt(i);
                 
-                String sql2 = new String("SELECT "+config.tid+" as tid, "+config.time+" as time, the_geom, gid as serial_time " +
-                    "FROM "+config.table+" WHERE "+config.tid+"="+traj.tid+cluster.sqlGids()+stopsInts+
-                    " ORDER BY "+config.time);
+                String sql2 = "SELECT " + config.tid + " as tid, " + config.time + " as time, the_geom, gid as serial_time " +
+                        "FROM " + config.table + " WHERE " + config.tid + "=" + traj.tid + cluster.sqlGids() + stopsInts +
+                        " ORDER BY " + config.time;
                 
                 s = config.conn.createStatement();
                 rs2 = s.executeQuery(sql2);
@@ -886,7 +799,7 @@ public class TrajectoryMethods {
 	    Vector stops = new Vector(); // the array of stops
 	    Stop st;//the current stop
 	    Unknown unk; //the current unknown    
-	    System.out.println("Clusters found: "+clusters.size());
+	    LOG.info("Clusters found: "+clusters.size());
 
 	    for(ClusterPoints c:clusters){
 	        array=c.points;
@@ -901,7 +814,7 @@ public class TrajectoryMethods {
 	        		//before it, there's an Interc ?
 	        		//Vector<Interc> rf=intercepts.is_in2(array.elementAt(i).gid);
 	        		Interc rf = intercepts.is_in(array.elementAt(i).gid);
-	        		//if(rf.size()>1)System.out.println("Size: "+rf.size());
+
 	        		//if(rf.size()>0){//yes, it intercepts something, so...
 	        		if (rf != null) {
 	        			// if it's the same stop...
@@ -953,10 +866,10 @@ public class TrajectoryMethods {
 	        		}
 	        	}            	
 	        	else{//being the first, there's no need to tests, so...
-	        		//System.out.println("gid: "+array.elementAt(i).gid);
+
 	        		//Vector<Interc> rf=intercepts.is_in2(array.elementAt(i).gid);
 	        		Interc rf = intercepts.is_in(array.elementAt(i).gid);
-	        		//System.out.println("pt gid: "+rf.pt);
+
 	            	//if(rf.size()>0){//...tests only if there's an intercs associated and add to the stop
 	        		if (rf != null) {
 	            		first=false;
@@ -978,8 +891,9 @@ public class TrajectoryMethods {
 			}
 	    }//foreach Cluster
 
-        System.out.println("\t\tSaving: "+stops.size()+" stops.");
-        stopid=saveStopsAndMoves2(stops,config.conn,featureType,bufferValue,++stopid);        
+        LOG.info("\t\tSaving: "+stops.size()+" stops.");
+
+	    saveStopsAndMoves2(stops,config.conn,featureType,bufferValue,++stopid);
     }
     
     protected static void enriquecimentoSemanticoStopCon(Stop stop, Connection conn, int count){
@@ -996,17 +910,19 @@ public class TrajectoryMethods {
 		}
     }
 
-	protected static int saveStopsAndMoves2(Vector list, Connection conn, boolean featureType, double buffer,int stopextern){
+	static int saveStopsAndMoves2(List<Stop> list, Connection conn, boolean featureType, double buffer, int stopextern){
 	    Statement s,s1;
 	    boolean flag=false;
 	    int stopId=stopextern;
 	    String sql="";
-	    int count = 1; // contador do serial
-	    for (int i=0;i<list.size();i++) {
-	    	try{
+
+	    int count = 1;
+
+	    for (Object obj : list) {
+	    	try {
 	    		s = conn.createStatement();
 		    	s1 = conn.createStatement();	
-		        Object obj = list.elementAt(i);
+
 		        if (obj.getClass() == Stop.class) {
 		            Stop stop = (Stop) obj;
 		            String stopName = featureType ? stop.tableName : (stop.gid + "_" + stop.amenity);
@@ -1015,8 +931,8 @@ public class TrajectoryMethods {
 		                "("+stop.tid+","+stopId+",'"+stop.enterTime.toString()+"','"+stop.leaveTime.toString()+"','"+stop.gid+"','"+stopName+"',"+stop.toSQL(buffer)+",'"+stop.amenity+"',"+stop.avgSpeed()+")";                
 		            stopId++;
 		            count++;
-		            flag=false;
-		        }else if (obj.getClass() == Unknown.class) {
+		            flag = false;
+		        } else if (obj.getClass() == Unknown.class) {
 		            Unknown unk = (Unknown) obj;
 		            int tid = unk.pontos.firstElement().tid;
 		            if(unk.pontos.size()>=4){//to prevent the_geom null, nb: added by yipeng 080115
@@ -1032,18 +948,17 @@ public class TrajectoryMethods {
 		            		"("+tid+","+stopId+",'"+unk.enterTime.toString()+"','"+unk.leaveTime.toString()+"',"+stopId+",'"+nextUnknown()+"_unknown',"+unk.toSQL(buffer)+",'unknown',"+unk.avgSpeed()+")";
 		            	}
 		            	stopId++;
-		            	flag=false;//poe pra executar a query...
+		            	flag = false;//poe pra executar a query...
 		            }
 		            //else flag=true;//ou NAO executa...
 		        }
-		        
-		        if(!flag){//teste pra saber se executa ou nao a query
-//		        	System.out.print("Stop "+i+" saving... ");
-		        	s.execute(sql);
-//		        	System.out.println("Saved");
+
+                // Teste pra saber se executa ou nao a query
+		        if (!flag) {
+		            s.execute(sql);
 		        }
-	    	}catch(Exception e){
-	    		System.out.println(e.getMessage());
+	    	} catch(Exception e) {
+	    	    LOG.severe(e.getMessage());
 	    		break;
 	    	}
 	    }
@@ -1072,169 +987,18 @@ public class TrajectoryMethods {
 	    		sql+= p.getX() + " " + p.getY() + ",";
 	    	}
 	    	sql=sql.substring(0,sql.length()-2) + ")',-1),10));";
-	    	try{
-	    	s.execute(sql);
-	    	}
-	    	catch(Exception e){
-	    		System.out.println(e.getMessage());
-	    	}
-	    	finally{
+
+	    	try {
+	    	    s.execute(sql);
+	    	} catch(Exception e){
+	    		LOG.severe(e.getMessage());
+	    	} finally{
 	    		s.close();	    		
 	    	}
 	    }
 	    
 	}
-	
-	/** Finds the stops in a trajectory.
-	 * 
-	 * @param bufferChecked		If the user set a buffer or not.
-	 * @param buffer		The value of buffer.
-	 * @param config			User configurations.
-	 * @param t					The trajectory being analized.
-	 * @param featureType		Defines to pre-process in Type (true) or Instance (false) granularity.
-	 * @param intercepts		The Table of Geometry Relations (Intercepts Table) to be used.
-	 * @throws SQLException		If any table didn't exist in the BD, or a field.
-	 */
-	
-	
-	public static void smot2(boolean bufferChecked, Double buffer, Config config,Trajectory t,boolean featureType,InterceptsG intercepts)throws SQLException {
-		int i,j,gidaux,serial_gid=0;	
-		org.postgis.PGgeometry geom /*= new PGgeometry()*/;
-		Statement s=config.conn.createStatement();
-		String sql = "select "+config.tid+",gid,"+config.time+",the_geom from "+config.table+" where "+config.tid+"="+t.tid+" order by time;";
-		ResultSet rs = s.executeQuery(sql);
-		Vector stops = new Vector();
-	    ActiveStops activeStops = new ActiveStops();
-	    boolean first=true;
-	    Stop st = new Stop();
-	    int gidRelevantFeature = -1;
-	    
-	    while(rs.next()){
-	    	System.out.print(".");//just for visualization
-	    	//creates the point in the BD 
-	    	GPSPoint pt = new GPSPoint();
-	    	pt.tid=rs.getInt("tid");
-	    	pt.gid=rs.getInt("gid");
-	    	pt.time=rs.getTimestamp(config.time);
-	    	//System.out.println(rs.getObject("the_geom"));
-	    	geom = (org.postgis.PGgeometry) rs.getObject("the_geom");
-	    	pt.point = (org.postgis.Point) geom.getGeometry();
-	    	
-	    	//get the actual gid/time variables to be tested
-	    	gidaux=pt.gid;
-	    	if(!first){//the others not-the-first need to control if the gid is or not sequential  
-	    		//before it, there's an Interc ?
-	    		Interc rf=intercepts.is_in(pt.gid);
-	    		if((rf!=null) && (rf.gid == gidRelevantFeature) /*&& (rf.rf == nameRelevantFeature)*/) {//yes, it intercepts something, so...
-	    			//... we have to test that sequential control, then...
-						if(gidaux - serial_gid <= 1){ // the diference between gid's can't exceed 1
-							st.amenity = rf.amenity;
-							st.addPoint(pt);
-						}
-				}
-	    		else {//no, it didn't have an Interc, so...
-	    			if(st.check()) {//tests the actual stop
-	        			stops.addElement(st);//if passes, it's added
-	        		}        			
-	    			st = new Stop();//creates a new stop
-	        		if (rf != null) { //it is the first of another relevant feature in the same trajectory
-	        			st.amenity = rf.amenity;
-	        			st.addPoint(pt,rf.rf,rf.value,rf.gid); // saves the enterTime
-		        		first=false;
-		        		gidRelevantFeature = rf.gid;
-	        		}
-	        		else {
-	        			first = true;
-	        		}
-	    		}
-	    	}
-	    	else{//being the first, there's no need to tests, so...            		
-	        	Interc rf=intercepts.is_in(pt.gid);
-	        	if(rf!=null){//...tests only if there's an intercs associated and add to the stop
-	        		st.amenity = rf.amenity;
-	        		st.addPoint(pt,rf.rf,rf.value,rf.gid); // saves the enterTime
-	        		first=false;
-	        		gidRelevantFeature = rf.gid;
-	        	}
-	        	// in case of no Interc at all, we can continue normally.
-	    	}
-	    	//refresh the values of the serial_variables
-	    	serial_gid=gidaux;
-		}
-	    if ((!first) && (st.check())) {
-	    	stops.addElement(st);//if passes, it's added
-	    }
-	    
-//	    for (int m=0;m<stops.size();m++) {
-//	    	Stop obj = (Stop) stops.elementAt(m);
-//            System.out.println("aqui: " + m + " ----- size: " + obj.pts.size());
-//            for(GPSPoint g : obj.pts){
-//            	System.out.println(g.gid);
-//            }
-//	    }
-	    
-	    System.out.println("");	
-	    saveStopsAndMoves2(stops,config.conn,featureType,buffer,0);
-	    rs.close();
-	}
-	
-	/*private static  void loadPropertiesFromFile(String userFromInput, String passFromInput, String urlFromInput) throws SQLException {
-		
-		Properties prop = new Properties();
-    	InputStream input = null;
 
-    	try {
+	private static Logger LOG = Logger.getLogger(TrajectoryMethods.class.getName());
 
-    		input = new FileInputStream("config.properties");
-
-    		// load a properties file
-    		prop.load(input);
-
-    		String user = (userFromInput!=null) ? userFromInput : prop.getProperty("dbUser"); 
-    		String pass = (userFromInput!=null) ? passFromInput : prop.getProperty("dbPass");
-    		String url = (userFromInput!=null) ? urlFromInput : prop.getProperty("dbURL") + prop.getProperty("dbName");
-
-    		if (user == "")
-    			conn = DriverManager.getConnection(url);
-    		else
-    			conn = DriverManager.getConnection(url,user,pass);
-
-    		((org.postgresql.PGConnection) conn).addDataType("geometry",PGgeometry.class);
-
-    		config.conn = conn;
-    		config.table = prop.getProperty("trajectoryTable");
-    		config.tid = prop.getProperty("trajectoryId");
-    		config.time = prop.getProperty("detectionTime"); 
-
-    	} catch (IOException ex) {
-    		ex.printStackTrace();
-    	} finally {
-    		if (input != null) {
-    			try {
-    				input.close();
-    			} catch (IOException e) {
-    				e.printStackTrace();
-    			}
-    		}
-    	}
-
-    }
-	
-	public static void main(String[] args) {
-		
-		TrajectoryMethods tm = new TrajectoryMethods();
-		Config config = new Config();
-		Trajectory traj = new Trajectory();
-		AssociatedParameter[] relevantFeatures = new AssociatedParameter[1];
-		AssociatedParameter a = new AssociatedParameter("lugares_relevantes");
-		relevantFeatures[0] = a;
-		//tm.smot2(bufferChecked, buffer, config, t, featureType, intercepts);
-		try {
-			tm.smot(true, 50, config, traj, "taxi_junho", relevantFeatures, false);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	
-	}*/
 }
