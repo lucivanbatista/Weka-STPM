@@ -8,9 +8,10 @@
 	<title>Weka-STPM - Enqieucimento Semântico</title>
 	<meta name="viewport" content="width=device-width">
 	<link rel="stylesheet" href="css/bootstrap-litera.min.css">
+	<link rel="stylesheet" href="css/estilosemantic.css">
 </head>
 <body>
-	<div class="container intro">
+	<div class="container intro header">
 		<h1>
 			Enriquecimento Semântico</br>
 			<small> Consiga enriquecer semanticamente sua base de dados</small>
