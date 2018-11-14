@@ -2,6 +2,8 @@ package weka.gui.stpm;
 
 import weka.gui.stpm.clean.TrajectoryClean;
 import weka.gui.stpm.clean.Util;
+import weka.model.PointStop;
+import weka.model.Tabela;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,21 +49,43 @@ public class TrajectoryFrame {
         }      
     }
     
-    public List<String> getTables(){
-    	List<String> tables = new ArrayList<>();
+    public List<Tabela> getTables(){
+    	List<Tabela> tables = new ArrayList<>();
         try {
         	Statement s = conn.createStatement();
         	String sql = "select table_name"
         			+ " from information_schema.tables"
-        			+ " where table_schema not in ('pg_catalog', 'information_schema') AND table_type <> 'VIEW'";
+        			+ " where table_schema not in ('pg_catalog', 'information_schema') AND table_type <> 'VIEW' AND (table_name LIKE 'ib%' OR table_name LIKE 'cb%')";
 			ResultSet rs = s.executeQuery(sql);
 			while(rs.next()) {
-				tables.add(rs.getString("table_name"));
+				tables.add(new Tabela(rs.getString("table_name")));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
         return tables;        
+    }
+    
+    public List<PointStop> getPointStops(String tableName, int limit){
+    	List<PointStop> stops = new ArrayList<>();
+    	String limitQuery = "";
+    	if(limit != 0) {
+    		limitQuery = " limit " + limit;
+    	}
+        try {
+        	Statement s = conn.createStatement();
+        	String sql = "select c.tid, c.latitude, c.longitude, c.time, c.edge_id, c.gid, c.gid_stop, s.stop_gid, s.start_time, s.end_time, s.rf "
+        			+ " from complete_" + tableName + " as c, " + tableName+ " as s where c.gid_stop = s.gid"
+        			+ limitQuery;
+        	ResultSet rs = s.executeQuery(sql);
+			while(rs.next()) {
+				stops.add(new PointStop(rs.getInt("tid"), rs.getDouble("latitude"), rs.getDouble("longitude"), rs.getTimestamp("time"), rs.getInt("edge_id"),
+						rs.getInt("gid"), rs.getInt("gid_stop"), rs.getInt("stop_gid"), rs.getTimestamp("start_time"), rs.getTimestamp("end_time"), rs.getString("rf")));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+        return stops;
     }
     
     public List<Stop> getStops(){

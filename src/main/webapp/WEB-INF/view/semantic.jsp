@@ -5,13 +5,12 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Weka-STPM - Enqieucimento Semântico</title>
+<title>Weka-STPM - Enriquecimento Semântico</title>
 <meta name="viewport" content="width=device-width">
 <link rel="stylesheet" href="css/bootstrap-litera.min.css">
 <link rel="stylesheet" href="css/estilosemantic.css">
 </head>
 <body>
-
 	<div class="container intro header">
 		<h1>
 			Enriquecimento Semântico</br> <small> Consiga enriquecer
@@ -21,10 +20,16 @@
 	<hr>
 
 	<div class="container">
+		<c:if test="${not empty msg}">
+			<div class="alert alert-success alert-dismissible">
+   				  <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+				  <strong><p>${msg}</p></strong> Enriquecimento Semântico Realizado com ${msg}!
+				</div>
+		</c:if>
 		<form action="semanticstart" method="post" id="formsemantic">
 			<div class="row">
 				<div class="col-6">
-					<h3>Configurações das Tabelas e do Banco</h3>
+					<center><h3>Configurações das Tabelas e do Banco</h3></center>
 					<div class="form-group">
 						<label class="col-form-label col-form-label-sm">Schema </label> <input
 							type="text" class="form-control" id="schema" name="schema"
@@ -79,7 +84,7 @@
 
 				<div class="col-6">
 
-					<h3>Configuração dos Algoritmos</h3>
+					<center><h3>Configuração dos Algoritmos</h3></center>
 					<div class="row">
 						<div class="col-6">
 							<div class="form-group">
@@ -141,9 +146,9 @@
 						<label class="col-form-label col-form-label-sm">Nome da
 							tabela a ser gerada</label> <input
 							type="text" class="form-control" id="tableName"
-							name="tableName" aria-describedby="tableHelpBlock" value="90" required>
+							name="tableName" aria-describedby="tableHelpBlock" required>
 						<small id="tableHelpBlock" class="form-text text-muted">
-		  					Digite o nome da tabela a ser gerada pela aplicação
+		  					Digite o nome desejado para a nova tabela, formato final: METODO_stops_NOME
 						</small>
 					</div>
 				</div>
@@ -157,7 +162,7 @@
 
 	</div>
 
-
+	<c:import url="imports/rodape.jsp" />
 	<script src="js/jquery.js"></script>
 	<script src="js/bootstrap.js"></script>
 </body>
