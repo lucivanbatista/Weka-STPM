@@ -6,9 +6,10 @@
 - Jar: Sem Interface gráfica + Sem partes visuais + config.properties atualizado e funcionando
 - Spring: Projeto Spring Boot + Interface gráfica (web) + Após o Jar (não funcionando com o CB)
 
-### Application
-- Update the file ```config.properties```
-- Execute the ```main``` in ```src/main/java/App.java```
+### Application (branch Spring)
+- Update the file ```config.properties```, it is necessary only the attributes of database connection
+- Execute ```/src/main/java/weka/WekaStpmSpringApplication.java```
+- In ```Enriquecimento Semântico``` choose the method and change the parameters if you want to. Put the configs to find the datas.
 
 ### Library
 - Add the repository in ```pom.xml```
