@@ -17,7 +17,12 @@ public class PointStop {
     
     public PointStop() {
     	
-    }    
+    }
+    
+    public PointStop(double latitude, double longitude) {
+		this.latitude = latitude;
+		this.longitude = longitude;
+    }   
     
 	public PointStop(int tid, double latitude, double longitude, Timestamp time, int edge_id, int gid, int gid_stop,
 			int stop_gid, Timestamp startTime, Timestamp endTime, String rf) {

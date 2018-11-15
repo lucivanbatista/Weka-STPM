@@ -5,7 +5,9 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Mapa</title>
+<link rel="stylesheet" href="css/bootstrap-litera.min.css">
+<link rel="stylesheet" href="css/estilosemantic.css">
+<title>Weka-STPM</title>
 <style>
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
@@ -14,24 +16,18 @@
       }
       /* Optional: Makes the sample page fill the window. */
       html, body {
-        height: 100%;
-        margin: 0;
+        height: 80%;
+        margin: 10px;
         padding: 0;
       }
     </style>
 </head>
 <body>
     <div id="map"></div>
+    
     <c:import url="imports/rodape.jsp" />
-    <script>
-      var map;
-      function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: -34.397, lng: 150.644},
-          zoom: 8
-        });
-      }
-    </script>
+    <script src="js/jquery.js"></script>
+    <script src="js/map.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBaQ4ELIUByX3CICs58xkieMYK5q3_wMuI&callback=initMap" async defer></script>
   </body>
 </html>

@@ -32,7 +32,13 @@
 				<option value="0">ALL</option>
 			</select> <input type="submit" class="btn btn-primary btn-md" value="Filtrar">
 		</form>
-	</div>
+		
+		<form method="post" action="/map" id="generate-map">
+		    <c:if test="${empty tabelas}">
+				<input type="submit" class="btn btn-primary btn-md" value="Gerar Mapa">
+			</c:if>
+		</form>
+	</div>		
 
 	<div class="container">
 		<div class="panel-body">
@@ -76,6 +82,7 @@
 
 	<c:import url="imports/rodape.jsp" />
 	<script src="js/jquery.js"></script>
+    <script src="js/map.js"></script>
 	<script src="js/bootstrap.js"></script>
 </body>
 </html>

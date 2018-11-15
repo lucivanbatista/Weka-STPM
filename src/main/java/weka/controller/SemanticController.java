@@ -1,15 +1,22 @@
 package weka.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import weka.gui.stpm.Config;
 import weka.gui.stpm.TrajectoryFrame;
+import weka.model.PointStop;
+import weka.model.Tabela;
 
 @Controller
 public class SemanticController {
@@ -35,8 +42,17 @@ public class SemanticController {
 	}
 	
 	@RequestMapping("/data")
-	public String dados(Model model) {
-		return "/data";
+	public ModelAndView dados(ModelAndView model) {
+		List<Tabela> t = new ArrayList<>();
+		t.add(new Tabela("testeABC"));
+		
+		List<PointStop> stops = new ArrayList<>();
+		stops.add(new PointStop(39.9220529553753,116.43993444234));
+		
+//		model.addAttribute("point", stops);
+		model.addObject("temp", t);
+		model.addObject("point", stops);
+		return model;
 	}
 	
 	@PostMapping("/getstops")
@@ -53,8 +69,8 @@ public class SemanticController {
 	}
 	
 	@RequestMapping("/map")
-	public String mapa() {
-		return "/map";
+	public ModelAndView mapa(ModelAndView model) {
+		return model;
 	}
 	
 	@RequestMapping("/sobre")
