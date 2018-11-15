@@ -120,7 +120,7 @@
 							<div class="form-group">
 								<label class="col-form-label col-form-label-sm">MaxAvgSpeed
 									</label> <input type="number" class="form-control"
-									id="maxAvgSpeed" name="maxAvgSpeed" value="0.9"
+									id="maxAvgSpeed" name="maxAvgSpeed" value="0.6"
 									placeholder="Digite o MaxAvgSpeed">
 							</div>
 						</div>
@@ -128,7 +128,7 @@
 							<div class="form-group">
 								<label class="col-form-label col-form-label-sm">MinTime
 									</label> <input type="number" class="form-control"
-									id="minTime" name="minTime" value="60"
+									id="minTime" name="minTime" value="40"
 									placeholder="Digite o MinTime">
 							</div>
 						</div>
@@ -136,7 +136,7 @@
 							<div class="form-group">
 								<label class="col-form-label col-form-label-sm">MaxSpeed
 									</label> <input type="number" class="form-control"
-									id="maxSpeed" name="maxSpeed" value="1.1"
+									id="maxSpeed" name="maxSpeed" value="1.5"
 									placeholder="Digite o maxSpeed">
 							</div>
 						</div>

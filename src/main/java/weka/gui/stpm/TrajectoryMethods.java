@@ -9,9 +9,6 @@
 package weka.gui.stpm;
 
 import java.util.*;
-
-import org.postgis.Point;
-
 import java.sql.*;
 /**
  *
@@ -546,7 +543,6 @@ public class TrajectoryMethods {
 	 */    
     public static void smot(boolean bufferChecked, int bufferValue, Config config,Trajectory traj, String targetFeature, AssociatedParameter[] relevantFeatures, boolean featureType) throws SQLException {
     	org.postgis.PGgeometry geom;
-        String campos = config.tid + "," + config.time;
         
         for (AssociatedParameter rf: relevantFeatures) {
             Runtime.getRuntime().gc();
@@ -653,7 +649,6 @@ public class TrajectoryMethods {
     	Statement s = config.conn.createStatement();
     	ResultSet rs2;
     	org.postgis.PGgeometry geom;
-        String campos = config.tid + "," + config.time;
         Vector stops = new Vector();
         ActiveStops activeStops = new ActiveStops();
         boolean first;
@@ -982,11 +977,11 @@ public class TrajectoryMethods {
         stopid=saveStopsAndMoves2(stops,config.conn,featureType,bufferValue,++stopid);        
     }
     
-    protected static void enriquecimentoSemanticoStopCon(Stop stop, Connection conn, int count){
+    protected static void enriquecimentoSemanticoStopCon(Stop stop, Connection conn, int stopId, int tid){
     	Statement s2;
     	String sql_enriquecimento="";
     	for(GPSPoint g : stop.pts){
-           	sql_enriquecimento = sql_enriquecimento + "INSERT INTO " + " con_" + TrajectoryFrame.getCurrentNameTableStop() + "(gid_point, gid_stop) VALUES " + " ( "+g.gid+" , "+count+");";
+           	sql_enriquecimento = sql_enriquecimento + "INSERT INTO " + " con_" + TrajectoryFrame.getCurrentNameTableStop() + "(gid_point, stopid, tid) VALUES " + " ( "+g.gid+" , "+stopId+", " + tid + ");";
         }
 		try {
 			s2 = conn.createStatement();
@@ -1001,7 +996,6 @@ public class TrajectoryMethods {
 	    boolean flag=false;
 	    int stopId=stopextern;
 	    String sql="";
-	    int count = 1; // contador do serial
 	    for (int i=0;i<list.size();i++) {
 	    	try{
 	    		s = conn.createStatement();
@@ -1010,11 +1004,10 @@ public class TrajectoryMethods {
 		        if (obj.getClass() == Stop.class) {
 		            Stop stop = (Stop) obj;
 		            String stopName = featureType ? stop.tableName : (stop.gid + "_" + stop.amenity);
-		            enriquecimentoSemanticoStopCon(stop, conn, count);
+		            enriquecimentoSemanticoStopCon(stop, conn, stopId, stop.tid);
 		            sql = "INSERT INTO "+TrajectoryFrame.getCurrentNameTableStop()+" (tid,stopid,start_time,end_time,stop_gid,stop_name,the_geom,rf,avg) VALUES "+
 		                "("+stop.tid+","+stopId+",'"+stop.enterTime.toString()+"','"+stop.leaveTime.toString()+"','"+stop.gid+"','"+stopName+"',"+stop.toSQL(buffer)+",'"+stop.amenity+"',"+stop.avgSpeed()+")";                
 		            stopId++;
-		            count++;
 		            flag=false;
 		        }else if (obj.getClass() == Unknown.class) {
 		            Unknown unk = (Unknown) obj;

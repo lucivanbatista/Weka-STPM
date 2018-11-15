@@ -205,8 +205,10 @@ public class TrajectoryFrame {
     	String sql_enriquecimento_stop="";
 		try {
 			s2 = conn.createStatement();
-			sql_enriquecimento_stop = "INSERT INTO complete_" + TrajectoryFrame.getCurrentNameTableStop() + " select m.*, c.gid_stop " + 
-								"from con_" + TrajectoryFrame.getCurrentNameTableStop() + " as c, " + userConfigurations.table + " as m where m.gid = c.gid_point";
+			sql_enriquecimento_stop = "INSERT INTO complete_" + TrajectoryFrame.getCurrentNameTableStop() + " select p.*, m.gid " 
+								+ " from con_" + TrajectoryFrame.getCurrentNameTableStop() + " as c, " + userConfigurations.table + " as p, " 
+								+ TrajectoryFrame.getCurrentNameTableStop() + " as m "
+								+ " where m.stopid = c.stopid AND m.tid = c.tid AND p.gid = c.gid_point";
 	           	s2.execute(sql_enriquecimento_stop);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -326,7 +328,8 @@ public class TrajectoryFrame {
             s.execute(
                     "CREATE TABLE IF NOT EXISTS " + "con_" + TrajectoryFrame.getCurrentNameTableStop() + " (" +
                             "    gid_point integer," +
-                            "    gid_stop integer" +
+                            "    stopid integer," +
+                            "    tid integer" +
                             ");"
             );
         }        
