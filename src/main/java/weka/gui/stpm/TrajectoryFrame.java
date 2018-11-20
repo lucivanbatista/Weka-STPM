@@ -4,6 +4,7 @@ import weka.gui.stpm.clean.TrajectoryClean;
 import weka.gui.stpm.clean.Util;
 import weka.model.PointStop;
 import weka.model.Tabela;
+import weka.repository.SemanticRepository;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,6 +12,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static weka.gui.stpm.Constants.*;
 import static weka.gui.stpm.Parameter.Type.DOUBLE;
@@ -29,7 +32,7 @@ public class TrajectoryFrame {
     private Config userConfigurations;
     private GraphicComponents graphicComponents;
     private static String tableName;
-
+    private static SemanticRepository semanticRepository;
 
     public TrajectoryFrame(String user, String pass, String url, String tableName, Config config) {
         this.userConfigurations = config;
@@ -68,12 +71,13 @@ public class TrajectoryFrame {
     
     public List<PointStop> getPointStops(String tableName, int limit){
     	List<PointStop> stops = new ArrayList<>();
-    	String limitQuery = "";
-    	if(limit != 0) {
-    		limitQuery = " limit " + limit;
-    	}
         try {
+        	String limitQuery = "";
+        	if(limit > 0) {
+        		limitQuery = " limit " + limit;
+        	}
         	Statement s = conn.createStatement();
+//        	String sql = semanticRepository.getStopsFiltro(tableName, value, limit, filtro);
         	String sql = "select c.tid, c.latitude, c.longitude, c.time, c.edge_id, c.gid, c.gid_stop, s.stop_gid, s.start_time, s.end_time, s.rf "
         			+ " from complete_" + tableName + " as c, " + tableName+ " as s where c.gid_stop = s.gid"
         			+ limitQuery;

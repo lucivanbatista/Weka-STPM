@@ -24,25 +24,28 @@
 				<c:forEach items="${tabelas}" var="tabela">
 					<option value="${tabela.nome}">${tabela.nome}</option>
 				</c:forEach>
-			</select> <select id="limit" name="limit">
+			</select>
+			<select id="limit" name="limit">
 				<option value="10">10</option>
 				<option value="20">20</option>
 				<option value="50">50</option>
 				<option value="100">100</option>
 				<option value="0">ALL</option>
-			</select> <input type="submit" class="btn btn-primary btn-md" value="Filtrar">
-		</form>
-		
-		<form method="post" action="/map" id="generate-map">
-		    <c:if test="${empty tabelas}">
-				<input type="submit" class="btn btn-primary btn-md" value="Gerar Mapa">
-			</c:if>
+			</select>
+<!-- 			<select id="tipoFiltro" name="tipoFiltro"> -->
+<!-- 				<option value="fSemFiltro">Sem Filtro</option> -->
+<!-- 				<option value="fObjeto">Por Objeto</option> -->
+<!-- 				<option value="fHora">Por Hora</option> -->
+<!-- 				<option value="fPOI">Por Tipo de Ponto de Interesse</option> -->
+<!-- 			</select> -->
+<!-- 			Digite o parâmetro do filtro: <input type="text" id="valueFiltro" name="valueFiltro"> -->
+			<input type="submit" class="btn btn-primary btn-md" value="Filtrar">
 		</form>
 	</div>		
 
 	<div class="container">
 		<div class="panel-body">
-			<h3>Pontos e seus Stops Identificados da tabela ${tableName}</h3>
+			<h3>Pontos e seus Stops Identificados da tabela: <span id="tableChoosed">${tableName}</span></h3>
 		</div>
 		<table class="table">
 			<thead>

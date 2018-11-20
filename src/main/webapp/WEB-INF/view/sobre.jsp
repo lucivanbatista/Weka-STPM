@@ -19,21 +19,14 @@
 		</h1>
 	</div>
 	<hr>
-	
-	<div class="container">
-		<div class="row">
-			<div class="col-6">
-				<center>
-					<button type="button"><a href="/semantic">Enriquecimento Semântico</a></button>
-				</center> 
-			</div>
-			
-			<div class="col-6">
-				<center>
-					<button type="button"><a href="/data">Visualização dos Dados</a></button>
-				</center> 
-			</div>
-		</div>
+
+	<div class="d-flex w-100 h-100 p-3 mx-auto flex-column">      
+		<main role="main" class="inner">
+			<h1>Sobre</h1>
+			<p class="lead">Esta aplicação é um dos resultados provenientes do Trabalho de Conclusão de Curso do aluno José Lucivan Batista Freires 
+			realizado na Universidade Federal do Ceará no Campus Quixadá durante o ano de 2018.</p>
+			<p class="lead">Ela executa algoritmos que detectam paradas e enriquece semanticamente trajetórias de objetos em movimento.</p>
+		</main>
 	</div>
 
 	<c:import url="imports/rodape.jsp" />
