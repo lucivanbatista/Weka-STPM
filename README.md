@@ -8,7 +8,7 @@
 
 ### Application (branch Spring)
 - Update the file ```config.properties```, it is necessary only the attributes of database connection
-- Execute ```/src/main/java/weka/WekaStpmSpringApplication.java```
+- Execute ```/src/main/java/weka/WekaStpmSpringApplication.java```. A log will be create with the name ```log_file.txt```.
 - In ```Enriquecimento Semântico``` choose the method and change the parameters if you want to. Put the configs to find the datas.
 - It will be created in the database, the tables ```complete_(method)_stops_(name_choosed)``` and ```(method)_stops_(name_choosed)```. The first one has all the points known as 'stops', the second one has all the stops areas, those points known as 'stops' are in these areas. You can use the attribute ```gid_stop``` in the fisrt one and ```gid``` in the second one to make a join.
 
