@@ -1,5 +1,7 @@
 package weka.gui.stpm;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,14 +16,16 @@ class GraphicComponents {
     private Method[] algorithms;
     private AssociatedParameter poi_associated = null;
     private ArrayList<AssociatedParameter> rf_poi = new ArrayList<>();
-
-    GraphicComponents(Connection conn, Config config, Method[] algorithms) {
+    BufferedWriter fr;
+    
+    GraphicComponents(Connection conn, Config config, Method[] algorithms, BufferedWriter fr) throws IOException {
         this.conn = conn;
         this.config = config;
         this.algorithms = algorithms;
+        this.fr = fr;
     }
 
-    void initGraphicComponents() {
+    void initGraphicComponents() throws IOException {
     	OKActionPerformed();
     }
 
@@ -41,13 +45,12 @@ class GraphicComponents {
         }
     }
 
-    private void OKActionPerformed() {
-    	System.out.println("Buffer of "+config.userBuff+" saved.");	
-
+    private void OKActionPerformed() throws IOException {
         String error = checkSRIDs(); //att the variable 'table_srid'
 
         if(error.compareTo("")!=0){
-        	System.out.println(error);
+        	fr.write(error);
+        	fr.newLine();
             return;
         }
 
@@ -65,15 +68,18 @@ class GraphicComponents {
         try {
 	        long time = createTrajectoryTablesSelected(config.table, config.tid, config.time, selectedValues, config.userBuff, method, enableBuffer,
 	                        config, config.ftype, maxSelectedIndex);
-	        System.out.println("Processing time: " + time + " ms");
-	        System.out.println("Operation finished successfully.");
+	        fr.write("Processing time: " + time + " ms");
+	        fr.newLine();
+	        fr.write("Operation finished successfully.");
+	        fr.newLine();
         } catch (Exception e) {
-        	System.out.println("Error during operation: \n" + e.getMessage());
+        	fr.write("Error during operation: \n" + e.getMessage());
+        	fr.newLine();
         }
         Runtime.getRuntime().gc();
     }
 
-    private String checkSRIDs() {
+    private String checkSRIDs() throws IOException {
         Statement sn;
         try {
             sn = conn.createStatement();
@@ -101,7 +107,8 @@ class GraphicComponents {
                 }
             }
         } catch (SQLException e) {
-        	System.out.println(e.getMessage());
+        	fr.write(e.getMessage());
+        	fr.newLine();
         }
         return "";
     }

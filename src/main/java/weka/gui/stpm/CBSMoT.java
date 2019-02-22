@@ -1,5 +1,7 @@
 package weka.gui.stpm;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.Vector;
 
 public class CBSMoT extends Method {
@@ -10,18 +12,22 @@ public class CBSMoT extends Method {
 	private boolean jRadioButtonFType;
 	private int table_srid;
     private int maxSelectionIndex;
+    BufferedWriter fr;
 
-    void setInformation(Double buffer, Config config, boolean jCheckBoxBuffer, boolean jRadioButtonFType, Integer table_srid, int maxSelectionIndex) {
+    void setInformation(Double buffer, Config config, boolean jCheckBoxBuffer, boolean jRadioButtonFType, Integer table_srid, int maxSelectionIndex, 
+    		BufferedWriter fr) {
 		this.buffer = buffer;
 		this.config = config;
 		this.jCheckBoxBuffer = jCheckBoxBuffer;
 		this.jRadioButtonFType = jRadioButtonFType;
 		this.table_srid = table_srid;
         this.maxSelectionIndex = maxSelectionIndex;
+        this.fr = fr;
 	}
 
 	@Override
     public void run(Trajectory t, InterceptsG in, String targetFeature) {
+		
 		//load the Parameter Vector of the method class
         Parameter avg = param.elementAt(0);
         Parameter minTime = param.elementAt(1);
@@ -31,7 +37,14 @@ public class CBSMoT extends Method {
 		int minTimeMili = ((Integer) minTime.value).intValue() * 1000;
 
 //		java.util.Date ini = new java.util.Date();
-		System.out.println("\t\tStarting Trajectory "+t.tid);
+		try {
+			fr.write("\t\tStarting Trajectory "+t.tid);
+			fr.newLine();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 //		System.out.println("\t\tStarting Trajectory "+t.tid+"\n\t\tavg= "+((Double) avg.value).doubleValue()+" ;\n\t\tminTime= "+minTimeMili+" ;\n\t\tSL= "+SL+" ; ");
 
 		// the clustering method, which will use the points in 't'	

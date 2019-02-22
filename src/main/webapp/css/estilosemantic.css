@@ -31,3 +31,7 @@ body {
 	margin-bottom: 10px; 
 }
 
+div .log {
+  overflow: scroll;
+}
+

@@ -4,22 +4,21 @@ import weka.gui.stpm.clean.TrajectoryClean;
 import weka.gui.stpm.clean.Util;
 import weka.model.PointStop;
 import weka.model.Tabela;
-import weka.repository.SemanticRepository;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import static weka.gui.stpm.Constants.*;
 import static weka.gui.stpm.Parameter.Type.DOUBLE;
 import static weka.gui.stpm.StringUtil.isEmpty;
 
-public class TrajectoryFrame {
+public class TrajectoryFrame{
     /**
      * Spatial reference for ALL trajectory_table
      */
@@ -32,24 +31,46 @@ public class TrajectoryFrame {
     private Config userConfigurations;
     private GraphicComponents graphicComponents;
     private static String tableName;
-    private static SemanticRepository semanticRepository;
+    static File file = new File("log_file.txt");
+    static FileWriter br;
+    static BufferedWriter fr;
 
-    public TrajectoryFrame(String user, String pass, String url, String tableName, Config config) {
+    public TrajectoryFrame(String user, String pass, String url, String tableName, Config config) throws IOException {
         this.userConfigurations = config;
         this.tableName = tableName;
+        
+        br = new FileWriter(file, true);
+        fr = new BufferedWriter(br);  
+        
         initAlgorithms();
 
         try {
             loadPropertiesFromFile(user, pass, url);
             
-            this.graphicComponents = new GraphicComponents(conn, userConfigurations, algorithms);
+            this.graphicComponents = new GraphicComponents(conn, userConfigurations, algorithms, fr);
             this.graphicComponents.LoadActionPerformed();
             this.graphicComponents.initGraphicComponents();
+            dropConTable();
             
         } catch (Exception e) {
-            System.out.println(e.toString());
-            System.out.println("Error in connection with DB.");
-        }      
+            fr.write(e.toString());
+            fr.newLine();
+            fr.write("Error in connection with DB.");
+            fr.newLine();
+        }
+        
+        fr.close();
+        br.close();
+    }
+    
+    public void dropConTable(){
+        try {
+        	Statement s = conn.createStatement();
+        	String sql = "drop table con_" + TrajectoryFrame.getCurrentNameTableStop() + ";";
+			s.executeUpdate(sql);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}        
     }
     
     public List<Tabela> getTables(){
@@ -110,7 +131,7 @@ public class TrajectoryFrame {
 
     // TID dos taxis and points
     private static void loadTrajectories(String trajectoryTable, String tid, String time, Object[] objects, Double buffer, Method method, boolean enableBuffer,
-                                         Config userConfigurations, boolean enableFType, int maxSelectedIndex) throws SQLException {
+                                         Config userConfigurations, boolean enableFType, int maxSelectedIndex) throws SQLException, IOException {
 
         InterceptsG i;
 
@@ -119,10 +140,13 @@ public class TrajectoryFrame {
         String sql = "SELECT " + tid + " as tid, count(*) FROM " + trajectoryTable + " GROUP BY " + tid + " ORDER BY tid DESC";
         ResultSet rs = s.executeQuery(sql);
 
-        System.out.println("Creating interceptions...");
+		fr.write("Creating interceptions...");
+		fr.newLine();
         i = createIntercepts(objects, buffer, trajectoryTable, enableBuffer);
-        System.out.println("Interceptions created ");
-
+        fr.write("Interceptions created ");
+        fr.newLine();
+        
+        
         File speedFile = null;
         if (TrajectoryClean.isPrintSpeedToFileXls()) {
             speedFile = Util.getFileSpeed(TrajectoryFrame.getCurrentNameTableStop());
@@ -140,13 +164,15 @@ public class TrajectoryFrame {
 
         // Change of methods is here
         if (!indexTimeExists){
-        	System.out.println("Creating Index on " + tid);
+        	fr.write("Creating Index on " + tid);
+        	fr.newLine();
             Statement s0b = conn.createStatement();
             String sql0b = "CREATE INDEX ON " + trajectoryTable + " USING hash (" + tid + ") WITH (FILLFACTOR=100);";
             s0b.execute(sql0b);
             s0b.close();
         } else {
-        	System.out.println("Tid index on " + trajectoryTable + " exists. Performance will be good.");
+        	fr.write("Tid index on " + trajectoryTable + " exists. Performance will be good.");
+        	fr.newLine();
         }
 
         //for each trajectory... (select que pega os tid dos taxistas e ordena de forma decrescente)
@@ -186,16 +212,17 @@ public class TrajectoryFrame {
                         Util.imprimeVelocidades(trajectory.points, speedFile, rs.isFirst());
                     }
                     // Run do CB
-                    CB_SMoT_RUN.setInformation(buffer, userConfigurations, enableBuffer, enableFType, table_srid, maxSelectedIndex);
+                    CB_SMoT_RUN.setInformation(buffer, userConfigurations, enableBuffer, enableFType, table_srid, maxSelectedIndex, fr);
                     CB_SMoT_RUN.run(trajectory, i, trajectoryTable);
                 } else {
-                	System.out.println("Trajectory " + trajectory.tid + " has less than 5 points.");
+                	fr.write("Trajectory " + trajectory.tid + " has less than 5 points.");
+                	fr.newLine();
                 }
 
             }
             // Run do IB
             else{
-                IB_SMoT_RUN.setInformation(buffer, userConfigurations, enableBuffer, enableFType);
+                IB_SMoT_RUN.setInformation(buffer, userConfigurations, enableBuffer, enableFType, fr);
                 IB_SMoT_RUN.run(trajectory, i, trajectoryTable);
             }
         }
@@ -219,7 +246,7 @@ public class TrajectoryFrame {
 		}
     }
 
-    public static List<Trajectory> getTrajectoriesWithSpeeds(String tableTraj, Config config, Integer table_srid) throws SQLException {
+    public static List<Trajectory> getTrajectoriesWithSpeeds(String tableTraj, Config config, Integer table_srid) throws SQLException, IOException {
         List<Trajectory> trajectorys = new ArrayList<Trajectory>();
         Statement s = config.conn.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_UPDATABLE);
         // selects the trajectory-tid to be processed
@@ -254,13 +281,14 @@ public class TrajectoryFrame {
                 timeIndex++;
 
             }
-//            System.out.println("calculando velocidade da trajetoria "+trajectory.tid);
+//            fr.write("calculando velocidade da trajetoria "+trajectory.tid);
             //calculates the speed of each point, and then runs the method
             if (trajectory.points.size()>5){
                 trajectory.calculatePointsSpeed();
             }
             trajectorys.add(trajectory);
-            System.out.println("add trajetoria " + trajectory.tid);
+            fr.write("add trajetoria " + trajectory.tid);
+            fr.newLine();
             System.gc();
         }
         return trajectorys;
@@ -268,7 +296,7 @@ public class TrajectoryFrame {
 
     public static long createTrajectoryTablesSelected(String tableName, String tid, String dateTime, Object[] objects, Double buffer,
                                                       Method method, boolean enableBuffer, Config userConfigurations, boolean enableFType,
-                                                      int maxSelectedIndex) throws SQLException {
+                                                      int maxSelectedIndex) throws SQLException, IOException {
 
         long initialTime = System.currentTimeMillis();
 
@@ -282,11 +310,13 @@ public class TrajectoryFrame {
         }
 
         //end of srid checking
-        System.out.println("Creating tables...");
+        fr.write("Creating tables...");
+        fr.newLine();
 
         createTables(method);
 
-        System.out.println("Processing the trajectories...");
+        fr.write("Processing the trajectories...");
+        fr.newLine();
 
         loadTrajectories(tableName, tid, dateTime, objects, buffer, method, enableBuffer, userConfigurations, enableFType, maxSelectedIndex);
 
@@ -295,7 +325,7 @@ public class TrajectoryFrame {
         return finalTime - initialTime;
     }
 
-    private static void createTables(Method method) throws SQLException {
+    private static void createTables(Method method) throws SQLException, IOException {
         Statement s = conn.createStatement();
         TrajectoryFrame.setCurrentNameTableStop(method);
         
@@ -339,7 +369,8 @@ public class TrajectoryFrame {
         }        
         
         // STOPS table
-        System.out.println("\t\tstops table...");
+        fr.write("\t\tstops table...");
+        fr.newLine();
         try {
             s.execute("DROP TABLE IF EXISTS "+TrajectoryFrame.getCurrentNameTableStop());
             s.execute("DELETE FROM geometry_columns WHERE f_table_name = '"+TrajectoryFrame.getCurrentNameTableStop()+"'");
@@ -366,7 +397,7 @@ public class TrajectoryFrame {
         }
 
         //MOVES table (NOT USED YET)
-//        System.out.println("\t\tmoves table...");
+//        fr.write("\t\tmoves table...");
 //        try {
 //            s.execute("DROP TABLE IF EXISTS moves");
 //            s.execute("DELETE FROM geometry_columns WHERE f_table_name = 'moves'");
@@ -393,7 +424,7 @@ public class TrajectoryFrame {
     }
 
     // Creating Interest Points
-    private static InterceptsG createIntercepts(Object[] objects, Double buffer, String tableName, Boolean enableBuffer) throws SQLException {
+    private static InterceptsG createIntercepts(Object[] objects, Double buffer, String tableName, Boolean enableBuffer) throws SQLException, IOException {
         //get the RFs from panel...
 
         AssociatedParameter[] relevantFeatures = new AssociatedParameter[objects.length];
@@ -410,7 +441,8 @@ public class TrajectoryFrame {
             // rf -> rf_name
 
             java.util.Date tempo2, fim2, ini2 = new java.util.Date();
-            System.out.println("\t\t...with " + a.name);
+            fr.write("\t\t...with " + a.name);
+            fr.newLine();
             
             String sql;
             if (a.type.contains("POINT") || a.type.contains("LINE")) {// if any kind of POINT or LINE
@@ -451,7 +483,8 @@ public class TrajectoryFrame {
             ResultSet Intercep = s.executeQuery(sql);
             fim2 = new java.util.Date();
             tempo2 = new java.util.Date(fim2.getTime()-ini2.getTime());
-            System.out.println("\t\t"+a.name+" time: " +tempo2.getTime()+" ms");
+            fr.write("\t\t"+a.name+" time: " +tempo2.getTime()+" ms");
+            fr.newLine();
             // then, save the registers from the query in an adequate struct
 
             while (Intercep.next()) {
@@ -466,43 +499,6 @@ public class TrajectoryFrame {
     public static String getCurrentNameTableStop() {
         return isEmpty(currentNameTableStop) ? "stops" : currentNameTableStop;
     }
-
-    // Using Congi.properties
-//    private void loadPropertiesFromFile(String userFromInput, String passFromInput, String urlFromInput) throws SQLException {
-//        Properties properties = new Properties();
-//        
-//
-//        try {
-//            properties.load(ClassLoader.getSystemResourceAsStream(CONFIG_PROPERTIES));
-//
-//            String user = (userFromInput != null) ? userFromInput : properties.getProperty(DB_USER);
-//            String pass = (userFromInput != null) ? passFromInput : properties.getProperty(DB_PASS);
-//            String url = (userFromInput != null) ? urlFromInput : properties.getProperty(DB_URL) + properties.getProperty(DB_NAME);
-//            
-//            if (user.equals(VOID)){
-//            	conn = DriverManager.getConnection(url);
-//            }else{
-//            	conn = DriverManager.getConnection(url, user, pass);
-//            }
-//
-//            ((org.postgresql.PGConnection) conn).addDataType(DB_TYPE_GEOMETRY, org.postgis.PGgeometry.class);
-//
-//            userConfigurations.conn = conn;
-//            userConfigurations.table = properties.getProperty(TRAJECTORY_TABLE);
-//            userConfigurations.tid = properties.getProperty(TRAJECTORY_ID);
-//            userConfigurations.time = properties.getProperty(DETECTION_TIME);
-//            userConfigurations.poi = properties.getProperty(POINTS_INTEREST);
-//            userConfigurations.schema = properties.getProperty(SCHEMA);
-//            userConfigurations.userBuff = Double.parseDouble(properties.getProperty(USERBUFF));
-//            userConfigurations.rfMinTime = Integer.parseInt(properties.getProperty(RFMINTIME));
-//            userConfigurations.method = properties.getProperty(METHOD);
-//            userConfigurations.maxAvgSpeed = Double.parseDouble(properties.getProperty(MAXAVGSPEED));
-//            userConfigurations.minTime = Integer.parseInt(properties.getProperty(MINTIME));
-//            userConfigurations.maxSpeed = Double.parseDouble(properties.getProperty(MAXSPEED));
-//        } catch (IOException ex) {
-//            ex.printStackTrace();
-//        }
-//    }
 
     private void loadPropertiesFromFile(String userFromInput, String passFromInput, String urlFromInput) throws SQLException {
     	Properties properties = new Properties();

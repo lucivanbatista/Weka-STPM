@@ -1,5 +1,6 @@
 package weka.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class SemanticController {
 	@PostMapping("/semanticstart")
 	public String semanticStart(Model model, RedirectAttributes redirectAttributes, String schema, String trajectoryTable, String trajectoryId, String detectionTime, String pointsInterest, 
 			Double userBuff, Integer rfMinTime, String methodName, Double maxAvgSpeed, Integer minTime, Double maxSpeed,
-			@RequestParam(value = "method") Integer method, String tableName){
+			@RequestParam(value = "method") Integer method, String tableName) throws IOException{
 		Config config = new Config(schema, trajectoryTable, trajectoryId, detectionTime, pointsInterest, userBuff, rfMinTime, 
 				(method == 1) ? "SMoT" : "CB-SMoT", maxAvgSpeed, minTime, maxSpeed);
 		model.addAttribute("config", config);

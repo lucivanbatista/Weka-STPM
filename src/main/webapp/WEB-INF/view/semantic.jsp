@@ -53,10 +53,8 @@
 								<label class="col-form-label col-form-label-sm">TrajectoryId</label> 
 								<input type="text" class="form-control"
 									id="trajectoryId" name="trajectoryId" value="tid"
-									placeholder="Digite o identificador do objeto" aria-describedby="trajectoryIDHelpBlock" required>
-								<small id="trajectoryIDHelpBlock" class="form-text text-muted">
-		  							Digite o identificador único para os objetos dos seus dados (Padrão é tid)
-								</small>
+									placeholder="Digite o identificador do objeto" aria-describedby="trajectoryIDHelpBlock" 
+									data-toggle="tooltip" title="Digite o identificador único para os objetos dos seus dados (Padrão é tid)" required>
 							</div>
 						</div>
 						<div class="col-6">
@@ -64,10 +62,8 @@
 								<label class="col-form-label col-form-label-sm">DetectionTime</label>
 								<input type="text" class="form-control"
 									id="detectionTime" name="detectionTime" value="time"
-									placeholder="Digite o identificador do timestamp" aria-describedby="timeHelpBlock" required>
-								<small id="timeHelpBlock" class="form-text text-muted">
-		  							Digite a coluna do tempo dos seus dados (Padrão é time)
-								</small>
+									placeholder="Digite o identificador do timestamp" aria-describedby="timeHelpBlock" 
+									data-toggle="tooltip" title="Digite a coluna do tempo dos seus dados (Padrão é time)" required>
 							</div>
 						</div>
 					</div>
@@ -90,20 +86,16 @@
 							<div class="form-group">
 								<label class="col-form-label col-form-label-sm">User
 									Buff (metros)</label> <input type="number" class="form-control"
-									id="userBuff" name="userBuff" aria-describedby="ubHelpBlock" value="150" required>
-								<small id="ubHelpBlock" class="form-text text-muted">
-		  							Digite o valor em metros que representa o raio dos pontos de interesse
-								</small>
+									id="userBuff" name="userBuff" aria-describedby="ubHelpBlock" value="150" 
+									data-toggle="tooltip" title="Digite o valor em metros que representa o raio dos pontos de interesse" required>
 							</div>
 						</div>
 						<div class="col-6">
 							<div class="form-group">
 								<label class="col-form-label col-form-label-sm">RF Min
 									Time (s)</label> <input type="number" class="form-control"
-									id="rfMinTime" name="rfMinTime" aria-describedby="rfHelpBlock" value="90" required>
-								<small id="rfHelpBlock" class="form-text text-muted">
-		  							Digite o valor em segundos que representa o tempo mínimo de permanência nos pontos de interesse
-								</small>
+									id="rfMinTime" name="rfMinTime" aria-describedby="rfHelpBlock" value="90"
+									data-toggle="tooltip" title="Digite o valor em segundos que representa o tempo mínimo de permanência nos pontos de interesse" required>
 							</div>
 						</div>
 					</div>
@@ -150,7 +142,7 @@
 						<small id="tableHelpBlock" class="form-text text-muted">
 		  					Digite o nome desejado para a nova tabela, formato final: METODO_stops_NOME
 						</small>
-					</div>
+					</div>					
 				</div>
 			</div>			
 			<center>
